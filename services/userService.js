@@ -7,24 +7,20 @@ exports.editProfile = async (body, session) => {
 
     const { fullName, email, phoneNumber } = body;
 
-    if (!session.user) {
-        return {
-            success: true,
-            message: "Please sign in again"
-        }
-    }
-
     const id = session.user.id;
 
-    if (fullName) {
+    const user = await User.findById(id);
+
+    if (fullName !== user.fullName) {
         await User.updateOne({ _id: id }, { fullName });
     }
 
-    if (phoneNumber) {
+    if (phoneNumber !== user.phoneNumber) {
         await User.updateOne({ _id: id }, { phoneNumber });
     }
 
-    if (email) {
+    if (email !== user.email) {
+        session.newEmail = email;
         return {
             success: true,
             isEmail: true
@@ -78,24 +74,7 @@ exports.verifyOtp1 = (body, session) => {
 }
 
 
-exports.verifyNewEmail = (body) => {
-
-    const { email } = body;
-
-    if (!email) {
-        return {
-            success: false,
-            message: "Please enter your new email address"
-        }
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return {
-            success: false,
-            message: "Please enter a valid email address"
-        }
-    }
+exports.verifyNewEmail = (body, session) => {
 
     function generateOTP() {
         return Math.floor(100000 + Math.random() * 900000).toString();
@@ -106,7 +85,7 @@ exports.verifyNewEmail = (body) => {
 
     return {
         success: true,
-        email,
+        email: session.newEmail,
         otp,
         otpExpiry: Date.now() + 3 * 60 * 1000
     }
@@ -131,9 +110,9 @@ exports.verifyOtp2 = async (body, session) => {
         }
     }
 
-    await User.updateOne({ _id: session.user.id }, { email: session.email });
+    await User.updateOne({ _id: session.user.id }, { email: session.newEmail });
 
-    delete session.email;
+    delete session.newEmail;
     delete session.otp;
     delete session.otpExpiry;
 

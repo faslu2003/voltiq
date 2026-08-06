@@ -2,25 +2,23 @@
 // ---- Data (passed in from the route as `locals`) ----
 // Use locals.xxx (not `typeof xxx !== 'undefined' ? xxx : ...`) to avoid
 // EJS's `with(locals)` temporal-dead-zone ReferenceError on self-reference.
-const user = locals.user || {
-  name: 'Arjun Malhotra',
-  tier: 'Premium Member',
-  avatar: 'https://i.pravatar.cc/80?img=68'
-};
-const personalInfo = locals.personalInfo || {
-  fullName: 'Arjun Malhotra',
-  email: 'arjun.m@voltiq.com',
-  phone: '+91 98765 43210',
-  country: 'India'
-};
 const error = locals.error || null;
+// Mask the current email for display, e.g. "arjun.m@voltiq.com" -> "a*****m@voltiq.com"
+function maskEmail(email) {
+  const parts = (email || '').split('@');
+  if (parts.length !== 2) return email;
+  const [local, domain] = parts;
+  if (local.length <= 2) return local[0] + '*'.repeat(Math.max(local.length - 1, 1)) + '@' + domain;
+  return local[0] + '*'.repeat(local.length - 2) + local[local.length - 1] + '@' + domain;
+}
+const maskedEmail = maskEmail(newEmail);
 %><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verify New Email · Voltiq</title>
-<link rel="stylesheet" href="/css/user/verify-new-email.css">
+<title>Verify Current Email · Voltiq</title>
+<link rel="stylesheet" href="/css/user/verify-current-email.css">
 </head>
 <body>
 
@@ -56,10 +54,9 @@ const error = locals.error || null;
   <div class="layout">
     <aside class="sidebar">
       <div class="profile-card">
-        <img class="profile-avatar" src="<%= user.avatar %>" alt="">
+        <img class="profile-avatar" src="<%= user.profileImgUrl %>" alt="">
         <div class="profile-text">
           <span class="profile-name"><%= user.name %></span>
-          <span class="profile-tier"><%= user.tier %></span>
         </div>
       </div>
       <nav class="account-nav">
@@ -69,7 +66,7 @@ const error = locals.error || null;
         </span>
         <span class="account-nav-item active">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Personal Info
+          Personal Information
         </span>
         <span class="account-nav-item">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
@@ -80,17 +77,15 @@ const error = locals.error || null;
 
     <main class="main">
       <section class="panel">
-        <div class="panel-head">
-          <h1 class="panel-title">Personal Information</h1>
-        </div>
+        <h1 class="panel-title">Personal Information</h1>
         <div class="info-grid">
           <div class="info-field">
             <span class="info-label">FULL NAME</span>
-            <span class="info-value"><%= personalInfo.fullName %></span>
+            <span class="info-row"><span class="info-value"><%= user.fullName %></span><span class="info-edit">Edit</span></span>
           </div>
           <div class="info-field">
             <span class="info-label">EMAIL ADDRESS</span>
-            <span class="info-value"><%= personalInfo.email %></span>
+            <span class="info-row"><span class="info-value"><%= user.email %></span><span class="info-edit">Edit</span></span>
           </div>
         </div>
       </section>
@@ -107,8 +102,8 @@ const error = locals.error || null;
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
       </div>
 
-      <h2 id="modalTitle" class="modal-title">Update Email Address</h2>
-      <p class="modal-sub">Verify your new email for continued secure access to your Voltiq account.</p>
+      <h2 id="modalTitle" class="modal-title">Verify Current Email</h2>
+      <p class="modal-sub">For your security, we need to verify your new email before you can change it.</p>
 
       <% if (error) { %>
         <div class="alert alert-error"><%= error %></div>
@@ -116,8 +111,11 @@ const error = locals.error || null;
 
       <form action="/email/verify-new" method="POST" class="modal-form">
         <div class="field">
-          <label for="newEmail">NEW EMAIL ADDRESS</label>
-          <input type="email" id="newEmail" name="email" placeholder="name@example.com">
+          <label for="currentEmail">NEW EMAIL ADDRESS</label>
+          <div class="readonly-input">
+            <svg class="icon lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input type="text" id="currentEmail" value="<%= maskedEmail %>" readonly tabindex="-1">
+          </div>
         </div>
 
         <button type="submit" class="btn-send-otp">
@@ -125,13 +123,13 @@ const error = locals.error || null;
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
 
-        <a href="/account/personal" class="btn-cancel-link">Cancel</a>
+        <a href="" class="btn-cancel-link">Cancel</a>
       </form>
     </div>
 
     <div class="modal-footer">
       <svg class="icon info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <p>We will send a one-time password to your new email to verify ownership before making any changes.</p>
+      <p>We will send a one-time password to your current email to confirm it's really you before allowing any changes.</p>
     </div>
 
   </div>

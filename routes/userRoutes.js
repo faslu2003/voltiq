@@ -7,6 +7,8 @@ const userController = require('../controllers/userController');
 const multer = require('multer');
 const upload = multer({ dest: "uploads/" });
 
+const authMiddleware = require('../middlewares/authMiddleware');
+
 
 
 router.get('/signup', userController.getSignup);
@@ -21,6 +23,11 @@ router.post('/signin', userController.postSignin);
 
 router.get('/signin/reset-password', userController.getResetPassword);
 router.post('/signin/reset-password', userController.postResetPassword);
+
+
+
+router.use(['/home', '/profile', '/email', '/address', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+
 
 
 router.get('/home', userController.getHome);

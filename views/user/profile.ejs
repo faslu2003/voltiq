@@ -1,29 +1,5 @@
 <%
 
-const user = locals.user || {
-
-  name: "Faslul Farisa",
-
-  tier: "Premium Member",
-
-  avatar: "https://i.pravatar.cc/80?img=68"
-
-};
-
-const personalInfo = locals.personalInfo || {
-
-  fullName: "Arjun Malhotra",
-
-  email: "arjun.m@voltiq.com",
-
-  phone: "+91 98765 43210",
-
-  avatar: "",
-
-  lastUpdated: "Last updated 2 months ago"
-
-};
-
 const security = locals.security || [
 
   {
@@ -134,14 +110,10 @@ const recentOrders = locals.recentOrders || [
       <!-- ============ SIDEBAR ============ -->
       <aside class="sidebar">
         <div class="profile-card">
-          <img class="profile-avatar" src="<%= user.avatar %>" alt="<%= user.name %>">
+          <img class="profile-avatar" src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="<%= user.fullName %>">
           <div class="profile-text">
             <span class="profile-name">
-              <%= user.name %>
-            </span>
-            <span class="profile-tier">
-              <%= user.tier %>
-            </span>
+              <%= user.fullName %>
           </div>
         </div>
 
@@ -213,7 +185,8 @@ const recentOrders = locals.recentOrders || [
             <h1 class="card-title">Personal Information</h1>
             <div class="card-head-right">
               <span class="updated-pill">
-                <%= personalInfo.lastUpdated %>
+                Last Updated:
+                <%= user.updatedAt %>
               </span>
               <a href="/profile/edit" class="edit-link">Edit</a>
             </div>
@@ -223,24 +196,24 @@ const recentOrders = locals.recentOrders || [
             <div class="info-field">
               <span class="info-label">FULL NAME</span>
               <span class="info-value">
-                <%= personalInfo.fullName %>
+                <%= user.fullName %>
               </span>
             </div>
             <div class="info-field">
               <span class="info-label">EMAIL ADDRESS</span>
               <span class="info-value">
-                <%= personalInfo.email %>
+                <%= user.email %>
               </span>
             </div>
             <div class="info-field">
               <span class="info-label">PHONE NUMBER</span>
               <span class="info-value">
-                <%= personalInfo.phone %>
+                <%= user.phoneNumber %>
               </span>
             </div>
             <div class="info-field">
               <span class="info-label">PROFILE PICTURE</span>
-              <img class="info-avatar" src="<%= personalInfo.avatar %>" alt="">
+              <img class="info-avatar" src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="">
             </div>
           </div>
         </section>

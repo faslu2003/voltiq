@@ -21,7 +21,7 @@ function maskEmail(email) {
   if (local.length <= 2) return local[0] + '*'.repeat(Math.max(local.length - 1, 1)) + '@' + domain;
   return local[0] + '*'.repeat(local.length - 2) + local[local.length - 1] + '@' + domain;
 }
-const maskedEmail = maskEmail(personalInfo.email);
+const maskedEmail = maskEmail(user.email);
 %><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,11 +92,11 @@ const maskedEmail = maskEmail(personalInfo.email);
         <div class="info-grid">
           <div class="info-field">
             <span class="info-label">FULL NAME</span>
-            <span class="info-row"><span class="info-value"><%= personalInfo.fullName %></span><span class="info-edit">Edit</span></span>
+            <span class="info-row"><span class="info-value"><%= user.fullName %></span><span class="info-edit">Edit</span></span>
           </div>
           <div class="info-field">
             <span class="info-label">EMAIL ADDRESS</span>
-            <span class="info-row"><span class="info-value"><%= personalInfo.email %></span><span class="info-edit">Edit</span></span>
+            <span class="info-row"><span class="info-value"><%= user.email %></span><span class="info-edit">Edit</span></span>
           </div>
         </div>
       </section>

@@ -5,7 +5,7 @@ const userService = require('../services/userService');
 
 
 
-// SIGN UP & SIGN IN
+// SIGN UP
 
 exports.getSignup = (req, res) => {
 
@@ -78,6 +78,9 @@ exports.postSignupVerification = async (req, res) => {
     }
 }
 
+
+
+// SIGN IN
 
 exports.getSignin = (req, res) => {
 
@@ -167,17 +170,24 @@ exports.getHome = (req, res) => {
 
 
 // PROFILE
-exports.getProfile = (req, res) => {
 
-    res.render('user/profile');
+exports.getProfile = async (req, res) => {
+
+    const user = await User.findById(req.session.user.id);
+
+    console.log(user);
+
+    res.render('user/profile', { user });
 }
 
-exports.getEditProfile = (req, res) => {
+exports.getEditProfile = async (req, res) => {
+
+    const user = await User.findById(req.session.user.id);
 
     const message = req.session.message || null;
     req.session.message = null;
 
-    res.render('user/edit-profile', { message });
+    res.render('user/edit-profile', { message, user });
 }
 
 exports.postEditProfile = async (req, res) => {
@@ -190,7 +200,7 @@ exports.postEditProfile = async (req, res) => {
 
     if (result.success) {
         req.session.message = result.message;
-        return res.redirect('/profile/edit');
+        return res.redirect('/profile');
     }
 }
 
@@ -198,12 +208,14 @@ exports.postEditProfile = async (req, res) => {
 
 // EMAIL 
 
-exports.getVerifyCurrentEmail = (req, res) => {
+exports.getVerifyCurrentEmail = async (req, res) => {
+
+    const user = await User.findById(req.session.user.id);
 
     const error = req.session.error || null;
     req.session.error = null
 
-    res.render('user/verify-current-email', { error });
+    res.render('user/verify-current-email', { user, error });
 }
 
 exports.postVerifyCurrentEmail = (req, res) => {
@@ -259,17 +271,20 @@ exports.postVerifyOtp1 = async (req, res) => {
 }
 
 
-exports.getVerifyNewEmail = (req, res) => {
+exports.getVerifyNewEmail = async (req, res) => {
+
+    const user = await User.findById(req.session.user.id);
+    const newEmail = req.session.newEmail;
 
     const error = req.session.error = null;
     req.session.error = null;
 
-    res.render('user/verify-new-email', { error });
+    res.render('user/verify-new-email', { error, user, newEmail });
 }
 
 exports.postVerifyNewEmail = async (req, res) => {
 
-    const result = await userService.verifyNewEmail(req.body);
+    const result = await userService.verifyNewEmail(req.body, req.session);
 
     if (!result.success) {
         req.session.error = result.message;
@@ -325,6 +340,7 @@ exports.postVerifyOtp2 = async (req, res) => {
         res.redirect('/email/verify-otp-1');
     }
 }
+
 
 
 // ADDRESS 

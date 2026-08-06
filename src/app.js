@@ -29,15 +29,11 @@ app.use(session({
 }));
 
 
-const userRoutes = require('../routes/userRoutes');
-app.use('/', userRoutes);
-
 const adminRoutes = require('../routes/adminRoutes');
 app.use('/admin', adminRoutes);
 
-
-
-
+const userRoutes = require('../routes/userRoutes');
+app.use('/', userRoutes);
 
 
 
