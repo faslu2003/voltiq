@@ -1,54 +1,9 @@
-<%
-
-const security = locals.security || [
-
-  {
-
-    icon: "lock",
-
-    title: "Change Password",
-
-    subtitle: "Recommended every 6 months to maintain high security",
-
-    badge: null
-
-  },
-
-  {
-
-    icon: "shield",
-
-    title: "Two-Factor Authentication",
-
-    subtitle: "Enabled via Authenticator App for extra protection",
-
-    badge: "Active"
-
-  }
-
-];
-
-const recentOrders = locals.recentOrders || [
-
-  {
-
-    id: "#VTQ-88291",
-
-    date: "Feb 14, 2024",
-
-    product: "Premium Headphones Pro",
-
-    price: "2,53,464",
-
-    status: "DELIVERED",
-
-    thumbnail: "https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=200&auto=format&fit=crop"
-
-  }
-
-];
-
-%>
+<% const security=locals.security || [ { icon: "lock" , title: "Change Password" ,
+  subtitle: "Recommended every 6 months to maintain high security" , badge: null }, { icon: "shield" ,
+  title: "Two-Factor Authentication" , subtitle: "Enabled via Authenticator App for extra protection" , badge: "Active"
+  } ]; const recentOrders=locals.recentOrders || [ { id: "#VTQ-88291" , date: "Feb 14, 2024" ,
+  product: "Premium Headphones Pro" , price: "2,53,464" , status: "DELIVERED" ,
+  thumbnail: "https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=200&auto=format&fit=crop" } ]; %>
   <!DOCTYPE html>
   <html lang="en">
 
@@ -110,7 +65,9 @@ const recentOrders = locals.recentOrders || [
       <!-- ============ SIDEBAR ============ -->
       <aside class="sidebar">
         <div class="profile-card">
-          <img class="profile-avatar" src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="<%= user.fullName %>">
+          <img class="profile-avatar"
+            src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>"
+            alt="<%= user.fullName %>">
           <div class="profile-text">
             <span class="profile-name">
               <%= user.fullName %>
@@ -213,55 +170,64 @@ const recentOrders = locals.recentOrders || [
             </div>
             <div class="info-field">
               <span class="info-label">PROFILE PICTURE</span>
-              <img class="info-avatar" src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="">
+              <img class="info-avatar"
+                src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>"
+                alt="">
             </div>
           </div>
         </section>
 
-        <!-- Security Settings -->
+        <!-- Security Settings Section -->
         <section class="card">
           <h2 class="card-title">Security Settings</h2>
 
           <div class="security-list">
-            <% security.forEach(function(item){ %>
-              <a href="#" class="security-row">
-                <span class="security-icon <%= item.icon === 'shield' ? 'green' : 'violet' %>">
-                  <% if (item.icon==='lock' ) { %>
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 12a9 9 0 1 1 2.6 6.4" />
-                      <polyline points="3 16 3 12 7 12" />
-                      <rect x="9.5" y="10.5" width="7" height="6" rx="1" />
-                      <path d="M11 10.5V9a2 2 0 0 1 4 0v1.5" />
-                    </svg>
-                    <% } else if (item.icon==='shield' ) { %>
-                      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5Z" />
-                        <path d="m9 12 2 2 4-4" />
-                      </svg>
-                      <% } %>
-                </span>
-                <span class="security-text">
-                  <span class="security-title">
-                    <%= item.title %>
-                  </span>
-                  <span class="security-sub">
-                    <%= item.subtitle %>
-                  </span>
-                </span>
-                <span class="security-right">
-                  <% if (item.badge) { %><span class="active-badge">
-                      <%= item.badge %>
-                    </span>
-                    <% } %>
-                      <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
-                </span>
-              </a>
-              <% }); %>
+
+            <!-- 1. Change Password Row -->
+            <a href="/change-password" class="security-row" onclick="openChangePasswordModal(); return false;">
+              <span class="security-icon violet">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 1 2.6 6.4" />
+                  <polyline points="3 16 3 12 7 12" />
+                  <rect x="9.5" y="10.5" width="7" height="6" rx="1" />
+                  <path d="M11 10.5V9a2 2 0 0 1 4 0v1.5" />
+                </svg>
+              </span>
+              <span class="security-text">
+                <span class="security-title">Change Password</span>
+                <span class="security-sub">Recommended every 6 months to maintain high security</span>
+              </span>
+              <span class="security-right">
+                <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </a>
+
+            <!-- 2. Two-Factor Authentication Row -->
+            <a href="#" class="security-row">
+              <span class="security-icon green">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5Z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </span>
+              <span class="security-text">
+                <span class="security-title">Two-Factor Authentication</span>
+                <span class="security-sub">Enabled via Authenticator App for extra protection</span>
+              </span>
+              <span class="security-right">
+                <span class="active-badge">Active</span>
+                <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </a>
+
           </div>
         </section>
 

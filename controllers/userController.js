@@ -342,6 +342,32 @@ exports.postVerifyOtp2 = async (req, res) => {
 }
 
 
+exports.getChangePassword = (req, res) => {
+
+    res.render('user/change-password');
+}
+
+exports.postChangePassword = async (req, res) => {
+
+    const result = await userService.changePassword(req.body, req.session);
+
+    if (!result.success) {
+        req.session.error = result.message;
+        res.redirect('/change-password');
+    }
+
+    try {
+        res.redirect('/profile');
+    }
+    catch(err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again"
+
+        res.redirect('/change-password');
+    }
+}
+
+
 
 // ADDRESS 
 

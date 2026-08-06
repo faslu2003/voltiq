@@ -61,12 +61,35 @@ exports.signin = async (body) => {
 }
 
 
-exports.getCustomers = async (page = 1) => {
+exports.getCustomers = async (page = 1, search) => {
+
+    let filter = {};
+
+    if (search) {
+        filter = {
+            $or: [
+                {
+                    fullName: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+                {
+                    email: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+            ]
+        }
+    }
+
+    filter.role = "user";
 
     const limit = 5;
     const skip = (page - 1) * limit;
 
-    const customers = await User.find({ role: "user" }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const customers = await User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const totalCustomers = await User.countDocuments({ role: "user" });
 

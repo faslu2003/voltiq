@@ -251,14 +251,31 @@
         <!-- ============ TABLE PANEL ============ -->
         <div class="table-panel">
           <div class="table-toolbar">
-            <div class="filter-search">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
+            <form class="customer-search" action="/admin/customers" method="GET">
+
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
                 <circle cx="11" cy="11" r="7" />
+
                 <path d="m21 21-4.3-4.3" />
+
               </svg>
-              <span>Filter by name, email, or ID...</span>
-            </div>
+
+              <input type="text" name="search" value="<%= search || '' %>" placeholder="Search customers...">
+
+              <button type="submit">Search</button>
+
+              <% if(search){ %>
+
+                <a href="/admin/customers" class="clear-search">
+
+                  ✕
+
+                </a>
+
+                <% } %>
+
+            </form>
             <div class="select-btn">
               <span>Status: All</span>
               <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -317,7 +334,9 @@
                 <tr>
                   <td>
                     <div class="cust-cell">
-                      <img class="avatar" src="<%= customer.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="<%= customer.fullName %>">
+                      <img class="avatar"
+                        src="<%= customer.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>"
+                        alt="<%= customer.fullName %>">
                       <div>
                         <div class="cust-name">
                           <%= customer.fullName %>
@@ -336,9 +355,10 @@
                     <%= customer.spend %>
                   </td>
                   <td>
-                    <form action="/admin/customers/<%= customer._id %>/status" method="POST">
+                    <form action="/admin/customers/<%= customer._id %>/status" method="POST"
+                      onsubmit="return confirmStatus('<%= customer.fullName %>', <%= customer.isBlocked %>)">
                       <select name="isBlocked" class="status-pill <%= customer.isBlocked ? 'blocked' : 'unblocked' %>"
-                        onchange="this.form.submit()">
+                        onchange="handleStatusChange(this, '<%= customer.fullName %>', <%= customer.isBlocked %>)">
                         <option value="false" <%=!customer.isBlocked ? 'selected' : '' %>>
                           Unblocked
                         </option>
@@ -372,6 +392,20 @@
 
       </main>
     </div>
+
+    <script>
+      function handleStatusChange(select, name, isBlocked) {
+        const ok = isBlocked
+          ? confirm(`Are you sure you want to unblock ${name}?`)
+          : confirm(`Are you sure you want to block ${name}?`);
+        if (ok) {
+          select.form.requestSubmit();
+        } else {
+          // Restore previous selection
+          select.value = isBlocked ? "true" : "false";
+        }
+      }
+    </script>
   </body>
 
   </html>

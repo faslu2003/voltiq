@@ -26,7 +26,7 @@ router.post('/signin/reset-password', userController.postResetPassword);
 
 
 
-router.use(['/home', '/profile', '/email', '/address', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+router.use(['/home', '/profile', '/email', '/change-password', '/address', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
 
 
@@ -49,6 +49,9 @@ router.get('/email/verify-otp-2', userController.getVerifyOtp2);
 
 router.post('/email/verify-otp-1', userController.postVerifyOtp1);
 router.post('/email/verify-otp-2', userController.postVerifyOtp2);
+
+router.get('/change-password', userController.getChangePassword);
+router.post('/change-password', userController.postChangePassword);
 
 
 router.get('/address', userController.getAddress);

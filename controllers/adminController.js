@@ -41,9 +41,11 @@ exports.postSignin = async (req, res) => {
 
 exports.getCustomers = async (req, res) => {
 
+    const search = req.query.search || "";
+
     const page = Number(req.query.page) || 1;
 
-    const result = await adminService.getCustomers(page);
+    const result = await adminService.getCustomers(page, search);
 
     const customers = result.customers;
     const totalCustomers = result.totalCustomers;
@@ -53,7 +55,7 @@ exports.getCustomers = async (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('admin/customers', { customers, totalCustomers, stats, pagination, error });
+    res.render('admin/customers', { customers, totalCustomers, stats, pagination, search, error });
 }
 
 exports.upddateCustomerStatus = async (req, res) => {

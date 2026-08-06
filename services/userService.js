@@ -1,6 +1,8 @@
 const User = require('../src/models/User');
 const Address = require('../src/models/Address');
 
+const bcrypt = require('bcrypt');
+
 
 
 exports.editProfile = async (body, session) => {
@@ -118,6 +120,47 @@ exports.verifyOtp2 = async (body, session) => {
 
     return {
         success: true
+    }
+}
+
+
+exports.changePassword = async (body, session) => {
+
+    const { currentPassword, newPassword } = body;
+
+    const user = await User.findById(session.user.id);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+        return {
+            success: false,
+            message: "Please enter the correct password"
+        }
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=])[A-Za-z\d@$!%*?&^#()_\-+=]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+        return {
+            success: false,
+            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+        }
+    }
+
+    if (newPassword === currentPassword) {
+        return {
+            success: false,
+            message: "New password cannot be the same as your current password"
+        }
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.updateOne({ _id: session.user.id }, { password: hashedPassword});
+
+    return {
+        success: true,
+        message: "Password changed successfully"
     }
 }
 
