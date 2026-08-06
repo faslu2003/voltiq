@@ -1,0 +1,437 @@
+/* =====================================================
+                    RESET
+===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --primary:#694CAC;
+    --primary-light:#F2ECFF;
+
+    --text:#171717;
+    --secondary-text:#666666;
+
+    --card:#FFFFFF;
+
+    --border:#E6E3ED;
+
+    --background:#F6F3F2;
+
+}
+
+
+/* =====================================================
+                    BODY
+===================================================== */
+
+body{
+
+    min-height:100vh;
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        sans-serif;
+
+}
+
+
+/* =====================================================
+                BACKDROP
+===================================================== */
+
+.overlay{
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:40px;
+
+    background:
+        radial-gradient(
+            circle at 90% 0%,
+            rgba(186,166,241,.22),
+            transparent 25%
+        ),
+        rgba(0,0,0,.45);
+
+    backdrop-filter:blur(10px);
+
+}
+
+
+/* =====================================================
+                CARD
+===================================================== */
+
+.verification-card{
+
+    width:450px;
+    max-width:100%;
+
+    background:var(--card);
+
+    border-radius:28px;
+
+    padding:40px 36px;
+
+    text-align:center;
+
+    box-shadow:
+        0 24px 60px rgba(0,0,0,.12);
+
+}
+
+
+/* =====================================================
+                    ICON
+===================================================== */
+
+.icon-wrapper{
+
+    width:82px;
+    height:82px;
+
+    margin:auto;
+    margin-bottom:28px;
+
+    border-radius:50%;
+
+    background:#F5F0FF;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+
+/* =====================================================
+                    HEADING
+===================================================== */
+
+.verification-card h1{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:var(--text);
+
+    margin-bottom:18px;
+
+}
+
+
+/* =====================================================
+                DESCRIPTION
+===================================================== */
+
+.description{
+
+    width:90%;
+
+    margin:auto;
+
+    color:var(--secondary-text);
+
+    line-height:1.6;
+
+    font-size:15px;
+
+    margin-bottom:42px;
+
+}
+
+
+.description span{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+}
+
+
+/* =====================================================
+                FORM
+===================================================== */
+
+form{
+
+    width:100%;
+
+}
+
+/* =====================================================
+                    OTP INPUTS
+===================================================== */
+
+.otp-container{
+
+    display:flex;
+    justify-content:center;
+    gap:14px;
+
+    margin-bottom:36px;
+
+}
+
+.otp-input{
+
+    width:50px;
+    height:56px;
+
+    border:1.5px solid var(--border);
+    border-radius:12px;
+
+    background:#FFFFFF;
+
+    text-align:center;
+
+    font-size:24px;
+    font-weight:600;
+    color:var(--text);
+
+    outline:none;
+
+    transition:
+        border-color .25s,
+        box-shadow .25s,
+        transform .2s;
+
+}
+
+.otp-input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:
+        0 0 0 4px rgba(105,76,172,.12);
+
+    transform:translateY(-2px);
+
+}
+
+.otp-input:hover{
+
+    border-color:#C8B8F3;
+
+}
+
+
+/* =====================================================
+                VERIFY BUTTON
+===================================================== */
+
+.verify-btn{
+
+    width:100%;
+    height:58px;
+
+    border:none;
+    border-radius:14px;
+
+    background:var(--primary);
+    color:#FFFFFF;
+
+    font-size:17px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:
+        background .25s,
+        transform .2s,
+        box-shadow .25s;
+
+}
+
+.verify-btn:hover{
+
+    background:#5B4198;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 12px 28px rgba(105,76,172,.25);
+
+}
+
+.verify-btn:active{
+
+    transform:translateY(0);
+
+}
+
+
+/* =====================================================
+                RESEND TEXT
+===================================================== */
+
+.timer{
+
+    margin-top:30px;
+
+    color:var(--secondary-text);
+
+    font-size:15px;
+
+}
+
+.timer a{
+
+    text-decoration:none;
+
+    color:var(--primary);
+
+    font-weight:600;
+
+    margin-left:4px;
+
+}
+
+.timer a:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* =====================================================
+                    DIVIDER
+===================================================== */
+
+.divider{
+
+    display:flex;
+    align-items:center;
+
+    margin:36px 0;
+
+}
+
+.divider span{
+
+    flex:1;
+
+    height:1px;
+
+    background:#E8E5EF;
+
+}
+
+.divider p{
+
+    margin:0 18px;
+
+    color:#8D8D8D;
+
+    font-size:14px;
+    font-weight:500;
+
+}
+
+
+/* =====================================================
+                BACK LINK
+===================================================== */
+
+.back-link{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    text-decoration:none;
+
+    color:var(--primary);
+
+    font-size:16px;
+    font-weight:600;
+
+    transition:
+        transform .2s,
+        color .2s;
+
+}
+
+.back-link:hover{
+
+    transform:translateX(-4px);
+
+    color:#563D94;
+
+}
+
+
+/* =====================================================
+                RESPONSIVE
+===================================================== */
+
+@media(max-width:640px){
+
+    .overlay{
+
+        padding:20px;
+
+    }
+
+    .verification-card{
+
+        padding:40px 24px;
+
+        border-radius:24px;
+
+    }
+
+    .verification-card h1{
+
+        font-size:30px;
+
+    }
+
+    .description{
+
+        width:100%;
+
+        font-size:15px;
+
+        margin-bottom:32px;
+
+    }
+
+    .otp-container{
+
+        gap:8px;
+
+        flex-wrap:wrap;
+
+    }
+
+    .otp-input{
+
+        width:48px;
+        height:56px;
+
+        font-size:20px;
+
+    }
+
+    .verify-btn{
+
+        height:54px;
+
+        font-size:16px;
+
+    }
+
+}

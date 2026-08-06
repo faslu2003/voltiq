@@ -1,0 +1,141 @@
+<%
+// ---- Data (passed in from the route as `locals`) ----
+// Use locals.xxx (not `typeof xxx !== 'undefined' ? xxx : ...`) to avoid
+// EJS's `with(locals)` temporal-dead-zone ReferenceError on self-reference.
+const user = locals.user || {
+  name: 'Arjun Malhotra',
+  tier: 'Premium Member',
+  avatar: 'https://i.pravatar.cc/80?img=68'
+};
+const personalInfo = locals.personalInfo || {
+  fullName: 'Arjun Malhotra',
+  email: 'arjun.m@voltiq.com',
+  phone: '+91 98765 43210',
+  country: 'India'
+};
+const error = locals.error || null;
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify New Email · Voltiq</title>
+<link rel="stylesheet" href="/css/user/verify-new-email.css">
+</head>
+<body>
+
+<!-- ============ BACKGROUND (blurred Personal Info page) ============ -->
+<div class="page-backdrop" aria-hidden="true">
+
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="/" class="brand">voltiq</a>
+      <nav class="main-links">
+        <a href="/">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/support">Support</a>
+      </nav>
+      <div class="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search premium electronics...</span>
+      </div>
+      <div class="topnav-icons">
+        <span class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
+        <span class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+        </span>
+        <span class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="profile-card">
+        <img class="profile-avatar" src="<%= user.avatar %>" alt="">
+        <div class="profile-text">
+          <span class="profile-name"><%= user.name %></span>
+          <span class="profile-tier"><%= user.tier %></span>
+        </div>
+      </div>
+      <nav class="account-nav">
+        <span class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Account Overview
+        </span>
+        <span class="account-nav-item active">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Personal Info
+        </span>
+        <span class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Order History
+        </span>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <section class="panel">
+        <div class="panel-head">
+          <h1 class="panel-title">Personal Information</h1>
+        </div>
+        <div class="info-grid">
+          <div class="info-field">
+            <span class="info-label">FULL NAME</span>
+            <span class="info-value"><%= personalInfo.fullName %></span>
+          </div>
+          <div class="info-field">
+            <span class="info-label">EMAIL ADDRESS</span>
+            <span class="info-value"><%= personalInfo.email %></span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+    <div class="modal-body">
+      <div class="modal-icon">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+      </div>
+
+      <h2 id="modalTitle" class="modal-title">Update Email Address</h2>
+      <p class="modal-sub">Verify your new email for continued secure access to your Voltiq account.</p>
+
+      <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form action="/email/verify-new" method="POST" class="modal-form">
+        <div class="field">
+          <label for="newEmail">NEW EMAIL ADDRESS</label>
+          <input type="email" id="newEmail" name="email" placeholder="name@example.com">
+        </div>
+
+        <button type="submit" class="btn-send-otp">
+          Send OTP
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+
+        <a href="/account/personal" class="btn-cancel-link">Cancel</a>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <svg class="icon info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <p>We will send a one-time password to your new email to verify ownership before making any changes.</p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/user/sign-up-in.css">
+    <title>Sign Up</title>
+</head>
+
+<body>
+
+    <header>
+
+        <h2 id="logo">voltiq</h2>
+
+    </header>
+
+    <div id="wrapper">
+
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+            <% } %>
+
+                <form action="/signup" method="post">
+
+                    <!-- add for & name values -->
+                    <div class="input-box">
+                        <label for="">Full Name</label>
+                        <input type="text" placeholder="Enter your full name" name="fullName">
+                    </div>
+
+                    <div class="input-box">
+                        <label for="">Email Address</label>
+                        <input type="email" placeholder="name@example.com" name="email">
+                    </div>
+
+                    <div class="input-box">
+                        <label for="">Phone Number</label>
+                        <input type="text" placeholder="Enter your 10 digit phone number" name="phoneNumber">
+                    </div>
+
+                    <div class="input-box">
+                        <label for="">Password</label>
+                        <input type="password" placeholder="Min. 8 characters" name="password">
+                    </div>
+
+                    <div class="input-box">
+                        <label for="">Confirm Password</label>
+                        <input type="password" placeholder="Repeat your password" name="confirmPassword">
+                    </div>
+
+                    <div>
+                        <button type="submit" id="signup-btn">Sign Up</button>
+                    </div>
+
+                    <div id="divider">
+                        <!-- add -> icon -->
+                        <span>OR SIGN UP WITH</span>
+                    </div>
+
+                    <!-- add Google icon -->
+                    <button type=" button" id="google-btn">Google</button>
+
+                    <div id="signin"">
+                <!-- add href -->
+                <p>Already have an account? <a href="">Sign In</a></p>
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

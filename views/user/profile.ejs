@@ -1,0 +1,363 @@
+<%
+
+const user = locals.user || {
+
+  name: "Faslul Farisa",
+
+  tier: "Premium Member",
+
+  avatar: "https://i.pravatar.cc/80?img=68"
+
+};
+
+const personalInfo = locals.personalInfo || {
+
+  fullName: "Arjun Malhotra",
+
+  email: "arjun.m@voltiq.com",
+
+  phone: "+91 98765 43210",
+
+  avatar: "",
+
+  lastUpdated: "Last updated 2 months ago"
+
+};
+
+const security = locals.security || [
+
+  {
+
+    icon: "lock",
+
+    title: "Change Password",
+
+    subtitle: "Recommended every 6 months to maintain high security",
+
+    badge: null
+
+  },
+
+  {
+
+    icon: "shield",
+
+    title: "Two-Factor Authentication",
+
+    subtitle: "Enabled via Authenticator App for extra protection",
+
+    badge: "Active"
+
+  }
+
+];
+
+const recentOrders = locals.recentOrders || [
+
+  {
+
+    id: "#VTQ-88291",
+
+    date: "Feb 14, 2024",
+
+    product: "Premium Headphones Pro",
+
+    price: "2,53,464",
+
+    status: "DELIVERED",
+
+    thumbnail: "https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=200&auto=format&fit=crop"
+
+  }
+
+];
+
+%>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Info · Voltiq</title>
+    <link rel="stylesheet" href="/css/user/profile.css">
+  </head>
+
+  <body>
+
+    <!-- ============ TOP NAV ============ -->
+    <header class="topnav">
+      <div class="topnav-inner">
+        <a href="/" class="brand">voltiq</a>
+        <nav class="main-links">
+          <a href="/">Home</a>
+          <a href="/shop">Shop</a>
+          <a href="/support">Support</a>
+        </nav>
+        <div class="search">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <span>Search premium electronics...</span>
+        </div>
+        <div class="topnav-icons">
+          <a href="/account" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a href="/wishlist" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
+          </a>
+          <a href="/cart" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="19" cy="21" r="1" />
+              <path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar">
+        <div class="profile-card">
+          <img class="profile-avatar" src="<%= user.avatar %>" alt="<%= user.name %>">
+          <div class="profile-text">
+            <span class="profile-name">
+              <%= user.name %>
+            </span>
+            <span class="profile-tier">
+              <%= user.tier %>
+            </span>
+          </div>
+        </div>
+
+        <form action="/logout" method="POST">
+          <button type="submit" class="logout-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </form>
+
+        <nav class="account-nav">
+          <a href="/account" class="account-nav-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Account Overview
+          </a>
+          <a href="/account/personal" class="account-nav-item active">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Personal Info
+          </a>
+          <a href="/account/orders" class="account-nav-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            Order History
+          </a>
+          <a href="/account/addresses" class="account-nav-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Saved Addresses
+          </a>
+          <a href="/account/wallet" class="account-nav-item">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="14" rx="2" />
+              <path d="M2 10h20" />
+              <path d="M17 15h.01" />
+            </svg>
+            Wallet
+          </a>
+        </nav>
+      </aside>
+
+      <!-- ============ MAIN ============ -->
+      <main class="main">
+
+        <!-- Personal Information -->
+        <section class="card card-personal">
+          <div class="card-head">
+            <h1 class="card-title">Personal Information</h1>
+            <div class="card-head-right">
+              <span class="updated-pill">
+                <%= personalInfo.lastUpdated %>
+              </span>
+              <a href="/profile/edit" class="edit-link">Edit</a>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-field">
+              <span class="info-label">FULL NAME</span>
+              <span class="info-value">
+                <%= personalInfo.fullName %>
+              </span>
+            </div>
+            <div class="info-field">
+              <span class="info-label">EMAIL ADDRESS</span>
+              <span class="info-value">
+                <%= personalInfo.email %>
+              </span>
+            </div>
+            <div class="info-field">
+              <span class="info-label">PHONE NUMBER</span>
+              <span class="info-value">
+                <%= personalInfo.phone %>
+              </span>
+            </div>
+            <div class="info-field">
+              <span class="info-label">PROFILE PICTURE</span>
+              <img class="info-avatar" src="<%= personalInfo.avatar %>" alt="">
+            </div>
+          </div>
+        </section>
+
+        <!-- Security Settings -->
+        <section class="card">
+          <h2 class="card-title">Security Settings</h2>
+
+          <div class="security-list">
+            <% security.forEach(function(item){ %>
+              <a href="#" class="security-row">
+                <span class="security-icon <%= item.icon === 'shield' ? 'green' : 'violet' %>">
+                  <% if (item.icon==='lock' ) { %>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 1 2.6 6.4" />
+                      <polyline points="3 16 3 12 7 12" />
+                      <rect x="9.5" y="10.5" width="7" height="6" rx="1" />
+                      <path d="M11 10.5V9a2 2 0 0 1 4 0v1.5" />
+                    </svg>
+                    <% } else if (item.icon==='shield' ) { %>
+                      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5Z" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                      <% } %>
+                </span>
+                <span class="security-text">
+                  <span class="security-title">
+                    <%= item.title %>
+                  </span>
+                  <span class="security-sub">
+                    <%= item.subtitle %>
+                  </span>
+                </span>
+                <span class="security-right">
+                  <% if (item.badge) { %><span class="active-badge">
+                      <%= item.badge %>
+                    </span>
+                    <% } %>
+                      <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                </span>
+              </a>
+              <% }); %>
+          </div>
+        </section>
+
+        <!-- Recent Orders -->
+        <section class="card">
+          <div class="card-head">
+            <h2 class="card-title">Recent Orders</h2>
+            <a href="/account/orders" class="view-all-link">
+              View All Orders
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          <div class="orders-list">
+            <% recentOrders.forEach(function(order){ %>
+              <div class="order-row">
+                <img class="order-thumb" src="<%= order.thumbnail %>" alt="<%= order.product %>">
+                <div class="order-info">
+                  <span class="order-id">
+                    <%= order.id %>
+                  </span>
+                  <span class="order-meta">
+                    <%= order.date %> • <%= order.product %>
+                  </span>
+                </div>
+                <div class="order-price-block">
+                  <span class="order-price">₹<%= order.price %></span>
+                  <span class="order-status"><span class="status-dot"></span>
+                    <%= order.status %>
+                  </span>
+                </div>
+                <a href="/account/orders/<%= order.id.replace('#','') %>/invoice" class="invoice-btn"
+                  aria-label="View invoice">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="8" y1="13" x2="16" y2="13" />
+                    <line x1="8" y1="17" x2="13" y2="17" />
+                  </svg>
+                </a>
+              </div>
+              <% }); %>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">voltiq</div>
+          <p class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision.</p>
+        </div>
+        <div class="footer-links">
+          <a href="/privacy">PRIVACY</a>
+          <a href="/terms">TERMS</a>
+          <a href="/sustainability">SUSTAINABILITY</a>
+          <a href="/careers">CAREERS</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+
+  </html>

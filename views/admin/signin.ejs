@@ -1,0 +1,123 @@
+<%
+// ---- Data (passed in from the route as `locals`) ----
+// Use locals.xxx (not `typeof xxx !== 'undefined' ? xxx : ...`) to avoid
+// EJS's `with(locals)` temporal-dead-zone ReferenceError on self-reference.
+const error = locals.error || null;
+const oldEmail = locals.email || '';
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Sign In · Voltiq Admin</title>
+<link rel="stylesheet" href="/css/admin/signin.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="auth-wrap">
+
+    <div class="logo-block">
+      <div class="logo-badge">
+        <svg class="bolt" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+      </div>
+      <span class="logo-name">voltiq</span>
+    </div>
+
+    <div class="auth-card">
+      <h1 class="auth-title">Admin Portal Authentication</h1>
+      <p class="auth-sub">INTERNAL ACCESS ONLY</p>
+
+      <% if (error) { %>
+        <div class="form-error"><%= error %></div>
+      <% } %>
+
+      <form action="/admin/signin" method="POST" class="auth-form">
+
+        <div class="field">
+          <label for="adminId">Email Address</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input
+              type="text"
+              id=""
+              name="email"
+              placeholder="Enter your email"
+              value="<%= oldEmail %>"
+              autocomplete="username"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-visibility" aria-label="Show password" data-target="password">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- <label class="checkbox-row">
+          <input type="checkbox" name="trustDevice">
+          <span class="checkbox-box">
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="checkbox-label">Trust this device</span>
+        </label> -->
+
+        <button type="submit" class="btn-submit">
+          Secure Sign In
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+
+      </form>
+    </div>
+
+    <a href="/admin/help" class="trouble-link">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 5"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Trouble accessing your account?
+    </a>
+
+  </div>
+
+  <footer class="page-footer">
+    <div class="footer-links">
+      <a href="/support">Support</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/sustainability">Sustainability</a>
+    </div>
+    <div class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision.</div>
+  </footer>
+
+</div>
+
+<script>
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-visibility').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      btn.classList.toggle('active', isPassword);
+    });
+  });
+</script>
+
+</body>
+</html>

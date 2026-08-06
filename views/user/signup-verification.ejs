@@ -1,0 +1,153 @@
+<%
+// ---- Data (passed in from the route as `locals`) ----
+// Use locals.xxx (not `typeof xxx !== 'undefined' ? xxx : ...`) to avoid
+// EJS's `with(locals)` temporal-dead-zone ReferenceError on self-reference.
+const codeLength = locals.codeLength || 6;
+const resendSeconds = locals.resendSeconds || 58;
+const error = locals.error || null;
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Account · Voltiq</title>
+<link rel="stylesheet" href="/css/user/signup-verification.css">
+</head>
+<body>
+
+<!-- ============ TOP NAV ============ -->
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="/" class="brand">voltiq</a>
+    <a href="/shop" class="shop-link">Shop All</a>
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="page">
+
+  <div class="card">
+    <div class="card-icon">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M10 12.5a2 2 0 1 1 2.5 1.94V15"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+
+    <h1 class="card-title">Verify Account</h1>
+    <p class="card-sub">We've sent a <%= codeLength %>-digit code to your phone. Please enter it below to verify your account.</p>
+
+    <% if (error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form action="/signup/verification" method="POST" class="otp-form" id="otpForm">
+      <div class="otp-row">
+        <% for (let i = 0; i < codeLength; i++) { %>
+          <input
+            type="text"
+            inputmode="numeric"
+            maxlength="1"
+            class="otp-box"
+            name="code<%= i %>"
+            autocomplete="<%= i === 0 ? 'one-time-code' : 'off' %>"
+            <%= i === 0 ? 'autofocus' : '' %>
+          >
+        <% } %>
+      </div>
+
+      <button type="submit" class="btn-verify">Verify Code</button>
+    </form>
+
+    <p class="resend-line">
+      Didn't receive the code?
+      <button type="button" class="resend-btn" id="resendBtn" disabled>Resend Code</button>
+    </p>
+    <p class="resend-hint" id="resendHint">Request new code in <span id="resendTimer"><%= resendSeconds %></span>s</p>
+  </div>
+
+  <div class="divider">
+    <span class="divider-line"></span>
+    <span class="divider-label">Secure Verification</span>
+    <span class="divider-line"></span>
+  </div>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">voltiq</span>
+
+    <nav class="footer-links">
+      <a href="/support">Support</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/contact">Contact Us</a>
+    </nav>
+
+    <span class="footer-copy">© <%= new Date().getFullYear() %> voltiq Electronics. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+  // ---- Auto-advance between OTP boxes ----
+  const boxes = Array.from(document.querySelectorAll('.otp-box'));
+  boxes.forEach(function (box, index) {
+    box.addEventListener('input', function () {
+      box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      if (box.value && index < boxes.length - 1) {
+        boxes[index + 1].focus();
+      }
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !box.value && index > 0) {
+        boxes[index - 1].focus();
+      }
+    });
+    box.addEventListener('paste', function (e) {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/[^0-9]/g, '').split('');
+      digits.forEach(function (d, i) {
+        if (boxes[index + i]) boxes[index + i].value = d;
+      });
+      const next = boxes[Math.min(index + digits.length, boxes.length - 1)];
+      if (next) next.focus();
+    });
+  });
+
+  // ---- Resend countdown ----
+  const resendBtn = document.getElementById('resendBtn');
+  const resendHint = document.getElementById('resendHint');
+  const resendTimer = document.getElementById('resendTimer');
+  let secondsLeft = <%= resendSeconds %>;
+
+  const countdown = setInterval(function () {
+    secondsLeft -= 1;
+    if (secondsLeft <= 0) {
+      clearInterval(countdown);
+      resendBtn.disabled = false;
+      resendHint.style.display = 'none';
+    } else {
+      resendTimer.textContent = secondsLeft;
+    }
+  }, 1000);
+
+  resendBtn.addEventListener('click', function () {
+    if (resendBtn.disabled) return;
+    fetch('/resend-otp', { method: 'POST' }).catch(function () {});
+    resendBtn.disabled = true;
+    resendHint.style.display = 'block';
+    secondsLeft = <%= resendSeconds %>;
+    resendTimer.textContent = secondsLeft;
+    setInterval(function () {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0) {
+        resendBtn.disabled = false;
+        resendHint.style.display = 'none';
+      } else {
+        resendTimer.textContent = secondsLeft;
+      }
+    }, 1000);
+  });
+</script>
+
+</body>
+</html>

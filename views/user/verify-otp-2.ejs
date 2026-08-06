@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email</title>
+
+    <link rel="stylesheet" href="/css/user/verify-otp.css">
+</head>
+
+<body>
+
+    <!-- Dark Blurred Background -->
+    <div class="overlay">
+
+        <!-- Verification Card -->
+        <div class="verification-card">
+
+            <!-- Email Icon -->
+            <div class="icon-wrapper">
+
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                    <path d="M4 6H20V18H4V6Z" stroke="#694CAC" stroke-width="1.7" stroke-linejoin="round" />
+
+                    <path d="M4 7L12 13L20 7" stroke="#694CAC" stroke-width="1.7" stroke-linecap="round"
+                        stroke-linejoin="round" />
+
+                </svg>
+
+            </div>
+
+            <!-- Heading -->
+            <h1>Verify Your Email</h1>
+
+            <!-- Description -->
+            <p class="description">
+                Enter the 6-digit code sent to your new
+                email address to complete the update.
+            </p>
+
+            <!-- OTP Form -->
+            <form action="/email/verify-otp-2" method="POST">
+
+                <div class="otp-container">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp1">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp2">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp3">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp4">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp5">
+
+                    <input type="text" maxlength="1" class="otp-input" name="otp6">
+
+                </div>
+
+                <button type="submit" class="verify-btn">
+                    Verify &amp; Update
+                </button>
+
+            </form>
+
+            <!-- Timer -->
+            <p class="timer">
+
+                Didn't receive the code?
+
+                <a href="#">
+                    Resend in 00:52
+                </a>
+
+            </p>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span></span>
+                <p>OR</p>
+                <span></span>
+            </div>
+
+            <!-- Back Link -->
+            <a href="/profile" class="back-link">
+
+                ← Back to Profile Settings
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

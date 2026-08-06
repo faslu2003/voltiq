@@ -1,0 +1,211 @@
+<%
+// ---- Data (passed in from the route as `locals`) ----
+// Use locals.xxx (not `typeof xxx !== 'undefined' ? xxx : ...`) to avoid
+// EJS's `with(locals)` temporal-dead-zone ReferenceError on self-reference.
+const user = locals.user || {
+  name: 'Faslul Farisa',
+  tier: 'Premium Member',
+  avatar: 'https://i.pravatar.cc/80?img=68'
+};
+const addresses = locals.addresses || [
+  {
+    label: 'Home',
+    icon: 'home',
+    isDefault: true,
+    name: 'arjun malhotra',
+    lines: ['penthouse 42, skyview towers, bandra west,', 'mumbai, maharashtra 400050', 'india'],
+    phone: '+91 98765 43210'
+  },
+  {
+    label: 'Studio',
+    icon: 'palette',
+    isDefault: false,
+    name: 'arjun malhotra',
+    lines: ['studio 3-b, industrial gala complex,', 'lower parel, mumbai, maharashtra 400013', 'india'],
+    phone: '+91 98765 00123'
+  },
+  {
+    label: 'Office',
+    icon: 'building',
+    isDefault: false,
+    name: 'arjun malhotra',
+    lines: ['volt tech corp, hiranandani knowledge park,', 'powai, mumbai, maharashtra 400076', 'india'],
+    phone: '+91 98200 98200'
+  }
+];
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Addresses · Voltiq</title>
+<link rel="stylesheet" href="/css/user/address.css">
+</head>
+<body>
+
+<!-- ============ TOP NAV ============ -->
+<header class="topnav">
+  <div class="topnav-inner">
+    <a href="/" class="brand">voltiq</a>
+    <nav class="main-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/support">Support</a>
+    </nav>
+    <div class="search">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>Search premium electronics...</span>
+    </div>
+    <div class="topnav-icons">
+      <a href="/account" class="icon-btn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <a href="/wishlist" class="icon-btn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+      </a>
+      <a href="/cart" class="icon-btn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="profile-card">
+      <img class="profile-avatar" src="<%= user.avatar %>" alt="<%= user.name %>">
+      <div class="profile-text">
+        <span class="profile-name"><%= user.name %></span>
+        <span class="profile-tier"><%= user.tier %></span>
+      </div>
+    </div>
+
+    <form action="/logout" method="POST">
+      <button type="submit" class="logout-btn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </form>
+
+    <nav class="account-nav">
+      <a href="/account" class="account-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Account Overview
+      </a>
+      <a href="/account/personal" class="account-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Personal Info
+      </a>
+      <a href="/account/orders" class="account-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Order History
+      </a>
+      <a href="/account/addresses" class="account-nav-item active">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Saved Addresses
+      </a>
+      <a href="/account/wallet" class="account-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M17 15h.01"/></svg>
+        Wallet
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <h1 class="page-title">Saved Addresses</h1>
+    <p class="page-sub">manage your shipping destinations for a faster checkout.</p>
+
+    <div class="addr-grid">
+
+      <!-- Add new address card -->
+      <a href="/address/add" class="addr-card add-card">
+        <span class="add-icon">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </span>
+        <span class="add-label">Add New Address</span>
+      </a>
+
+      <!-- Saved address cards -->
+      <% addresses.forEach(function(addr, i){ %>
+        <div class="addr-card">
+          <div class="addr-head">
+            <div class="addr-head-left">
+              <% if (addr.icon === 'home') { %>
+                <svg class="icon addr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+              <% } else if (addr.icon === 'palette') { %>
+                <svg class="icon addr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-4-4 2 2 0 0 1 2-2 2 2 0 0 0 2-2 10 10 0 0 0-10-2Z"/></svg>
+              <% } else if (addr.icon === 'building') { %>
+                <svg class="icon addr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+              <% } %>
+              <h2 class="addr-label"><%= addr.label %></h2>
+              <% if (addr.isDefault) { %><span class="default-badge">DEFAULT</span><% } %>
+            </div>
+            <div class="addr-actions">
+              <form action="/address/edit" method="get">
+                <button class="icon-action edit" aria-label="Edit address">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+              </form>
+              <form action="">
+                <button class="icon-action delete" aria-label="Delete address">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="addr-body">
+            <p class="addr-name"><%= addr.name %></p>
+            <p class="addr-lines">
+              <% addr.lines.forEach(function(line){ %><%= line %><br><% }); %>
+            </p>
+            <p class="addr-phone">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.9 2.2Z"/></svg>
+              <%= addr.phone %>
+            </p>
+          </div>
+
+          <% if (!addr.isDefault) { %>
+            <form action="/account/addresses/<%= i %>/default" method="POST">
+              <button type="submit" class="btn-set-default">Set as Default</button>
+            </form>
+          <% } %>
+        </div>
+      <% }); %>
+
+    </div>
+
+    <!-- Promo banner -->
+    <div class="promo-banner">
+      <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1600&auto=format&fit=crop" alt="City skyline at dusk">
+      <div class="promo-overlay">
+        <h3>Fast Deliveries</h3>
+        <p>your saved addresses ensure precision in every delivery.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">voltiq</div>
+      <p class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision in electronics.</p>
+    </div>
+    <div class="footer-links">
+      <a href="/privacy">privacy</a>
+      <a href="/terms">terms</a>
+      <a href="/shipping">shipping</a>
+      <a href="/returns">returns</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

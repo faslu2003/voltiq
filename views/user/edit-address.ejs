@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Edit Address | voltiq' %></title>
+  <link rel="stylesheet" href="/css/user/edit-address.css">
+</head>
+<body>
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="header-left">
+      <a href="/" class="brand-logo">voltiq</a>
+      <nav class="main-nav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/shop" class="nav-link">Shop</a>
+        <a href="/support" class="nav-link">Support</a>
+      </nav>
+    </div>
+    <div class="header-search">
+      <input type="text" class="search-input" placeholder="Search premium electronics..." aria-label="Search premium electronics">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="User Account">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Wishlist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Shopping Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
+    <div class="profile-container">
+      
+      <!-- SIDEBAR -->
+      <aside class="profile-sidebar">
+        <div class="user-profile-summary">
+          <div class="avatar-wrapper">
+            <img src="/images/female_avatar.jpg" alt="User Avatar" class="sidebar-avatar">
+          </div>
+          <div class="user-details">
+            <h3 class="user-name"><%= typeof user !== 'undefined' && user.name ? user.name : 'Faslul Farisa' %></h3>
+            <p class="user-role"><%= typeof user !== 'undefined' && user.tier ? user.tier : 'PREMIUM MEMBER' %></p>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/account" class="sidebar-nav-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Account Overview
+          </a>
+          <a href="/profile/edit" class="sidebar-nav-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Personal Info
+          </a>
+          <a href="/orders" class="sidebar-nav-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Order History
+          </a>
+          <a href="/account/addresses" class="sidebar-nav-item active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Saved Addresses
+          </a>
+          <a href="/wallet" class="sidebar-nav-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            Wallet
+          </a>
+        </nav>
+        <button class="logout-btn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
+        </button>
+      </aside>
+
+      <!-- BACKGROUND CONTENT (SAVED ADDRESSES PAGE) -->
+      <section class="content-area">
+        <div class="saved-address-card">
+          <div>
+            <span class="address-tag">Default</span>
+            <div class="address-details">
+              <strong>Arjun Malhotra</strong><br>
+              Penthouse 42, Skyview towers, bandra west,<br>
+              Mumbai, Maharashtra 400050
+            </div>
+          </div>
+          <button style="background:none; border:none; cursor:pointer;" onclick="openAddressModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= EDIT ADDRESS MODAL DIALOG ================= -->
+  <div class="modal-backdrop" id="editAddressModal">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      
+      <!-- CLOSE BUTTON -->
+      <button class="modal-close-btn" aria-label="Close modal" onclick="closeAddressModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- MODAL HEADER -->
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Edit Address</h2>
+        <p class="modal-subtitle">Update the details below for this shipping destination.</p>
+      </div>
+
+      <!-- MODAL FORM PRE-FILLED WITH ADDRESS DATA -->
+      <form action="/address/edit/<%= typeof address !== 'undefined' && address._id ? address._id : '' %>" method="POST" class="modal-form">
+        
+        <!-- ROW 1: FULL NAME & MOBILE NUMBER -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" name="fullName" class="form-input" value="<%= typeof address !== 'undefined' && address.fullName ? address.fullName : 'Arjun Malhotra' %>" placeholder="e.g. Arjun Malhotra" required>
+          </div>
+          <div class="form-group">
+            <label for="mobileNumber" class="form-label">Mobile Number</label>
+            <input type="tel" id="mobileNumber" name="phoneNumber" class="form-input" value="<%= typeof address !== 'undefined' && (address.phoneNumber || address.mobileNumber) ? (address.phoneNumber || address.mobileNumber) : '+91 98765 43210' %>" placeholder="+91 98765 43210" required>
+          </div>
+        </div>
+
+        <!-- ROW 2: PINCODE & FLAT / HOUSE NAME / BUILDING -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="pincode" class="form-label">Pincode</label>
+            <input type="text" id="pincode" name="pincode" class="form-input" value="<%= typeof address !== 'undefined' && address.pincode ? address.pincode : '400050' %>" placeholder="6 Digits" required>
+          </div>
+          <div class="form-group">
+            <label for="flatHouse" class="form-label">Flat / House Name / Building</label>
+            <input type="text" id="flatHouse" name="houseName" class="form-input" value="<%= typeof address !== 'undefined' && (address.houseName || address.flatHouse) ? (address.houseName || address.flatHouse) : 'Penthouse 42, Skyview Towers' %>" placeholder="e.g. Penthouse 42, Skyview Towers" required>
+          </div>
+        </div>
+
+        <!-- ROW 3: AREA / STREET / SECTOR / VILLAGE -->
+        <div class="form-group">
+          <label for="areaStreet" class="form-label">Area / Street / Sector / Village</label>
+          <input type="text" id="areaStreet" name="locality" class="form-input" value="<%= typeof address !== 'undefined' && (address.locality || address.areaStreet) ? (address.locality || address.areaStreet) : 'Bandra West' %>" placeholder="e.g. Bandra West" required>
+        </div>
+
+        <!-- ROW 4: LANDMARK & TOWN / CITY / STATE -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="landmark" class="form-label">Landmark <span style="font-size: 10px; color: #8E8E93; font-weight: 500;">(OPTIONAL)</span></label>
+            <input type="text" id="landmark" name="landmark" class="form-input" value="<%= typeof address !== 'undefined' && address.landmark ? address.landmark : 'Near Lilavati Hospital' %>" placeholder="e.g. Near Lilavati Hospital">
+          </div>
+          <div class="form-group">
+            <label for="cityState" class="form-label">Town / City / State</label>
+            <input type="text" id="cityState" name="cityState" class="form-input" value="<%= typeof address !== 'undefined' && address.cityState ? address.cityState : 'Mumbai, Maharashtra' %>" placeholder="e.g. Mumbai, Maharashtra" required>
+          </div>
+        </div>
+
+        <!-- TOGGLE DEFAULT ADDRESS -->
+        <label class="default-address-toggle">
+          <input type="checkbox" name="isDefault" value="true" <%= (typeof address === 'undefined' || address.isDefault) ? 'checked' : '' %> style="display: none;">
+          <span class="checkbox-custom"></span>
+          <span class="toggle-label">Set as Default Address</span>
+        </label>
+
+        <!-- ACTION BUTTONS -->
+        <div class="modal-actions">
+          <button type="submit" class="btn-save-address">Update Address</button>
+          <button type="button" class="btn-cancel-modal" onclick="closeAddressModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-left">
+      <div class="footer-logo">voltiq</div>
+      <div class="copyright">© 2024 VOLTIQ. ATMOSPHERIC PRECISION IN ELECTRONICS.</div>
+    </div>
+    <div class="footer-links">
+      <a href="/privacy" class="footer-link">PRIVACY</a>
+      <a href="/terms" class="footer-link">TERMS</a>
+      <a href="/shipping" class="footer-link">SHIPPING</a>
+      <a href="/returns" class="footer-link">RETURNS</a>
+    </div>
+  </footer>
+
+  <script>
+    function closeAddressModal() {
+      document.getElementById('editAddressModal').classList.add('hidden');
+    }
+    function openAddressModal() {
+      document.getElementById('editAddressModal').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
