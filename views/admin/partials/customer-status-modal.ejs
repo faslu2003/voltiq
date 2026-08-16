@@ -1,0 +1,179 @@
+<!--
+  ============================================================
+  Customer Status Modal (partial)
+  ------------------------------------------------------------
+  Include this once near the bottom of any admin page that
+  needs it.
+  Then trigger it with openModal().
+  ============================================================
+    openModal(
+      { id: 'VOL-27519', name: 'Vikram Singh', email: 'v.singh@techhub.com', avatar: '/img/avatar.jpg' },
+      'block'    // or 'unblock'
+    );
+
+  On confirm, it POSTs to /admin/customers/status/:id
+  via fetch (no full page reload) and fires a
+  'customerStatusChanged' event on `document` that the page can
+  listen for to update the row in place. See the integration
+  example at the bottom of this file.
+  ============================================================
+-->
+
+<div class="modal-overlay hidden" id="statusModalOverlay">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="statusModalTitle">
+
+    <div class="modal-icon" id="statusModalIconWrap"></div>
+
+    <h2 id="statusModalTitle" class="modal-title"></h2>
+    <p class="modal-sub" id="statusModalSub"></p>
+
+    <div class="alert alert-error hidden" id="statusModalError"></div>
+
+    <div class="customer-summary">
+      <img class="summary-avatar" id="statusSummaryAvatar" src="" alt="">
+      <div class="summary-text">
+        <span class="summary-name" id="statusSummaryName"></span>
+        <span class="summary-email" id="statusSummaryEmail"></span>
+      </div>
+    </div>
+
+    <form id="statusModalForm" class="modal-form">
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-confirm" id="statusConfirmBtn"></button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  (function () {
+    const ICONS = {
+      block: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg>',
+      unblock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+      check: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
+    };
+
+    const overlay = document.getElementById('statusModalOverlay');
+    const iconWrap = document.getElementById('statusModalIconWrap');
+    const titleEl = document.getElementById('statusModalTitle');
+    const subEl = document.getElementById('statusModalSub');
+    const errorEl = document.getElementById('statusModalError');
+    const avatarEl = document.getElementById('statusSummaryAvatar');
+    const nameEl = document.getElementById('statusSummaryName');
+    const emailEl = document.getElementById('statusSummaryEmail');
+    const confirmBtn = document.getElementById('statusConfirmBtn');
+    const form = document.getElementById('statusModalForm');
+
+    let activeCustomer = null;
+    let activeAction = null;
+    let activeSelect = null;
+
+    // ---- Public API ----
+    window.openModal = function (customer, action, select) {
+      if (!customer || (action !== 'block' && action !== 'unblock')) {
+        console.error('openModal(customer, action) requires a customer object and action of "block" or "unblock"');
+        return;
+      }
+
+      activeCustomer = customer;
+      activeAction = action;
+      activeSelect = select;
+
+      confirmBtn.disabled = false;
+
+      const isBlock = action === 'block';
+
+      iconWrap.className = 'modal-icon ' + (isBlock ? 'danger' : 'success');
+      iconWrap.innerHTML = ICONS[isBlock ? 'block' : 'unblock'];
+
+      titleEl.textContent = isBlock ? 'Block this customer?' : 'Unblock this customer?';
+      subEl.innerHTML = isBlock
+        ? 'This will immediately restrict <strong>' + escapeHtml(customer.name) + '</strong> from signing in, placing orders, or accessing their account until they\'re unblocked.'
+        : '<strong>' + escapeHtml(customer.name) + '</strong> will regain full access to their account, including signing in and placing new orders.';
+
+      avatarEl.src = customer.avatar || '';
+      avatarEl.alt = customer.name || '';
+      nameEl.textContent = customer.name || '';
+      emailEl.textContent = customer.email || '';
+
+      confirmBtn.className = 'btn-confirm ' + (isBlock ? 'danger' : 'success');
+      confirmBtn.innerHTML = ICONS[isBlock ? 'block' : 'check'] + (isBlock ? ' Block Customer' : ' Unblock Customer');
+
+      hideError();
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = function () {
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+
+      activeCustomer = null;
+      activeAction = null;
+      activeSelect = null;
+
+      confirmBtn.disabled = false;
+    };
+
+    // ---- Close on backdrop click / Escape ----
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeModal();
+    });
+
+    // ---- Confirm: fetch-based, no page reload ----
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      if (!activeCustomer || !activeAction) return;
+
+      hideError();
+      confirmBtn.disabled = true;
+      const originalHTML = confirmBtn.innerHTML;
+      confirmBtn.innerHTML = 'Processing…';
+
+      try {
+        const res = await fetch('/admin/customers/status/' + encodeURIComponent(activeCustomer.id), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isBlocked: activeAction === 'block' })
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(function () { return {}; });
+          throw new Error(data.message || 'Something went wrong. Please try again.');
+        }
+
+        window.location.reload();
+
+        activeSelect.value = activeAction === 'block' ? 'true' : 'false';
+        activeSelect.classList.remove('blocked', 'unblocked');
+        activeSelect.classList.add(activeAction === 'block' ? 'blocked' : 'unblocked');
+
+        closeModal();
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalHTML;
+      }
+    });
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+    }
+    function hideError() {
+      errorEl.classList.add('hidden');
+      errorEl.textContent = '';
+    }
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+  })();
+</script>

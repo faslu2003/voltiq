@@ -18,6 +18,17 @@
     
     <div id="wrapper">
 
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <% } %>
+        <% if (message) { %>
+                <div class="alert alert-success">
+                        <%= message %>
+                </div>
+        <% } %>
+
         <form action="/signin" method="post">
 
             <p id="welcome-msg">Welcome Back</p>

@@ -48,7 +48,8 @@ exports.verifyCurrentEmail = () => {
     return {
         success: true,
         otp,
-        otpExpiry: Date.now() + 3 * 60 * 1000
+        otpExpiry: Date.now() + 3 * 60 * 1000,
+        resendOtpExpiry: Date.now() + 60 * 1000
     }
 }
 
@@ -59,7 +60,7 @@ exports.verifyOtp1 = (body, session) => {
     if (Date.now() > session.otpExpiry) {
         return {
             success: false,
-            message: "OTP has expired`"
+            message: "OTP has expired"
         }
     }
 
@@ -89,7 +90,8 @@ exports.verifyNewEmail = (body, session) => {
         success: true,
         email: session.newEmail,
         otp,
-        otpExpiry: Date.now() + 3 * 60 * 1000
+        otpExpiry: Date.now() + 3 * 60 * 1000,
+        resendOtpExpiry: Date.now() + 60 * 1000
     }
 }
 
@@ -119,8 +121,26 @@ exports.verifyOtp2 = async (body, session) => {
     delete session.otpExpiry;
 
     return {
-        success: true
+        success: true,
+        message: "Email updated successfully"
     }
+}
+
+
+exports.resendOtp = async (session) => {
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    session.otp = otp;
+    session.otpExpiry = Date.now() + 3 * 60 * 1000;
+    session.resendOtpExpiry = Date.now() + 60 * 1000;
+
+    console.log("OTP:", otp);
+
+    return {
+        success: true,
+        resendSeconds: 60
+    };
 }
 
 
@@ -165,25 +185,33 @@ exports.changePassword = async (body, session) => {
 }
 
 
-exports.addAddress = async (body) => {
+exports.addAddress = async (body, session) => {
 
-    const { fullName, phoneNumber, pincode, houseName, locality, landmark, cityState } = body;
+    const { fullName, phoneNumber, pincode, houseName, locality, landmark, city, state, addressType } = body;
 
-    if (!fullName || !phoneNumber || !pincode || !houseName || !locality || !cityState) {
+    console.log(body);
+
+    if (!fullName || !phoneNumber || !pincode || !houseName || !locality || !city || !state || !addressType) {
         return {
             success: false,
             message: "Please fill in all the fields"
         }
     }
 
+    const isDefault = body.isDefault === "true";
+
     await Address.create({
+        userId: session.user.id,
         fullName,
         phoneNumber,
         pincode,
         houseName,
         locality,
         landmark,
-        cityState
+        city,
+        state,
+        addressType,
+        isDefault: isDefault
     });
 
     return {
@@ -192,9 +220,11 @@ exports.addAddress = async (body) => {
 }
 
 
-exports.editAddress = async (body, session, addressId) => {
+exports.editAddress = async (addressId, body, session) => {
 
-    const { fullName, phoneNumber, pincode, houseName, locality, landmark, cityState } = body;
+    const { fullName, phoneNumber, pincode, houseName, locality, landmark, city, state, addressType } = body;
+
+    const isDefault = body.isDefault === "true";
 
     if (Object.keys(body).length === 0) {
         return {
@@ -203,7 +233,7 @@ exports.editAddress = async (body, session, addressId) => {
         }
     }
 
-    await Address.updateOne({ addressId, userId: session.user.id }, { $set: body });
+    await Address.updateOne({ _id: addressId, userId: session.user.id }, { $set: body, isDefault });
 
     return {
         success: true

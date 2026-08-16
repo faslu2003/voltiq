@@ -1,99 +1,214 @@
-<!DOCTYPE html>
-<html lang="en">
+<% const resendSeconds=locals.resendSeconds || 60; %>
+    <!DOCTYPE html>
+    <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Email</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verify Email</title>
 
-    <link rel="stylesheet" href="/css/user/verify-otp.css">
-</head>
+        <link rel="stylesheet" href="/css/user/verify-otp.css">
+    </head>
 
-<body>
+    <body>
 
-    <!-- Dark Blurred Background -->
-    <div class="overlay">
+        <!-- Dark Blurred Background -->
+        <div class="overlay">
 
-        <!-- Verification Card -->
-        <div class="verification-card">
+            <!-- Verification Card -->
+            <div class="verification-card">
 
-            <!-- Email Icon -->
-            <div class="icon-wrapper">
+                <!-- Email Icon -->
+                <div class="icon-wrapper">
 
-                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                    <path d="M4 6H20V18H4V6Z" stroke="#694CAC" stroke-width="1.7" stroke-linejoin="round" />
+                        <path d="M4 6H20V18H4V6Z" stroke="#694CAC" stroke-width="1.7" stroke-linejoin="round" />
 
-                    <path d="M4 7L12 13L20 7" stroke="#694CAC" stroke-width="1.7" stroke-linecap="round"
-                        stroke-linejoin="round" />
+                        <path d="M4 7L12 13L20 7" stroke="#694CAC" stroke-width="1.7" stroke-linecap="round"
+                            stroke-linejoin="round" />
 
-                </svg>
-
-            </div>
-
-            <!-- Heading -->
-            <h1>Verify Your Email</h1>
-
-            <!-- Description -->
-            <p class="description">
-                Enter the 6-digit code sent to your new
-                email address to complete the update.
-            </p>
-
-            <!-- OTP Form -->
-            <form action="/email/verify-otp-2" method="POST">
-
-                <div class="otp-container">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp1">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp2">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp3">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp4">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp5">
-
-                    <input type="text" maxlength="1" class="otp-input" name="otp6">
+                    </svg>
 
                 </div>
 
-                <button type="submit" class="verify-btn">
-                    Verify &amp; Update
-                </button>
+                <!-- Heading -->
+                <h1>Verify Your Email</h1>
 
-            </form>
+                <!-- Description -->
+                <p class="description">
+                    Enter the 6-digit code sent to your new
+                    email address to complete the update.
+                </p>
 
-            <!-- Timer -->
-            <p class="timer">
+                <% if (error) { %>
+                    <div class="alert alert-error">
+                        <%= error %>
+                    </div>
+                    <% } %>
 
-                Didn't receive the code?
+                        <!-- OTP Form -->
+                        <form action="/email/verify-otp-2" method="POST">
 
-                <a href="#">
-                    Resend in 00:52
-                </a>
+                            <div class="otp-container">
 
-            </p>
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code"
+                                    class="otp-input" name="otp1">
 
-            <!-- Divider -->
-            <div class="divider">
-                <span></span>
-                <p>OR</p>
-                <span></span>
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+                                    class="otp-input" name="otp2">
+
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+                                    class="otp-input" name="otp3">
+
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+                                    class="otp-input" name="otp4">
+
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+                                    class="otp-input" name="otp5">
+
+                                <input type="text" maxlength="1" inputmode="numeric" autocomplete="off"
+                                    class="otp-input" name="otp6">
+
+                            </div>
+
+                            <button type="submit" class="verify-btn">
+                                Verify &amp; Update
+                            </button>
+
+                        </form>
+
+                        <!-- Timer -->
+                        <p class="resend-line">
+                            Didn't receive the code?
+                            <button type="button" class="resend-btn" id="resendBtn" disabled>Resend Code</button>
+                        </p>
+                        <p class="resend-hint" id="resendHint">Request new code in <span id="resendTimer">
+                                <%= resendSeconds %>
+                            </span>s</p>
+
+
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span></span>
+                            <p>OR</p>
+                            <span></span>
+                        </div>
+
+                        <!-- Back Link -->
+                        <a href="/profile" class="back-link">
+
+                            ← Back to Profile Settings
+
+                        </a>
             </div>
-
-            <!-- Back Link -->
-            <a href="/profile" class="back-link">
-
-                ← Back to Profile Settings
-
-            </a>
 
         </div>
 
-    </div>
+        </div>
 
-</body>
+        <script>
+            const otpInputs = Array.from(document.querySelectorAll(".otp-input"));
 
-</html>
+            otpInputs.forEach((input, index) => {
+
+                input.addEventListener("input", function () {
+
+                    // Allow only numbers
+                    input.value = input.value.replace(/[^0-9]/g, "").slice(0, 1);
+
+                    // Move to next box
+                    if (input.value && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener("keydown", function (e) {
+
+                    // Move back on Backspace
+                    if (e.key === "Backspace" && !input.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener("paste", function (e) {
+
+                    e.preventDefault();
+
+                    const digits = e.clipboardData
+                        .getData("text")
+                        .replace(/[^0-9]/g, "")
+                        .split("");
+
+                    digits.forEach((digit, i) => {
+                        if (otpInputs[index + i]) {
+                            otpInputs[index + i].value = digit;
+                        }
+                    });
+
+                    const lastInput = otpInputs[Math.min(index + digits.length, otpInputs.length - 1)];
+                    lastInput.focus();
+                });
+
+            });
+        </script>
+
+        <script>
+            const resendBtn = document.getElementById("resendBtn");
+            const resendHint = document.getElementById("resendHint");
+            const resendTimer = document.getElementById("resendTimer");
+
+            let secondsLeft = <%= resendSeconds %>;
+            let countdown;
+
+            function startCountdown() {
+
+                resendBtn.disabled = true;
+                resendHint.style.display = "block";
+                resendTimer.textContent = secondsLeft;
+
+                countdown = setInterval(() => {
+
+                    secondsLeft--;
+
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdown);
+                        resendBtn.disabled = false;
+                        resendHint.style.display = "none";
+                    } else {
+                        resendTimer.textContent = secondsLeft;
+                    }
+
+                }, 1000);
+            }
+
+            startCountdown();
+
+            resendBtn.addEventListener("click", async () => {
+
+                try {
+
+                    const response = await fetch("/resend-otp", {
+                        method: "POST"
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            secondsLeft = result.resendSeconds;
+                            clearInterval(countdown);
+                            startCountdown();
+                        }
+                    }
+
+
+                } catch (err) {
+                    console.error(err);
+                }
+
+            });
+        </script>
+
+    </body>
+
+    </html>

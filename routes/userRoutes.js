@@ -25,6 +25,9 @@ router.get('/signin/reset-password', userController.getResetPassword);
 router.post('/signin/reset-password', userController.postResetPassword);
 
 
+router.post('/resend-otp', userController.resendOtp);
+
+
 
 router.use(['/home', '/profile', '/email', '/change-password', '/address', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
@@ -59,10 +62,10 @@ router.get('/address', userController.getAddress);
 router.get('/address/add', userController.getAddAddress);
 router.post('/address/add', userController.postAddAddress);
 
-router.get('/address/edit', userController.getEditAddress);
-router.post('/address/edit', userController.postEditAddress);
+router.get('/address/edit/:id', userController.getEditAddress);
+router.post('/address/edit/:id', userController.postEditAddress);
 
-router.post('/address/delete', userController.deleteAddress);
+router.post('/address/delete/:id', userController.deleteAddress);
 
 
 router.post('/logout', userController.logout);

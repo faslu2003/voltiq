@@ -154,11 +154,11 @@
         <div class="form-row-2">
           <div class="form-group">
             <label for="fullName" class="form-label">Full Name</label>
-            <input type="text" id="fullName" name="fullName" class="form-input" value="<%= typeof address !== 'undefined' && address.fullName ? address.fullName : 'Arjun Malhotra' %>" placeholder="e.g. Arjun Malhotra" required>
+            <input type="text" id="fullName" name="fullName" class="form-input" value="<%= address.fullName %>" placeholder="e.g. Arjun Malhotra" required>
           </div>
           <div class="form-group">
             <label for="mobileNumber" class="form-label">Mobile Number</label>
-            <input type="tel" id="mobileNumber" name="phoneNumber" class="form-input" value="<%= typeof address !== 'undefined' && (address.phoneNumber || address.mobileNumber) ? (address.phoneNumber || address.mobileNumber) : '+91 98765 43210' %>" placeholder="+91 98765 43210" required>
+            <input type="tel" id="mobileNumber" name="phoneNumber" class="form-input" value="<%= address.phoneNumber %>" placeholder="+91 98765 43210" required>
           </div>
         </div>
 
@@ -166,35 +166,48 @@
         <div class="form-row-2">
           <div class="form-group">
             <label for="pincode" class="form-label">Pincode</label>
-            <input type="text" id="pincode" name="pincode" class="form-input" value="<%= typeof address !== 'undefined' && address.pincode ? address.pincode : '400050' %>" placeholder="6 Digits" required>
+            <input type="text" id="pincode" name="pincode" class="form-input" value="<%= address.pincode %>" placeholder="6 Digits" required>
           </div>
           <div class="form-group">
             <label for="flatHouse" class="form-label">Flat / House Name / Building</label>
-            <input type="text" id="flatHouse" name="houseName" class="form-input" value="<%= typeof address !== 'undefined' && (address.houseName || address.flatHouse) ? (address.houseName || address.flatHouse) : 'Penthouse 42, Skyview Towers' %>" placeholder="e.g. Penthouse 42, Skyview Towers" required>
+            <input type="text" id="flatHouse" name="houseName" class="form-input" value="<%= address.houseName %>" placeholder="e.g. Penthouse 42, Skyview Towers" required>
           </div>
         </div>
 
         <!-- ROW 3: AREA / STREET / SECTOR / VILLAGE -->
         <div class="form-group">
           <label for="areaStreet" class="form-label">Area / Street / Sector / Village</label>
-          <input type="text" id="areaStreet" name="locality" class="form-input" value="<%= typeof address !== 'undefined' && (address.locality || address.areaStreet) ? (address.locality || address.areaStreet) : 'Bandra West' %>" placeholder="e.g. Bandra West" required>
+          <input type="text" id="areaStreet" name="locality" class="form-input" value="<%= address.locality %>" placeholder="e.g. Bandra West" required>
         </div>
 
         <!-- ROW 4: LANDMARK & TOWN / CITY / STATE -->
         <div class="form-row-2">
           <div class="form-group">
             <label for="landmark" class="form-label">Landmark <span style="font-size: 10px; color: #8E8E93; font-weight: 500;">(OPTIONAL)</span></label>
-            <input type="text" id="landmark" name="landmark" class="form-input" value="<%= typeof address !== 'undefined' && address.landmark ? address.landmark : 'Near Lilavati Hospital' %>" placeholder="e.g. Near Lilavati Hospital">
+            <input type="text" id="landmark" name="landmark" class="form-input" value="<%= address.landmark %>" placeholder="e.g. Near Lilavati Hospital">
           </div>
           <div class="form-group">
-            <label for="cityState" class="form-label">Town / City / State</label>
-            <input type="text" id="cityState" name="cityState" class="form-input" value="<%= typeof address !== 'undefined' && address.cityState ? address.cityState : 'Mumbai, Maharashtra' %>" placeholder="e.g. Mumbai, Maharashtra" required>
+            <label for="city" class="form-label">City</label>
+            <input type="text" id="city" name="city" class="form-input" value="<%= address.city %>" placeholder="e.g. Mumbai" required>
+          </div>
+          <div class="form-group">
+            <label for="state" class="form-label">State</label>
+            <input type="text" id="state" name="state" class="form-input" value="<%= address.state %>" placeholder="e.g. Maharashtra" required>
+          </div>
+          <div class="form-group">
+            <label for="addressType" class="form-label">Address Type</label>
+            <select name="addressType" class="form-input form-select" required>
+              <option value="">Select</option>
+              <option value="Home" <%= address.addressType === "Home" ? "selected" : "" %>>Home</option>
+              <option value="Office" <%= address.addressType === "Office" ? "selected" : "" %>>Office</option>
+              <option value="Studio" <%= address.addressType === "Studio" ? "selected" : "" %>>Studio</option>
+            </select>
           </div>
         </div>
 
         <!-- TOGGLE DEFAULT ADDRESS -->
         <label class="default-address-toggle">
-          <input type="checkbox" name="isDefault" value="true" <%= (typeof address === 'undefined' || address.isDefault) ? 'checked' : '' %> style="display: none;">
+          <input type="checkbox" name="isDefault" value="true" <%= address.isDefault ? "checked" : "" %> style="display: none;">
           <span class="checkbox-custom"></span>
           <span class="toggle-label">Set as Default Address</span>
         </label>
@@ -202,7 +215,8 @@
         <!-- ACTION BUTTONS -->
         <div class="modal-actions">
           <button type="submit" class="btn-save-address">Update Address</button>
-          <button type="button" class="btn-cancel-modal" onclick="closeAddressModal()">Cancel</button>
+          <!-- <button type="button" class="btn-cancel-modal" onclick="closeAddressModal()">Cancel</button> -->
+           <a href="/address" class="btn-cancel-modal">Cancel</a>
         </div>
       </form>
     </div>

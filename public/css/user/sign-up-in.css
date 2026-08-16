@@ -33,6 +33,15 @@ body {
     background: #e6484f;
     color: #fdeceb;
 }
+.alert-success{
+
+    background:#e8f7ee;
+
+    color:#0f7b3b;
+
+    border:1px solid #b7e4c7;
+
+}
 
 .input-box {
     margin-bottom: 20px;

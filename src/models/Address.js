@@ -14,7 +14,6 @@ const addressSchema = new Schema({
     phoneNumber: {
         type: Number,
         required: true,
-        unique: true
     },
     houseName: {
         type: String,
@@ -31,10 +30,22 @@ const addressSchema = new Schema({
     landmark: {
         type: String
     },
-    cityState: {
+    city: {
         type: String,
         required: true
-    }
+    },
+    state: {
+        type: String,
+        required: true
+    },
+    addressType: {
+        type: String,
+        required: true
+    },
+    isDefault: {
+        type: Boolean,
+        required: true
+    },
 },
 {
     timestamps: true

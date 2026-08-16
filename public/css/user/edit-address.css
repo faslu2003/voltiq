@@ -461,6 +461,12 @@ body {
 }
 
 .btn-cancel-modal {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
   height: 48px;
   border-radius: var(--radius-btn);
   border: 1px solid var(--border-modal-input);
@@ -470,6 +476,8 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+
+  text-decoration: none;
 }
 
 .btn-cancel-modal:hover {

@@ -161,6 +161,20 @@ body{
 }
 
 
+.alert{
+  width:100%;
+  font-size:13.5px;
+  font-weight:500;
+  padding:11px 14px;
+  border-radius:10px;
+  margin-bottom:18px;
+}
+.alert-error{
+    background: #e6484f;
+    color: #fdeceb;
+}
+
+
 /* =====================================================
                 FORM
 ===================================================== */
@@ -303,6 +317,54 @@ form{
 
     text-decoration:underline;
 
+}
+
+.resend-line{
+  font-size:14.5px;
+  font-weight:500;
+  color:var(--text);
+  margin:26px 0 4px;
+}
+
+.resend-btn{
+  background:none;
+  border:none;
+  padding:0;
+  font-family:inherit;
+  font-size:14.5px;
+  font-weight:600;
+  color:var(--violet);
+}
+
+
+.resend-btn:disabled{
+
+  color:#999;
+
+  opacity:0.55;
+
+  cursor:default;
+
+}
+
+.resend-btn:not(:disabled){
+
+  color:#694CAC;
+
+  cursor:pointer;
+
+}
+
+.resend-btn:not(:disabled):hover{
+
+  color:#694CAC;
+
+}
+
+.resend-hint{
+  font-size:12.5px;
+  color:var(--text-faint);
+  margin:0;
 }
 
 

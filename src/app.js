@@ -3,20 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
-
-// app.use((req, res, next) => {
-//     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-//     res.set('Pragma', 'no-cache');
-//     res.set('Expires', '0');
-
-//     next();
-// });
-
+const nocache = require('nocache');
+app.use(nocache());
 
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 

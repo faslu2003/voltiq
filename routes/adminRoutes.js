@@ -16,10 +16,10 @@ router.use(authMiddleware.authenticateAdmin);
 
 router.get('/customers', adminController.getCustomers);
 
-router.post('/customers/:id/status', adminController.upddateCustomerStatus);
+router.post('/customers/status/:id', adminController.upddateCustomerStatus);
 
 
-
+router.post('/logout', adminController.logout);
 
 
 module.exports = router;

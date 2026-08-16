@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Management · Voltiq Admin</title>
     <link rel="stylesheet" href="/css/admin/customers.css">
+    <link rel="stylesheet" href="/css/admin/customer-status-modal.css">
   </head>
 
   <body>
@@ -188,6 +189,25 @@
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
+            <form action="/admin/logout" method="POST">
+
+              <button class="logout-btn" type="submit">
+
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+
+                  <polyline points="16 17 21 12 16 7" />
+
+                  <line x1="21" y1="12" x2="9" y2="12" />
+
+                </svg>
+
+                Logout
+
+              </button>
+
+            </form>
           </div>
         </div>
 
@@ -252,46 +272,31 @@
         <div class="table-panel">
           <div class="table-toolbar">
             <form class="customer-search" action="/admin/customers" method="GET">
-
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
                 <circle cx="11" cy="11" r="7" />
-
                 <path d="m21 21-4.3-4.3" />
-
               </svg>
-
               <input type="text" name="search" value="<%= search || '' %>" placeholder="Search customers...">
-
               <button type="submit">Search</button>
-
               <% if(search){ %>
-
                 <a href="/admin/customers" class="clear-search">
-
                   ✕
-
                 </a>
-
                 <% } %>
-
             </form>
+
             <div class="select-btn">
-              <span>Status: All</span>
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              <span>Status:</span>
+
+              <select name="status" id="status">
+                <option value="all" <%=status==='all' ? 'selected' : '' %>>All</option>
+                <option value="blocked" <%=status==='blocked' ? 'selected' : '' %>>Blocked</option>
+                <option value="unblocked" <%=status==='unblocked' ? 'selected' : '' %>>Unblocked</option>
+              </select>
             </div>
-            <div class="select-btn">
-              <span>Group: All</span>
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
+
             <div class="toolbar-spacer"></div>
-            <button class="btn-outline">
+            <button class="btn-outline" id="filter-btn">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <line x1="4" y1="6" x2="20" y2="6" />
@@ -300,6 +305,31 @@
               </svg>
               Filters
             </button>
+            <div class="filter-panel hidden" id="filter-panel">
+              <h3>Filters</h3>
+              <div class="filter-section">
+                <h4>Registered</h4>
+                <label>
+                  <input type="radio" name="registered" value="all" <%=registered==='all' ? 'checked' : '' %>>
+                  Any time
+                </label>
+                <label>
+                  <input type="radio" name="registered" value="this-month" <%=registered==='this-month' ? 'checked' : ''
+                    %>>
+                  This month
+                </label>
+                <label>
+                  <input type="radio" name="registered" value="this-year" <%=registered==='this-year' ? 'checked' : ''
+                    %>>
+                  This year
+                </label>
+              </div>
+              <div class="filter-actions">
+                <button type="button" id="clear-filters">Clear</button>
+                <button type="button" id="apply-filters">Apply</button>
+              </div>
+            </div>
+
             <button class="btn-outline">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -355,18 +385,16 @@
                     <%= customer.spend %>
                   </td>
                   <td>
-                    <form action="/admin/customers/<%= customer._id %>/status" method="POST"
-                      onsubmit="return confirmStatus('<%= customer.fullName %>', <%= customer.isBlocked %>)">
-                      <select name="isBlocked" class="status-pill <%= customer.isBlocked ? 'blocked' : 'unblocked' %>"
-                        onchange="handleStatusChange(this, '<%= customer.fullName %>', <%= customer.isBlocked %>)">
-                        <option value="false" <%=!customer.isBlocked ? 'selected' : '' %>>
-                          Unblocked
-                        </option>
-                        <option value="true" <%=customer.isBlocked ? 'selected' : '' %>>
-                          Blocked
-                        </option>
-                      </select>
-                    </form>
+                    <select name="isBlocked" class="status-pill <%= customer.isBlocked ? 'blocked' : 'unblocked' %>"
+                      onfocus="this.dataset.previousValue = this.value"
+                      onchange='handleStatusChange(this, { _id: "<%= customer._id %>", fullName: "<%= customer.fullName %>", email: "<%= customer.email %>", profileImgUrl: "<%= customer.profileImgUrl || "/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" %>" })'>
+                      <option value="false" <%=!customer.isBlocked ? 'selected' : '' %>>
+                        Unblocked
+                      </option>
+                      <option value="true" <%=customer.isBlocked ? 'selected' : '' %>>
+                        Blocked
+                      </option>
+                    </select>
                   </td>
                   <td class="last-active">
                     <%= customer.lastActive %>
@@ -381,7 +409,7 @@
                     pagination.total.toLocaleString('en-IN') %> customers</div>
             <div class="pagination">
               <% for(let i=1; i <=pagination.lastPage; i++) { %>
-                <a href="/admin/customers?page=<%= i %>"
+                <a href="/admin/customers?page=<%= i %>&status=<%= status %>&registered=<%= registered %>&search=<%= encodeURIComponent(search || '') %>"
                   class="page-btn <%= i === pagination.currentPage ? 'active' : '' %>">
                   <%= i %>
                 </a>
@@ -393,19 +421,71 @@
       </main>
     </div>
 
-    <script>
-      function handleStatusChange(select, name, isBlocked) {
-        const ok = isBlocked
-          ? confirm(`Are you sure you want to unblock ${name}?`)
-          : confirm(`Are you sure you want to block ${name}?`);
-        if (ok) {
-          select.form.requestSubmit();
-        } else {
-          // Restore previous selection
-          select.value = isBlocked ? "true" : "false";
+    <%- include('partials/customer-status-modal') %>
+
+      <script>
+        function handleStatusChange(select, customer) {
+          const action = select.value === "true"
+            ? "block"
+            : "unblock";
+
+          select.value = select.dataset.previousValue;
+
+          const customerData = {
+            id: customer._id,
+            name: customer.fullName,
+            email: customer.email,
+            avatar: customer.profileImgUrl
+          };
+
+          openModal(customerData, action, select);
         }
-      }
-    </script>
+      </script>
+
+      <script>
+        const statusSelect = document.getElementById('status');
+        statusSelect.addEventListener('change', function () {
+          const params = new URLSearchParams(window.location.search);
+          params.set('page', '1');
+
+          if (this.value === 'all') {
+            params.delete('status');
+          } else {
+            params.set('status', this.value);
+          }
+
+          window.location.href = `/admin/customers?${params.toString()}`;
+        });
+      </script>
+
+      <script>
+        const filterBtn = document.getElementById('filter-btn');
+        const filterPanel = document.getElementById('filter-panel');
+        filterBtn.addEventListener('click', function () {
+          filterPanel.classList.toggle('hidden');
+        });
+
+        const applyFilters = document.getElementById('apply-filters');
+        applyFilters.addEventListener('click', function () {
+          const selectedRegistered = document.querySelector(
+            'input[name="registered"]:checked'
+          ).value;
+          const params = new URLSearchParams(window.location.search);
+          if (selectedRegistered === 'all') {
+            params.delete('registered');
+          } else {
+            params.set('registered', selectedRegistered);
+          }
+          window.location.href = `/admin/customers?${params.toString()}`;
+        });
+
+        const clearFilters = document.getElementById('clear-filters');
+        clearFilters.addEventListener('click', function () {
+          const params = new URLSearchParams(window.location.search);
+          params.delete('registered');
+          window.location.href = `/admin/customers?${params.toString()}`;
+        });
+      </script>
   </body>
 
   </html>

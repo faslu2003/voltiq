@@ -61,37 +61,58 @@ exports.signin = async (body) => {
 }
 
 
-exports.getCustomers = async (page = 1, search) => {
+exports.getCustomers = async (page = 1, search, status, registered) => {
 
-    let filter = {};
+    let filter = { role: "user" };
 
     if (search) {
-        filter = {
-            $or: [
-                {
-                    fullName: {
-                        $regex: search,
-                        $options: "i"
-                    }
-                },
-                {
-                    email: {
-                        $regex: search,
-                        $options: "i"
-                    }
+        filter.$or = [
+            {
+                fullName: {
+                    $regex: search,
+                    $options: "i"
                 }
-            ]
-        }
+            },
+            {
+                email: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }
+        ]
     }
 
-    filter.role = "user";
+    if (status === "blocked") {
+        filter.isBlocked = true;
+    }
+    if (status === "unblocked") {
+        filter.isBlocked = false;
+    }
+
+    if (registered === "this-month") {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        filter.createdAt = {
+            $gte: startOfMonth
+        };
+    }
+    if (registered === "this-year") {
+        const startOfYear = new Date();
+        startOfYear.setMonth(0);
+        startOfYear.setDate(1);
+        startOfYear.setHours(0, 0, 0, 0);
+        filter.createdAt = {
+            $gte: startOfYear
+        };
+    }
 
     const limit = 5;
     const skip = (page - 1) * limit;
 
     const customers = await User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
-    const totalCustomers = await User.countDocuments({ role: "user" });
+    const totalCustomers = await User.countDocuments(filter);
 
     return {
         success: true,
@@ -110,16 +131,7 @@ exports.getCustomers = async (page = 1, search) => {
 
 exports.updateCustomerStatus = async (userId, isBlocked) => {
 
-    let blocked;
-
-    if (isBlocked === "true") {
-        blocked = true;
-    }
-    else {
-        blocked = false;
-    }
-
-    await User.updateOne({ _id: userId }, { $set: { isBlocked: blocked } });
+    await User.updateOne({ _id: userId }, { $set: { isBlocked: isBlocked } });
 
     return {
         success: true

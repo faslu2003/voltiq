@@ -42,10 +42,12 @@ exports.postSignin = async (req, res) => {
 exports.getCustomers = async (req, res) => {
 
     const search = req.query.search || "";
+    const status = req.query.status || "all";
+    const registered = req.query.registered || "all";
 
     const page = Number(req.query.page) || 1;
 
-    const result = await adminService.getCustomers(page, search);
+    const result = await adminService.getCustomers(page, search, status, registered);
 
     const customers = result.customers;
     const totalCustomers = result.totalCustomers;
@@ -55,19 +57,31 @@ exports.getCustomers = async (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('admin/customers', { customers, totalCustomers, stats, pagination, search, error });
+    res.render('admin/customers', { customers, totalCustomers, stats, pagination, search, status, registered, error });
 }
+
 
 exports.upddateCustomerStatus = async (req, res) => {
 
-    const result = await adminService.updateCustomerStatus(req.params.id, req.body.isBlocked);
-
     try {
-        res.redirect('/admin/customers');
+
+        const result = await adminService.updateCustomerStatus(req.params.id, req.body.isBlocked);
+
+        res.json(result);
     }
     catch(err) {
-        console.log(error);
-        req.session.error = "Something went wrong. Please try again";
-        res.redirect('/admin/customers');
+
+        console.log(err);
+
+        res.status(500).json({ success: false, message: "Something went wrong. Please try again."});
     }
+}
+
+
+
+exports.logout = (req, res) => {
+
+    req.session.destroy(() => {
+        res.redirect('/admin/signin');
+    })
 }

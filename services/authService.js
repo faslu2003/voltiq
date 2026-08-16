@@ -8,6 +8,15 @@ exports.signup = async (body) => {
 
     const { fullName, email, phoneNumber, password, confirmPassword } = body;
 
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+        return {
+            success: false,
+            message: "An account with this email already exists"
+        };
+    }
+
     if (!fullName) {
         return {
             success: false,
@@ -105,12 +114,12 @@ exports.signupVerification = async (body, session) => {
         }
     }
 
-    // if (!session.pendingUser) {
-    //     return {
-    //         success: false,
-    //         message: "Signup session expired. Please sign up again"
-    //     }
-    // }
+    if (!session.pendingUser) {
+        return {
+            success: false,
+            message: "Signup session expired. Please sign up again"
+        }
+    }
 
     const { fullName, email, phoneNumber, password } = session.pendingUser;
 
@@ -128,7 +137,8 @@ exports.signupVerification = async (body, session) => {
     delete session.otpExpiry;
 
     return {
-        success: true
+        success: true,
+        message: "Account created successfully"
     }
 }
 
