@@ -14,6 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+app.use('/uploads', express.static('uploads'));
+
+
 const session = require('express-session');
 app.use(session({
     secret: process.env.SESSION_SECRET,

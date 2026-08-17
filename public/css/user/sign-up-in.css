@@ -32,15 +32,13 @@ body {
 .alert-error{
     background: #e6484f;
     color: #fdeceb;
+    text-align: center;
 }
 .alert-success{
-
     background:#e8f7ee;
-
     color:#0f7b3b;
-
     border:1px solid #b7e4c7;
-
+    text-align: center;
 }
 
 .input-box {

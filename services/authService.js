@@ -156,6 +156,13 @@ exports.signin = async (body) => {
         }
     }
 
+    if (user.role !== "user") {
+        return {
+            success: false,
+            message: "Unauthorized access"
+        }
+    }
+
     if (!email) {
         return {
             success: false,
@@ -218,5 +225,3 @@ exports.resetPassword = async (body) => {
         message: "Reset link has been sent to your email"
     }
 }
-
-

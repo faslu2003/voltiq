@@ -197,9 +197,9 @@ exports.getEditProfile = async (req, res) => {
 
 exports.postEditProfile = async (req, res) => {
 
-    const result = await userService.editProfile(req.body, req.session);
+    const result = await userService.editProfile(req.body, req.file, req.session);
 
-    if (result.success & result.isEmail) {
+    if (result.success && result.isEmail) {
         return res.redirect('/email/verify-current');
     }
 

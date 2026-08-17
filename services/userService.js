@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 
 
-exports.editProfile = async (body, session) => {
+exports.editProfile = async (body, file, session) => {
 
     const { fullName, email, phoneNumber } = body;
 
@@ -19,6 +19,10 @@ exports.editProfile = async (body, session) => {
 
     if (phoneNumber !== user.phoneNumber) {
         await User.updateOne({ _id: id }, { phoneNumber });
+    }
+
+    if (file) {
+        await User.updateOne({ _id: id }, { profileImgUrl: `/uploads/${file.filename}` });
     }
 
     if (email !== user.email) {

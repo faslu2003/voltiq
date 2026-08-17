@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
-    profileImageUrl: {
+    profileImgUrl: {
         type: String
     },
     isBlocked: {
