@@ -9,6 +9,7 @@ body {
 
 #logo {
     color:#694CAC;
+    font-family: kalnia;
 }
 
 #wrapper {
@@ -48,6 +49,7 @@ body {
 form label {
     display: block;
     margin-bottom: 8px;
+    font-family: hanken grotesk;
     font-size: 15px;
     color:#444;
 }
@@ -73,6 +75,7 @@ form input::placeholder {
     background:#694CAC;
     color: white;
     font-size: 16px;
+    font-family: hanken grotesk;
     cursor: pointer;
 }
 
@@ -101,12 +104,14 @@ form input::placeholder {
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    font-family: hanken grotesk;
 }
 
 #signin {
     text-align: center;
     margin-top: 30px;
     font-size: 16px;
+    font-family: hanken grotesk;
 }
 
 #signin a {
@@ -126,6 +131,7 @@ form input::placeholder {
     background:#694CAC;
     color: white;
     font-size: 16px;
+    font-family: hanken grotesk;
     cursor: pointer;
 }
 
@@ -136,6 +142,7 @@ form input::placeholder {
 #signup {
     text-align: center;
     margin-top: 30px;
+    font-family: hanken grotesk;
     font-size: 16px;
 }
 
@@ -146,7 +153,7 @@ form input::placeholder {
 
 #welcome-msg {
     font-size: 32px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: hanken grotesk;
     text-align: center;
 }
 
@@ -160,4 +167,5 @@ form input::placeholder {
 #forgot-password {
     display: flex;
     justify-content: space-between;
+    font-family: hanken grotesk;
 }

@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalnia:wght@100..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Kalnia:wght@100..700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/user/sign-up-in.css">
     <title>Sign Up</title>
 </head>
@@ -22,7 +30,7 @@
             <div class="alert alert-error">
                 <%= error %>
             </div>
-        <% } %>
+            <% } %>
 
                 <form action="/signup" method="post">
 
@@ -66,32 +74,32 @@
 
                     <div id="signin"">
                 <!-- add href -->
-                <p>Already have an account? <a href="/signin">Sign In</a></p>
-            </div>
+                <p>Already have an account? <a href=" /signin">Sign In</a></p>
+                    </div>
 
-        </form>
+                </form>
 
     </div>
 
     <script>
 
-window.addEventListener("pageshow", function (event) {
+        window.addEventListener("pageshow", function (event) {
 
-    if (
+            if (
 
-        event.persisted ||
+                event.persisted ||
 
-        performance.getEntriesByType("navigation")[0]?.type === "back_forward"
+                performance.getEntriesByType("navigation")[0]?.type === "back_forward"
 
-    ) {
+            ) {
 
-        window.location.reload();
+                window.location.reload();
 
-    }
+            }
 
-});
+        });
 
-</script>
+    </script>
 
 </body>
 

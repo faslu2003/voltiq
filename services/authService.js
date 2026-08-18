@@ -13,21 +13,21 @@ exports.signup = async (body) => {
     if (existingUser) {
         return {
             success: false,
-            message: "An account with this email already exists"
+            message: "An account with this email already exists."
         };
     }
 
     if (!fullName) {
         return {
             success: false,
-            message: "Please enter your full name"
+            message: "Please enter your full name."
         }
     }
 
     if (!email) {
         return {
             success: false,
-            message: "Please enter your email address"
+            message: "Please enter your email address."
         }
     }
 
@@ -35,35 +35,35 @@ exports.signup = async (body) => {
     if (!emailRegex.test(email)) {
         return {
             success: false,
-            message: "Please enter a valid email address"
+            message: "Please enter a valid email address."
         }
     }
 
     if (!phoneNumber) {
         return {
             success: false,
-            message: "Please enter your phone number"
+            message: "Please enter your phone number."
         }
     }
 
     if (!password) {
         return {
             success: false,
-            message: "Please enter your password"
+            message: "Please enter your password."
         }
     }
 
     if (!confirmPassword) {
         return {
             success: false,
-            message: "Please confirm your password"
+            message: "Please confirm your password."
         }
     }
 
     if (password !== confirmPassword) {
         return {
             success: false,
-            message: "Passwords do not match"
+            message: "Passwords do not match."
         }
     }
 
@@ -72,7 +72,7 @@ exports.signup = async (body) => {
     if (!passwordRegex.test(password)) {
         return {
             success: false,
-            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
         }
     }
 
@@ -103,21 +103,21 @@ exports.signupVerification = async (body, session) => {
     if (Date.now() > session.otpExpiry) {
         return {
             success: false,
-            message: "OTP has expired"
+            message: "OTP has expired."
         }
     }
 
     if (enteredOTP !== session.otp) {
         return {
             success: false,
-            message: "Entered OTP is invalid"
+            message: "Entered OTP is invalid."
         }
     }
 
     if (!session.pendingUser) {
         return {
             success: false,
-            message: "Signup session expired. Please sign up again"
+            message: "Signup session expired. Please sign up again."
         }
     }
 
@@ -138,7 +138,7 @@ exports.signupVerification = async (body, session) => {
 
     return {
         success: true,
-        message: "Account created successfully"
+        message: "Account created successfully."
     }
 }
 
@@ -147,26 +147,10 @@ exports.signin = async (body) => {
 
     const { email, password } = body;
 
-    const user = await User.findOne({ email: email });
-
-    if (!user) {
-        return {
-            success: false,
-            message: "Invalid email or password"
-        }
-    }
-
-    if (user.role !== "user") {
-        return {
-            success: false,
-            message: "Unauthorized access"
-        }
-    }
-
     if (!email) {
         return {
             success: false,
-            message: "Please enter your email address"
+            message: "Please enter your email address."
         }
     }
 
@@ -174,14 +158,30 @@ exports.signin = async (body) => {
     if (!emailRegex.test(email)) {
         return {
             success: false,
-            message: "Please enter a valid email address"
+            message: "Please enter a valid email address."
         }
     }
 
     if (!password) {
         return {
             success: false,
-            message: "Please enter your password"
+            message: "Please enter your password."
+        }
+    }
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+        return {
+            success: false,
+            message: "Invalid email or password."
+        }
+    }
+
+    if (user.role !== "user") {
+        return {
+            success: false,
+            message: "Unauthorized access."
         }
     }
 
@@ -189,14 +189,14 @@ exports.signin = async (body) => {
     if (!isMatch) {
         return {
             success: false,
-            message: "Please enter the correct password"
+            message: "Invalid email or password."
         }
     }
 
     if (user.isBlocked) {
         return {
             success: false,
-            message: "Your account has been blocked. Please contact support"
+            message: "Your account has been blocked. Please contact support."
         }
     }
 
@@ -216,12 +216,12 @@ exports.resetPassword = async (body) => {
     if (!user) {
         return {
             success: false,
-            message: "The entered email is incorrect"
+            message: "The entered email is incorrect."
         }
     }
 
     return {
         success: true,
-        message: "Reset link has been sent to your email"
+        message: "Reset link has been sent to your email."
     }
 }

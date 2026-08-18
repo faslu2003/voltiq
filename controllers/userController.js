@@ -73,7 +73,7 @@ exports.postSignupVerification = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.error(err);
         req.session.error = "Something went wrong. Please try again";
         return res.redirect('/signup');
@@ -121,7 +121,7 @@ exports.postSignin = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -156,7 +156,7 @@ exports.postResetPassword = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
         return res.redirect('/signin/reset-password');
@@ -236,8 +236,8 @@ exports.postVerifyCurrentEmail = (req, res) => {
             return res.redirect('/email/verify-otp-1');
         }
     }
-    
-    catch(err) {
+
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -270,7 +270,7 @@ exports.postVerifyOtp1 = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -310,7 +310,7 @@ exports.postVerifyNewEmail = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -345,7 +345,7 @@ exports.postVerifyOtp2 = async (req, res) => {
         }
     }
 
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -386,7 +386,7 @@ exports.postChangePassword = async (req, res) => {
         req.session.message = result.message;
         res.redirect('/profile');
     }
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again"
 
@@ -420,24 +420,23 @@ exports.getAddAddress = async (req, res) => {
 
 exports.postAddAddress = async (req, res) => {
 
-    const result = await userService.addAddress(req.body, req.session);
-
-    if (!result.success) {
-        console.log(result.message);
-        req.session.error = result.message;
-        return res.redirect('/address/add');
-    }
-
     try {
+        const result = await userService.addAddress(req.body, req.session);
+
+        if (!result.success) {
+            console.log(result.message);
+            req.session.error = result.message;
+            return res.redirect('/address/add');
+        }
+
         if (result.success) {
             return res.redirect('/address');
         }
     }
-    catch(err) {
-        console.log(err);
+    catch (err) {
+        console.error(err);
         req.session.error = "Something went wrong. Please try again";
-
-        res.redirect('/address');
+        return res.redirect('/address/add');
     }
 }
 
@@ -451,7 +450,7 @@ exports.getEditAddress = async (req, res) => {
 
 exports.postEditAddress = async (req, res) => {
 
-    const result = await userService.editAddress(req.params.id, req.body, req.session, );
+    const result = await userService.editAddress(req.params.id, req.body, req.session,);
 
     if (!result.success) {
         req.session.error = result.message;
@@ -463,7 +462,7 @@ exports.postEditAddress = async (req, res) => {
             return res.redirect('/address');
         }
     }
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
         res.redirect('/address/edit');
@@ -480,7 +479,7 @@ exports.deleteAddress = async (req, res) => {
             return res.redirect('/address');
         }
     }
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 

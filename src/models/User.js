@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema({
         default: "user"
     },
     profileImgUrl: {
-        type: String
+        type: String,
+        default: null
     },
     isBlocked: {
         type: Boolean,

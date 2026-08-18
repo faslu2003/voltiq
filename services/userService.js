@@ -1,5 +1,7 @@
 const User = require('../src/models/User');
+
 const Address = require('../src/models/Address');
+const addressService = require('./addressService');
 
 const bcrypt = require('bcrypt');
 
@@ -35,7 +37,7 @@ exports.editProfile = async (body, file, session) => {
 
     return {
         success: true,
-        message: "Edited successfully"
+        message: "Edited successfully."
     }
 }
 
@@ -64,14 +66,14 @@ exports.verifyOtp1 = (body, session) => {
     if (Date.now() > session.otpExpiry) {
         return {
             success: false,
-            message: "OTP has expired"
+            message: "OTP has expired."
         }
     }
 
     if (enteredOTP !== session.otp) {
         return {
             success: false,
-            message: "Entered OTP is invalid"
+            message: "Entered OTP is invalid."
         }
     }
 
@@ -107,14 +109,14 @@ exports.verifyOtp2 = async (body, session) => {
     if (Date.now() > session.otpExpiry) {
         return {
             success: false,
-            message: "OTP has expired`"
+            message: "OTP has expired."
         }
     }
 
     if (enteredOTP !== session.otp) {
         return {
             success: false,
-            message: "Entered OTP is invalid"
+            message: "Entered OTP is invalid."
         }
     }
 
@@ -126,7 +128,7 @@ exports.verifyOtp2 = async (body, session) => {
 
     return {
         success: true,
-        message: "Email updated successfully"
+        message: "Email updated successfully."
     }
 }
 
@@ -158,7 +160,7 @@ exports.changePassword = async (body, session) => {
     if (!isMatch) {
         return {
             success: false,
-            message: "Please enter the correct password"
+            message: "Please enter the correct password."
         }
     }
 
@@ -167,27 +169,34 @@ exports.changePassword = async (body, session) => {
     if (!passwordRegex.test(newPassword)) {
         return {
             success: false,
-            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
         }
     }
 
     if (newPassword === currentPassword) {
         return {
             success: false,
-            message: "New password cannot be the same as your current password"
+            message: "New password cannot be the same as your current password."
         }
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await User.updateOne({ _id: session.user.id }, { password: hashedPassword});
+    await User.updateOne({ _id: session.user.id }, { password: hashedPassword });
 
     return {
         success: true,
-        message: "Password changed successfully"
+        message: "Password changed successfully."
     }
 }
 
+
+function normalize(value) {
+    return value
+        ?.toLowerCase()
+        .replace(/[^\w\s]/g, "")
+        .trim();
+}
 
 exports.addAddress = async (body, session) => {
 
@@ -198,11 +207,67 @@ exports.addAddress = async (body, session) => {
     if (!fullName || !phoneNumber || !pincode || !houseName || !locality || !city || !state || !addressType) {
         return {
             success: false,
-            message: "Please fill in all the fields"
+            message: "Please fill in all the fields."
         }
     }
 
     const isDefault = body.isDefault === "true";
+
+    const result = await addressService.validateAddress(body);
+    console.log("GEOAPIFY RESULT:", result);
+
+    if (!result.results || result.results.length === 0) {
+        return {
+            success: false,
+            message: "We couldn't verify this address. Please check your address details."
+        };
+    }
+
+    const isValidAddress = result.results.some(address => {
+
+        const countryMatches =
+            address.country_code?.toLowerCase() === "in";
+
+        const pincodeMatches =
+            address.postcode === pincode;
+
+        const stateMatches =
+            address.state?.toLowerCase() === state.toLowerCase();
+
+        const submittedLocality = normalize(locality);
+        const submittedCity = normalize(city);
+
+        const geoLocations = [
+            address.city,
+            address.town,
+            address.village,
+            address.hamlet,
+            address.suburb,
+            address.district,
+            address.county
+        ].map(normalize);
+
+        const locationMatches = geoLocations.some(location =>
+            location === submittedLocality ||
+            location === submittedCity ||
+            location?.includes(submittedLocality) ||
+            submittedLocality.includes(location)
+        );
+
+        return (
+            countryMatches &&
+            pincodeMatches &&
+            stateMatches &&
+            locationMatches
+        );
+    });
+
+    if (!isValidAddress) {
+        return {
+            success: false,
+            message: "The address could not be verified. Please check your address details."
+        };
+    }
 
     await Address.create({
         userId: session.user.id,
@@ -215,7 +280,7 @@ exports.addAddress = async (body, session) => {
         city,
         state,
         addressType,
-        isDefault: isDefault
+        isDefault
     });
 
     return {
@@ -233,7 +298,7 @@ exports.editAddress = async (addressId, body, session) => {
     if (Object.keys(body).length === 0) {
         return {
             success: false,
-            message: "No changes were made"
+            message: "No changes were made."
         }
     }
 

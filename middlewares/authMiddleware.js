@@ -26,7 +26,9 @@ exports.checkBlocked = async (req, res, next) => {
 
     const user = await User.findById(req.session.user.id);
 
-    if (!user || user.isBlocked) {
+    if (user.isBlocked) {
+        req.session.error = "Your account has been blocked. Please contact support.";
+
         delete req.session.user;
         return res.redirect('/signin');
     }
