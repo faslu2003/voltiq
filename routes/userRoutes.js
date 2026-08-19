@@ -20,6 +20,8 @@ router.post('/signup/verification', userController.postSignupVerification);
 router.get('/signin', userController.getSignin);
 router.post('/signin', userController.postSignin);
 
+router.post('/auth/google', userController.googleAuth);
+
 router.get('/signin/reset-password', userController.getResetPassword);
 router.post('/signin/reset-password', userController.postResetPassword);
 
@@ -68,6 +70,28 @@ router.post('/address/delete/:id', userController.deleteAddress);
 
 
 router.post('/logout', userController.logout);
+
+
+
+
+
+
+
+
+// practice
+
+router.get('/addresses', userController.addresses);
+
+
+
+
+
+
+
+
+
+
+
 
 
 

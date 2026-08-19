@@ -8,12 +8,17 @@ const userSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: Number,
-        required: true,
-        unique: true
+        required: function() {
+            return this.authProvider ==="local"
+        },
+        unique: true,
+        sparse: true
     },
     password: {
         type: String,
-        required: true
+        required: function() {
+            return this.authProvider === "local"
+        }
     },
     fullName: {
         type: String,
@@ -33,7 +38,8 @@ const userSchema = new mongoose.Schema({
     },
     authProvider: {
         type: String,
-        default: "local" // "local" or "google"
+        enum: ["local", "google"],
+        default: "local"
     },
     googleId: {
         type: String,

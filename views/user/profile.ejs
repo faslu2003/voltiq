@@ -153,7 +153,11 @@
                 <div class="card-head-right">
                   <span class="updated-pill">
                     Last Updated:
-                    <%= user.updatedAt %>
+                    <%= user.updatedAt.toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) %>
                   </span>
                   <a href="/profile/edit" class="edit-link">Edit</a>
                 </div>

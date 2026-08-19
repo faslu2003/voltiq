@@ -2,6 +2,9 @@ const User = require('../src/models/User');
 
 const bcrypt = require('bcrypt');
 
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 
 exports.signup = async (body) => {
@@ -15,6 +18,15 @@ exports.signup = async (body) => {
             success: false,
             message: "An account with this email already exists."
         };
+    }
+
+    const existingPhoneNumber = await User.findOne({ phoneNumber });
+
+    if (existingPhoneNumber) {
+        return {
+            success: false,
+            message: "This phone number is already associated with an account."
+        }
     }
 
     if (!fullName) {
@@ -199,6 +211,97 @@ exports.signin = async (body) => {
             message: "Your account has been blocked. Please contact support."
         }
     }
+
+    return {
+        success: true,
+        user
+    }
+}
+
+
+exports.googleAuth = async (credential) => {
+
+    const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    const googleId = payload.sub;
+    const email = payload.email;
+    const fullName = payload.name;
+    const profileImgUrl = payload.picture;
+
+    console.log("GOOGLE USER:", {
+        googleId,
+        email,
+        fullName,
+        profileImgUrl
+    });
+
+    return {
+        success: true,
+        googleId,
+        email,
+        fullName,
+        profileImgUrl
+    }
+}
+
+
+exports.googleSignin = async (googleUser) => {
+
+    const { googleId, email, fullName, profileImgUrl } = googleUser;
+
+    let user;
+
+    user = await User.findOne({ googleId });
+
+    if (user) {
+        return {
+            success: true,
+            user
+        }
+    }
+
+    user = await User.findOne({ email });
+
+    if (user) {
+
+        if (user.role !== "user") {
+            return {
+                success: false,
+                message: "Unable to sign in with Google."
+            }
+        }
+
+        if (user.authProvider === "local") {
+
+            user.googleId = googleId,
+            user.profileImgUrl = user.profileImgUrl || profileImgUrl
+
+            await user.save();
+
+            return {
+                success: true,
+                user
+            }
+        }
+
+        return {
+            success: false,
+            message: "Unable to sign in with Google."
+        }
+    }
+
+    user = await User.create({
+        googleId,
+        fullName,
+        email,
+        profileImgUrl,
+        authProvider: "google"
+    })
 
     return {
         success: true,

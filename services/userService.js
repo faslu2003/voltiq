@@ -318,3 +318,23 @@ exports.deleteAddress = async (addressId) => {
         success: true
     }
 }
+
+
+
+
+
+
+// practice
+
+exports.addresses = async () => {
+
+    const addresses = await Address.find();
+
+    const totalUsers = await User.countDocuments()
+
+    return {
+        success: true,
+        addresses,
+        totalUsers
+    }
+}

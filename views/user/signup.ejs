@@ -14,6 +14,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="css/user/sign-up-in.css">
     <title>Sign Up</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -70,7 +71,14 @@
                     </div>
 
                     <!-- add Google icon -->
-                    <button type=" button" id="google-btn">Google</button>
+                    <!-- <button type=" button" id="google-btn">Google</button> -->
+                    <div id="g_id_onload" data-client_id="<%= process.env.GOOGLE_CLIENT_ID %>"
+                        data-login_uri="http://localhost:3000/auth/google" data-auto_prompt="false">
+                    </div>
+
+                    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                        data-text="continue_with" data-shape="rectangular">
+                    </div>
 
                     <div id="signin"">
                 <!-- add href -->

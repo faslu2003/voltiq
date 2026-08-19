@@ -154,6 +154,8 @@ form input::placeholder {
 #welcome-msg {
     font-size: 32px;
     font-family: hanken grotesk;
+    font-weight: 500;
+    color: #3f3b42;
     text-align: center;
 }
 

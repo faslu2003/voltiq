@@ -130,6 +130,35 @@ exports.postSignin = async (req, res) => {
 }
 
 
+exports.googleAuth = async (req, res) => {
+
+    try {
+
+        const googleUser = await authService.googleAuth(req.body.credential);
+
+        const result = await authService.googleSignin(googleUser);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/signin');
+        }
+
+        req.session.user = {
+            id: result.user._id
+        }
+
+        return res.redirect('/home');
+    }
+    catch (err) {
+
+        console.log(err);
+        req.session.error = "Google authentication failed. Please try again.";
+
+        return res.redirect('/signin');
+    }
+}
+
+
 exports.getResetPassword = (req, res) => {
 
     const error = req.session.error || null;
@@ -496,4 +525,21 @@ exports.logout = (req, res) => {
     req.session.destroy(() => {
         res.redirect('/signin');
     })
+}
+
+
+
+
+
+
+// practice
+
+exports.addresses = async (req, res) => {
+
+    const result = await userService.addresses();
+
+    const addresses = result.addresses;
+    const totalUsers = result.totalUsers;
+
+    res.render('user/test', { addresses, totalUsers });
 }
