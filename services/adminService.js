@@ -110,7 +110,7 @@ exports.getCustomers = async (page = 1, search, status, registered) => {
     const limit = 5;
     const skip = (page - 1) * limit;
 
-    const customers = await User.find(filter).sort({ isBlocked: -1, createdAt: -1 }).skip(skip).limit(limit);
+    const customers = await User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const totalCustomers = await User.countDocuments(filter);
 

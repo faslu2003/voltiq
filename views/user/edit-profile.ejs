@@ -99,14 +99,11 @@ const success = locals.success || null;
         </div>
       </div>
 
-      <% if (success) { %>
-        <div class="alert alert-success"><%= success %></div>
-      <% } %>
       <% if (error) { %>
         <div class="alert alert-error"><%= error %></div>
       <% } %>
 
-      <form action="/profile/edit" method="post" enctype="multipart/form-data" class="edit-form">
+      <form action="/profile/edit" method="post" enctype="multipart/form-data" class="edit-form" novalidate>
 
         <div class="form-grid">
 

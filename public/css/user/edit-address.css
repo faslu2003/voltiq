@@ -338,6 +338,21 @@ body {
   color: #555555;
 }
 
+.alert{
+  width:100%;
+  font-size:13.5px;
+  font-weight:500;
+  padding:11px 14px;
+  border-radius:10px;
+  margin-top:18px;
+  margin-bottom: 18px;
+}
+.alert-error{
+    background: #e6484f;
+    color: #fdeceb;
+}
+
+
 /* MODAL FORM GRID */
 .modal-form {
   display: flex;

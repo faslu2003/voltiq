@@ -143,35 +143,21 @@ button{font-family:inherit;cursor:pointer;}
 }
 
 .alert {
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
     padding: 14px 18px;
-
     margin-bottom: 24px;
-
     border-radius: 12px;
-
     border: 1px solid transparent;
-
     font-size: 14px;
-
     font-weight: 500;
-
 }
 
 .alert-success {
-
     background: var(--green-soft);
-
     color: var(--green);
-
     border-color: rgba(30, 158, 107, 0.18);
-
 }
 
 .card{
@@ -285,13 +271,21 @@ button{font-family:inherit;cursor:pointer;}
   gap:14px;
   flex-shrink:0;
 }
-.active-badge{
+/* .active-badge{
   font-size:13px;
   font-weight:700;
   color:var(--violet);
   background:var(--violet-soft);
   padding:5px 12px;
   border-radius:999px;
+} */
+.disabled-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: #f1f1f1;
+  padding: 5px 12px;
+  border-radius: 999px;
 }
 .chev{color:var(--text-faint);}
 

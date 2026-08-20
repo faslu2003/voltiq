@@ -22,14 +22,14 @@ exports.getSignup = (req, res) => {
 
 exports.postSignup = async (req, res) => {
 
-    const result = await authService.signup(req.body);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/signup');
-    }
-
     try {
+
+        const result = await authService.signup(req.body);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/signup');
+        }
 
         if (result.success) {
             req.session.pendingUser = result.pendingUser;
@@ -58,14 +58,14 @@ exports.getSignupVerification = (req, res) => {
 
 exports.postSignupVerification = async (req, res) => {
 
-    const result = await authService.signupVerification(req.body, req.session);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/signup/verification');
-    }
-
     try {
+
+        const result = await authService.signupVerification(req.body, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/signup/verification');
+        }
 
         if (result.success) {
             req.session.message = result.message;
@@ -101,14 +101,14 @@ exports.getSignin = (req, res) => {
 
 exports.postSignin = async (req, res) => {
 
-    const result = await authService.signin(req.body);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/signin');
-    }
-
     try {
+
+        const result = await authService.signin(req.body);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/signin');
+        }
 
         const user = result.user;
 
@@ -172,13 +172,15 @@ exports.getResetPassword = (req, res) => {
 
 exports.postResetPassword = async (req, res) => {
 
-    const result = await authService.resetPassword(req.body);
-
-    if (!result.success) {
-        req.session.error = result.message;
-    }
-
     try {
+
+        const result = await authService.resetPassword(req.body);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/signin/reset-password');
+        }
+
         if (result.success) {
             req.session.message = result.message;
             return res.redirect('/signin/reset-password');
@@ -221,20 +223,38 @@ exports.getEditProfile = async (req, res) => {
 
     const user = await User.findById(req.session.user.id);
 
-    res.render('user/edit-profile', { user });
+    const error = req.session.error || null;
+    req.session.error = null;
+
+    res.render('user/edit-profile', { user, error });
 }
 
 exports.postEditProfile = async (req, res) => {
 
-    const result = await userService.editProfile(req.body, req.file, req.session);
+    try {
 
-    if (result.success && result.isEmail) {
-        return res.redirect('/email/verify-current');
+        const result = await userService.editProfile(req.body, req.file, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/profile/edit');
+        }
+
+        if (result.success && result.requiresEmailVerification) {
+            return res.redirect('/email/verify-current');
+        }
+
+        if (result.success) {
+            req.session.message = result.message;
+            return res.redirect('/profile');
+        }
     }
 
-    if (result.success) {
-        req.session.message = result.message;
-        return res.redirect('/profile');
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again";
+
+        res.redirect('/profile/edit');
     }
 }
 
@@ -254,9 +274,10 @@ exports.getVerifyCurrentEmail = async (req, res) => {
 
 exports.postVerifyCurrentEmail = (req, res) => {
 
-    const result = userService.verifyCurrentEmail();
-
     try {
+
+        const result = userService.verifyCurrentEmail();
+
         if (result.success) {
             req.session.otp = result.otp;
             req.session.otpExpiry = result.otpExpiry;
@@ -286,14 +307,15 @@ exports.getVerifyOtp1 = (req, res) => {
 
 exports.postVerifyOtp1 = async (req, res) => {
 
-    const result = await userService.verifyOtp1(req.body, req.session);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/email/verify-otp-1');
-    }
-
     try {
+
+        const result = await userService.verifyOtp1(req.body, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/email/verify-otp-1');
+        }
+
         if (result.success) {
             return res.redirect('/email/verify-new');
         }
@@ -321,14 +343,15 @@ exports.getVerifyNewEmail = async (req, res) => {
 
 exports.postVerifyNewEmail = async (req, res) => {
 
-    const result = await userService.verifyNewEmail(req.body, req.session);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/email/verify-new');
-    }
-
     try {
+
+        const result = await userService.verifyNewEmail(req.body, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/email/verify-new');
+        }
+
         if (result.success) {
             req.session.email = result.email;
             req.session.otp = result.otp;
@@ -360,14 +383,15 @@ exports.getVerifyOtp2 = (req, res) => {
 
 exports.postVerifyOtp2 = async (req, res) => {
 
-    const result = await userService.verifyOtp2(req.body, req.session);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/email/verify-otp-2');
-    }
-
     try {
+
+        const result = await userService.verifyOtp2(req.body, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/email/verify-otp-2');
+        }
+
         if (result.success) {
             req.session.message = result.message;
             return res.redirect('/profile');
@@ -404,14 +428,15 @@ exports.getChangePassword = (req, res) => {
 
 exports.postChangePassword = async (req, res) => {
 
-    const result = await userService.changePassword(req.body, req.session);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        res.redirect('/change-password');
-    }
-
     try {
+
+        const result = await userService.changePassword(req.body, req.session);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            res.redirect('/change-password');
+        }
+
         req.session.message = result.message;
         res.redirect('/profile');
     }
@@ -474,19 +499,23 @@ exports.getEditAddress = async (req, res) => {
 
     const address = await Address.findOne({ _id: req.params.id, userId: req.session.user.id });
 
-    res.render('user/edit-address', { address });
+    const error = req.session.error || null;
+    req.session.error = null;
+
+    res.render('user/edit-address', { address, error });
 }
 
 exports.postEditAddress = async (req, res) => {
 
-    const result = await userService.editAddress(req.params.id, req.body, req.session,);
-
-    if (!result.success) {
-        req.session.error = result.message;
-        return res.redirect('/address/edit');
-    }
-
     try {
+
+        const result = await userService.editAddress(req.params.id, req.body, req.session,);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect(`/address/edit/${req.params.id}`);
+        }
+
         if (result.success) {
             return res.redirect('/address');
         }
@@ -494,16 +523,17 @@ exports.postEditAddress = async (req, res) => {
     catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
-        res.redirect('/address/edit');
+        res.redirect(`/address/edit/${req.params.id}`);
     }
 }
 
 
 exports.deleteAddress = async (req, res) => {
 
-    const result = await userService.deleteAddress(req.params.id);
-
     try {
+
+        const result = await userService.deleteAddress(req.params.id);
+
         if (result.success) {
             return res.redirect('/address');
         }

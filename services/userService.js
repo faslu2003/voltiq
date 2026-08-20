@@ -16,10 +16,24 @@ exports.editProfile = async (body, file, session) => {
     const user = await User.findById(id);
 
     if (fullName !== user.fullName) {
+        const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+        if (!nameRegex.test(fullName)) {
+            return {
+                success: false,
+                message: "Please enter a valid name."
+            }
+        }
         await User.updateOne({ _id: id }, { fullName });
     }
 
     if (phoneNumber !== user.phoneNumber) {
+        const phoneNumRegex = /^[6-9]\d{9}$/;
+        if (!phoneNumRegex.test(phoneNumber)) {
+            return {
+                success: false,
+                message: "Please enter a valid 10-digit phone number."
+            }
+        }
         await User.updateOne({ _id: id }, { phoneNumber });
     }
 
@@ -28,10 +42,17 @@ exports.editProfile = async (body, file, session) => {
     }
 
     if (email !== user.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return {
+                success: false,
+                message: "Please enter a valid email address."
+            }
+        }
         session.newEmail = email;
         return {
             success: true,
-            isEmail: true
+            requiresEmailVerification: true
         }
     }
 
@@ -152,9 +173,16 @@ exports.resendOtp = async (session) => {
 
 exports.changePassword = async (body, session) => {
 
-    const { currentPassword, newPassword } = body;
+    const { currentPassword, newPassword, confirmPassword } = body;
 
     const user = await User.findById(session.user.id);
+
+    if (user.authProvider === "google") {
+        return {
+            success: false,
+            message: "Password cannot be changed for accounts created with Google."
+        }
+    }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
@@ -177,6 +205,13 @@ exports.changePassword = async (body, session) => {
         return {
             success: false,
             message: "New password cannot be the same as your current password."
+        }
+    }
+
+    if (newPassword !== confirmPassword) {
+        return {
+            success: false,
+            message: "Passwords do not match."
         }
     }
 
@@ -212,6 +247,30 @@ exports.addAddress = async (body, session) => {
     }
 
     const isDefault = body.isDefault === "true";
+
+    const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+    if (!nameRegex.test(fullName)) {
+        return {
+            success: false,
+            message: "Please enter a valid name."
+        }
+    }
+
+    const phoneNumRegex = /^[6-9]\d{9}$/;
+    if (!phoneNumRegex.test(phoneNumber)) {
+        return {
+            success: false,
+            message: "Please enter a valid 10-digit phone number."
+        }
+    }
+
+    const pincodeRegex = /^[1-9][0-9]{5}$/;
+    if (!pincodeRegex.test(pincode)) {
+        return {
+            success: false,
+            message: "Please enter a valid 6-digit PIN code."
+        };
+    }
 
     const result = await addressService.validateAddress(body);
     console.log("GEOAPIFY RESULT:", result);
@@ -302,7 +361,85 @@ exports.editAddress = async (addressId, body, session) => {
         }
     }
 
-    await Address.updateOne({ _id: addressId, userId: session.user.id }, { $set: body, isDefault });
+    const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+    if (!nameRegex.test(fullName)) {
+        return {
+            success: false,
+            message: "Please enter a valid name."
+        }
+    }
+
+    const phoneNumRegex = /^[6-9]\d{9}$/;
+    if (!phoneNumRegex.test(phoneNumber)) {
+        return {
+            success: false,
+            message: "Please enter a valid 10-digit phone number."
+        }
+    }
+
+    const pincodeRegex = /^[1-9][0-9]{5}$/;
+    if (!pincodeRegex.test(pincode)) {
+        return {
+            success: false,
+            message: "Please enter a valid 6-digit PIN code."
+        };
+    }
+
+    const result = await addressService.validateAddress(body);
+    if (!result.results || result.results.length === 0) {
+        return {
+            success: false,
+            message: "We couldn't verify this address. Please check your address details."
+        };
+    }
+
+    const isValidAddress = result.results.some(address => {
+
+        const countryMatches =
+            address.country_code?.toLowerCase() === "in";
+
+        const pincodeMatches =
+            address.postcode === pincode;
+
+        const stateMatches =
+            address.state?.toLowerCase() === state.toLowerCase();
+
+        const submittedLocality = normalize(locality);
+        const submittedCity = normalize(city);
+
+        const geoLocations = [
+            address.city,
+            address.town,
+            address.village,
+            address.hamlet,
+            address.suburb,
+            address.district,
+            address.county
+        ].map(normalize);
+
+        const locationMatches = geoLocations.some(location =>
+            location === submittedLocality ||
+            location === submittedCity ||
+            location?.includes(submittedLocality) ||
+            submittedLocality.includes(location)
+        );
+
+        return (
+            countryMatches &&
+            pincodeMatches &&
+            stateMatches &&
+            locationMatches
+        );
+    });
+
+    if (!isValidAddress) {
+        return {
+            success: false,
+            message: "The address could not be verified. Please check your address details."
+        };
+    }
+
+    await Address.updateOne({ _id: addressId, userId: session.user.id }, { $set: { fullName, phoneNumber, pincode, houseName, locality, landmark, city, state, addressType, isDefault } });
 
     return {
         success: true

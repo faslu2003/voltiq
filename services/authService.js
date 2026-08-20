@@ -36,6 +36,14 @@ exports.signup = async (body) => {
         }
     }
 
+    const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+    if (!nameRegex.test(fullName)) {
+        return {
+            success: false,
+            message: "Please enter a valid name."
+        }
+    }
+
     if (!email) {
         return {
             success: false,
@@ -55,6 +63,14 @@ exports.signup = async (body) => {
         return {
             success: false,
             message: "Please enter your phone number."
+        }
+    }
+
+    const phoneNumRegex = /^[6-9]\d{9}$/;
+    if (!phoneNumRegex.test(phoneNumber)) {
+        return {
+            success: false,
+            message: "Please enter a valid 10-digit phone number."
         }
     }
 
@@ -80,7 +96,6 @@ exports.signup = async (body) => {
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=])[A-Za-z\d@$!%*?&^#()_\-+=]{8,}$/;
-
     if (!passwordRegex.test(password)) {
         return {
             success: false,
@@ -313,6 +328,14 @@ exports.googleSignin = async (googleUser) => {
 exports.resetPassword = async (body) => {
 
     const { email } = body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return {
+            success: false,
+            message: "Please enter a valid email address."
+        }
+    }
 
     const user = await User.findOne({ email: email });
 
