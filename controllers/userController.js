@@ -532,7 +532,7 @@ exports.deleteAddress = async (req, res) => {
 
     try {
 
-        const result = await userService.deleteAddress(req.params.id);
+        const result = await userService.deleteAddress(req.params.id, req.session);
 
         if (result.success) {
             return res.redirect('/address');
@@ -555,21 +555,4 @@ exports.logout = (req, res) => {
     req.session.destroy(() => {
         res.redirect('/signin');
     })
-}
-
-
-
-
-
-
-// practice
-
-exports.addresses = async (req, res) => {
-
-    const result = await userService.addresses();
-
-    const addresses = result.addresses;
-    const totalUsers = result.totalUsers;
-
-    res.render('user/test', { addresses, totalUsers });
 }

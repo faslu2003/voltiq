@@ -78,21 +78,5 @@ router.post('/logout', userController.logout);
 
 
 
-// practice
-
-router.get('/addresses', userController.addresses);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router;

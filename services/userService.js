@@ -354,12 +354,17 @@ exports.editAddress = async (addressId, body, session) => {
 
     const isDefault = body.isDefault === "true";
 
-    if (Object.keys(body).length === 0) {
-        return {
-            success: false,
-            message: "No changes were made."
+    if (isDefault) {
+    await Address.updateMany(
+        {
+            userId: session.user.id,
+            _id: { $ne: addressId }
+        },
+        {
+            $set: { isDefault: false }
         }
-    }
+    );
+}
 
     const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
     if (!nameRegex.test(fullName)) {
@@ -447,31 +452,18 @@ exports.editAddress = async (addressId, body, session) => {
 }
 
 
-exports.deleteAddress = async (addressId) => {
+exports.deleteAddress = async (addressId, session) => {
 
-    await Address.deleteOne({ _id: addressId });
+    const result = await Address.deleteOne({ _id: addressId, userId: session.user.id });
+
+    if (result.deletedCount === 0) {
+        return {
+            success: false,
+            message: "Address not found."
+        }
+    }
 
     return {
         success: true
-    }
-}
-
-
-
-
-
-
-// practice
-
-exports.addresses = async () => {
-
-    const addresses = await Address.find();
-
-    const totalUsers = await User.countDocuments()
-
-    return {
-        success: true,
-        addresses,
-        totalUsers
     }
 }
