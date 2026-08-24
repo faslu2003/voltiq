@@ -184,29 +184,29 @@
         <div class="form-row-2">
           <div class="form-group">
             <label for="fullName" class="form-label">Full Name</label>
-            <input type="text" id="fullName" name="fullName" class="form-input" placeholder="e.g. Arjun Malhotra">
+            <input type="text" id="fullName" name="fullName" class="form-input" placeholder="e.g. Arjun Malhotra" value="<%=data.fullName || ''%>">
           </div>
           <div class="form-group">
             <label for="mobileNumber" class="form-label">Mobile Number</label>
-            <input type="tel" id="mobileNumber" name="phoneNumber" class="form-input" placeholder="+91 98765 43210">
+            <input type="tel" id="mobileNumber" name="phoneNumber" class="form-input" placeholder="+91 98765 43210" value="<%= data.phoneNumber || ''%>">
           </div>
         </div>
         <!-- ROW 2: PINCODE & FLAT / HOUSE NAME / BUILDING -->
         <div class="form-row-2">
           <div class="form-group">
             <label for="pincode" class="form-label">Pincode</label>
-            <input type="text" id="pincode" name="pincode" class="form-input" placeholder="6 Digits">
+            <input type="text" id="pincode" name="pincode" class="form-input" placeholder="6 Digits" value="<%= data.pincode || ''%>">
           </div>
           <div class="form-group">
             <label for="flatHouse" class="form-label">Flat / House Name</label>
             <input type="text" id="flatHouse" name="houseName" class="form-input"
-              placeholder="e.g. Penthouse 42, Skyview Towers">
+              placeholder="e.g. Penthouse 42, Skyview Towers" value="<%=data.houseName || ''%>">
           </div>
         </div>
         <!-- ROW 3: AREA / STREET / SECTOR / VILLAGE -->
         <div class="form-group">
-          <label for="areaStreet" class="form-label">Area / Street / Sector / Village</label>
-          <input type="text" id="areaStreet" name="locality" class="form-input" placeholder="e.g. Bandra West">
+          <label for="areaStreet" class="form-label">Area / Street / Village</label>
+          <input type="text" id="areaStreet" name="locality" class="form-input" placeholder="e.g. Bandra West" value="<%=data.locality || ''%>">
         </div>
         <!-- ROW 4: LANDMARK & TOWN / CITY / STATE -->
         <div class="form-row-2">
@@ -214,15 +214,15 @@
             <label for="landmark" class="form-label">Landmark <span
                 style="font-size: 10px; color: #8E8E93; font-weight: 500;">(OPTIONAL)</span></label>
             <input type="text" id="landmark" name="landmark" class="form-input"
-              placeholder="e.g. Near Lilavati Hospital">
+              placeholder="e.g. Near Lilavati Hospital" value="<%= data.landmark || ''%>">
           </div>
           <div class="form-group">
             <label for="city" class="form-label">City</label>
-            <input type="text" id="city" name="city" class="form-input" placeholder="e.g. Mumbai">
+            <input type="text" id="city" name="city" class="form-input" placeholder="e.g. Mumbai" value="<%= data.city || ''%>">
           </div>
           <div class="form-group">
             <label for="state" class="form-label">State</label>
-            <input type="text" id="state" name="state" class="form-input" placeholder="e.g. Maharashtra">
+            <input type="text" id="state" name="state" class="form-input" placeholder="e.g. Maharashtra" value="<%= data.state || ''%>">
           </div>
           <div class="form-group">
             <label for="addressType" class="form-label">Address Type</label>

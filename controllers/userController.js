@@ -17,7 +17,10 @@ exports.getSignup = (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/signup', { error });
+    const data = req.session.data || {};
+    req.session.data = null;
+
+    res.render('user/signup', { error, data });
 }
 
 exports.postSignup = async (req, res) => {
@@ -28,6 +31,11 @@ exports.postSignup = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = {
+                fullName: req.body.fullName,
+                email: req.body.email,
+                phoneNumber: req.body.phoneNumber
+            };
             return res.redirect('/signup');
         }
 
@@ -35,6 +43,7 @@ exports.postSignup = async (req, res) => {
             req.session.pendingUser = result.pendingUser;
             req.session.otp = result.otp;
             req.session.otpExpiry = result.otpExpiry;
+            req.session.resendOtpExpiry = result.resendOtpExpiry;
 
             return res.redirect('/signup/verification');
         }
@@ -53,7 +62,9 @@ exports.getSignupVerification = (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/signup-verification', { error, resendSeconds: 60 });
+    const resendSeconds = Math.max(0, Math.ceil((req.session.resendOtpExpiry - Date.now()) / 1000));
+
+    res.render('user/signup-verification', { error, resendSeconds });
 }
 
 exports.postSignupVerification = async (req, res) => {
@@ -96,7 +107,10 @@ exports.getSignin = (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/signin', { error, message });
+    const data = req.session.data || {};
+    req.session.data = null;
+
+    res.render('user/signin', { error, message, data });
 }
 
 exports.postSignin = async (req, res) => {
@@ -107,6 +121,9 @@ exports.postSignin = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = {
+                email: req.body.email
+            };
             return res.redirect('/signin');
         }
 
@@ -226,7 +243,10 @@ exports.getEditProfile = async (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/edit-profile', { user, error });
+    const data = req.session.data || {};
+    req.session.data = null;
+
+    res.render('user/edit-profile', { user, error, data });
 }
 
 exports.postEditProfile = async (req, res) => {
@@ -237,6 +257,7 @@ exports.postEditProfile = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = req.body;
             return res.redirect('/profile/edit');
         }
 
@@ -469,7 +490,10 @@ exports.getAddAddress = async (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/add-address', { error, user });
+    const data = req.session.data || {};
+    req.session.data = null;
+
+    res.render('user/add-address', { error, user, data });
 }
 
 exports.postAddAddress = async (req, res) => {
@@ -478,8 +502,8 @@ exports.postAddAddress = async (req, res) => {
         const result = await userService.addAddress(req.body, req.session);
 
         if (!result.success) {
-            console.log(result.message);
             req.session.error = result.message;
+            req.session.data = req.body;
             return res.redirect('/address/add');
         }
 
@@ -502,7 +526,10 @@ exports.getEditAddress = async (req, res) => {
     const error = req.session.error || null;
     req.session.error = null;
 
-    res.render('user/edit-address', { address, error });
+    const data = req.session.data || {};
+    req.session.data = null;
+
+    res.render('user/edit-address', { address, error, data });
 }
 
 exports.postEditAddress = async (req, res) => {
@@ -513,6 +540,7 @@ exports.postEditAddress = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = req.body;
             return res.redirect(`/address/edit/${req.params.id}`);
         }
 

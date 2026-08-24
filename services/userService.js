@@ -237,8 +237,6 @@ exports.addAddress = async (body, session) => {
 
     const { fullName, phoneNumber, pincode, houseName, locality, landmark, city, state, addressType } = body;
 
-    console.log(body);
-
     if (!fullName || !phoneNumber || !pincode || !houseName || !locality || !city || !state || !addressType) {
         return {
             success: false,

@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { OAuth2Client } = require('google-auth-library');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const mailer = require('../utils/mailer');
 
 
 exports.signup = async (body) => {
@@ -109,16 +110,21 @@ exports.signup = async (body) => {
     const otp = generateOTP();
     console.log("OTP:", otp);
 
+    await mailer.sendOTP(email, otp);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     return {
         success: true,
         pendingUser: {
             fullName,
             email,
             phoneNumber,
-            password
+            hashedPassword
         },
         otp,
-        otpExpiry: Date.now() + 3 * 60 * 1000
+        otpExpiry: Date.now() + 3 * 60 * 1000,
+        resendOtpExpiry: Date.now() + 60 * 1000
     }
 }
 
@@ -148,9 +154,7 @@ exports.signupVerification = async (body, session) => {
         }
     }
 
-    const { fullName, email, phoneNumber, password } = session.pendingUser;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { fullName, email, phoneNumber, hashedPassword } = session.pendingUser;
 
     await User.create({
         fullName,
@@ -294,7 +298,7 @@ exports.googleSignin = async (googleUser) => {
         if (user.authProvider === "local") {
 
             user.googleId = googleId,
-            user.profileImgUrl = user.profileImgUrl || profileImgUrl
+                user.profileImgUrl = user.profileImgUrl || profileImgUrl
 
             await user.save();
 

@@ -112,47 +112,35 @@
 
         <script>
             const otpInputs = Array.from(document.querySelectorAll(".otp-input"));
-
             otpInputs.forEach((input, index) => {
-
                 input.addEventListener("input", function () {
-
                     // Allow only numbers
                     input.value = input.value.replace(/[^0-9]/g, "").slice(0, 1);
-
                     // Move to next box
                     if (input.value && index < otpInputs.length - 1) {
                         otpInputs[index + 1].focus();
                     }
                 });
-
                 input.addEventListener("keydown", function (e) {
-
                     // Move back on Backspace
                     if (e.key === "Backspace" && !input.value && index > 0) {
                         otpInputs[index - 1].focus();
                     }
                 });
-
                 input.addEventListener("paste", function (e) {
-
                     e.preventDefault();
-
                     const digits = e.clipboardData
                         .getData("text")
                         .replace(/[^0-9]/g, "")
                         .split("");
-
                     digits.forEach((digit, i) => {
                         if (otpInputs[index + i]) {
                             otpInputs[index + i].value = digit;
                         }
                     });
-
                     const lastInput = otpInputs[Math.min(index + digits.length, otpInputs.length - 1)];
                     lastInput.focus();
                 });
-
             });
         </script>
 
@@ -165,15 +153,12 @@
             let countdown;
 
             function startCountdown() {
-
                 resendBtn.disabled = true;
                 resendHint.style.display = "block";
                 resendTimer.textContent = secondsLeft;
 
                 countdown = setInterval(() => {
-
                     secondsLeft--;
-
                     if (secondsLeft <= 0) {
                         clearInterval(countdown);
                         resendBtn.disabled = false;
@@ -181,7 +166,6 @@
                     } else {
                         resendTimer.textContent = secondsLeft;
                     }
-
                 }, 1000);
             }
 
@@ -207,7 +191,6 @@
                 } catch (err) {
                     console.error(err);
                 }
-
             });
         </script>
 
