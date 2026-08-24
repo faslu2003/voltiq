@@ -246,6 +246,14 @@ exports.addAddress = async (body, session) => {
 
     const isDefault = body.isDefault === "true";
 
+    if (isDefault) {
+        const defaultAddress = await Address.findOne({ userId: session.user.id, isDefault: true });
+
+        if (defaultAddress) {
+            await Address.updateOne({ _id: defaultAddress._id }, { isDefault: false });
+        }
+    }
+
     const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
     if (!nameRegex.test(fullName)) {
         return {
@@ -295,20 +303,24 @@ exports.addAddress = async (body, session) => {
         const submittedCity = normalize(city);
 
         const geoLocations = [
+            address.name,
+            address.street,
             address.city,
             address.town,
-            address.village,
             address.hamlet,
             address.suburb,
-            address.district,
-            address.county
+            address.county,
+            address.county_district,
+            address.state_district,
         ].map(normalize);
 
         const locationMatches = geoLocations.some(location =>
             location === submittedLocality ||
             location === submittedCity ||
             location?.includes(submittedLocality) ||
-            submittedLocality.includes(location)
+            submittedLocality.includes(location) ||
+            location?.includes(submittedCity) ||
+            submittedCity.includes(location)
         );
 
         return (
@@ -353,16 +365,16 @@ exports.editAddress = async (addressId, body, session) => {
     const isDefault = body.isDefault === "true";
 
     if (isDefault) {
-    await Address.updateMany(
-        {
-            userId: session.user.id,
-            _id: { $ne: addressId }
-        },
-        {
-            $set: { isDefault: false }
-        }
-    );
-}
+        await Address.updateMany(
+            {
+                userId: session.user.id,
+                _id: { $ne: addressId }
+            },
+            {
+                $set: { isDefault: false }
+            }
+        );
+    }
 
     const nameRegex = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
     if (!nameRegex.test(fullName)) {
@@ -411,12 +423,13 @@ exports.editAddress = async (addressId, body, session) => {
         const submittedCity = normalize(city);
 
         const geoLocations = [
+            address.name,
+            address.street,
             address.city,
             address.town,
-            address.village,
             address.hamlet,
             address.suburb,
-            address.district,
+            address.state_district,
             address.county
         ].map(normalize);
 
@@ -424,7 +437,9 @@ exports.editAddress = async (addressId, body, session) => {
             location === submittedLocality ||
             location === submittedCity ||
             location?.includes(submittedLocality) ||
-            submittedLocality.includes(location)
+            submittedLocality.includes(location) ||
+            location?.includes(submittedCity) ||
+            submittedCity.includes(location)
         );
 
         return (
