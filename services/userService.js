@@ -4,6 +4,7 @@ const Address = require('../src/models/Address');
 const addressService = require('./addressService');
 
 const bcrypt = require('bcrypt');
+const mailer = require('../utils/mailer');
 
 
 
@@ -28,17 +29,24 @@ exports.editProfile = async (body, file, session) => {
 
     if (phoneNumber !== user.phoneNumber) {
         const phoneNumRegex = /^[6-9]\d{9}$/;
-        if (!phoneNumRegex.test(phoneNumber)) {
-            return {
-                success: false,
-                message: "Please enter a valid 10-digit phone number."
+        if (user.authProvider === "local") {
+            if (!phoneNumRegex.test(phoneNumber)) {
+                return {
+                    success: false,
+                    message: "Please enter a valid 10-digit phone number."
+                }
             }
         }
         await User.updateOne({ _id: id }, { phoneNumber });
     }
 
-    if (file) {
-        await User.updateOne({ _id: id }, { profileImgUrl: `/uploads/${file.filename}` });
+    const removeProfilePic = body.removeProfilePic === "true";
+
+    if (removeProfilePic) {
+        await User.updateOne({ _id: id }, { $set: { profileImgUrl: null } });
+    }
+    else if (file) {
+        await User.updateOne({ _id: id }, { $set: { profileImgUrl: `/uploads/${file.filename}` } })
     }
 
     if (email !== user.email) {
@@ -157,12 +165,14 @@ exports.verifyOtp2 = async (body, session) => {
 exports.resendOtp = async (session) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const email = session.pendingUser.email;
 
     session.otp = otp;
     session.otpExpiry = Date.now() + 3 * 60 * 1000;
     session.resendOtpExpiry = Date.now() + 60 * 1000;
 
     console.log("OTP:", otp);
+    await mailer.sendOTP(email, otp);
 
     return {
         success: true,
@@ -336,6 +346,14 @@ exports.addAddress = async (body, session) => {
             success: false,
             message: "The address could not be verified. Please check your address details."
         };
+    }
+
+    const totalAddresses = await Address.countDocuments({ userId: session.user.id });
+    if (totalAddresses >= 3) {
+        return {
+            success: false,
+            message: "You can only add maximum 3 addresses"
+        }
     }
 
     await Address.create({

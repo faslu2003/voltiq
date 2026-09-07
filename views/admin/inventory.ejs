@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Inventory Management · Voltiq Admin Portal' %></title>
+  <link rel="stylesheet" href="/css/admin/inventory.css">
+  <link rel="stylesheet" href="/css/admin/add-product-modal.css">
+  <link rel="stylesheet" href="/css/admin/delete-category-modal.css">
+  <link rel="stylesheet" href="/css/admin/inactive-category-modal.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+      <a href="/admin/dashboard" class="brand-wrapper">
+        <div class="brand-logo-text">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          voltiq
+        </div>
+        <span class="brand-subtitle">Admin Portal</span>
+      </a>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="/admin/dashboard" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            Dashboard
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+
+        <!-- Sub Nav Items -->
+        <div class="sub-nav">
+          <a href="/admin/overview" class="sub-nav-item">Overview</a>
+          <a href="/admin/sales" class="sub-nav-item">Sales Performance</a>
+        </div>
+
+        <!-- Inventory (ACTIVE) -->
+        <a href="/admin/inventory" class="nav-item active">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </span>
+            Inventory
+          </div>
+        </a>
+
+        <!-- Categories -->
+        <a href="/admin/categories" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </span>
+            Categories
+          </div>
+        </a>
+
+        <!-- Orders -->
+        <a href="/admin/orders" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </span>
+            Orders
+          </div>
+        </a>
+
+        <!-- Customers -->
+        <a href="/admin/customers" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            Customers
+          </div>
+        </a>
+
+        <!-- Promotions -->
+        <a href="/admin/promotions" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            Promotions
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+
+        <!-- Brand Management -->
+        <a href="/admin/brands" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </span>
+            Brand Management
+          </div>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+      
+      <!-- TOP HEADER BAR (SEARCH BAR MATCHING CATEGORIES PAGE) -->
+      <header class="top-header">
+        <h2 class="header-title-text">Inventory</h2>
+
+        <div class="header-search">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search products, SKUs, or categories..." onkeyup="filterInventoryTable()">
+        </div>
+
+        <div class="header-right-actions">
+          <button class="icon-button" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <button class="icon-button" aria-label="User Account">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        
+        <!-- Page Heading Bar -->
+        <div class="page-heading-bar">
+          <div class="heading-title-group">
+            <h1>Product Catalog</h1>
+            <p>Manage your global inventory and stock levels across regions.</p>
+          </div>
+
+          <div class="heading-actions-group">
+            <button type="button" class="btn-export-csv" onclick="exportCSV()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export CSV
+            </button>
+
+            <button type="button" class="btn-add-product" onclick="openAddProductModal()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add New Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Cards Grid (4 Stat Cards) -->
+        <div class="metrics-grid-4">
+          
+          <!-- Card 1: Total Products -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                </svg>
+              </div>
+              <span class="stat-badge-green">+2.4%</span>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Total Products</span>
+              <span class="stat-value">1,240</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Categories -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper gray">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Categories</span>
+              <span class="stat-value">12</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Low Stock Items -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper orange">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Low Stock Items</span>
+              <span class="stat-value orange">45</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Out of Stock -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper red">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Out of Stock</span>
+              <span class="stat-value red">8</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Product Table Card -->
+        <div class="table-card">
+          
+          <!-- Table Controls Toolbar -->
+          <div class="filter-toolbar">
+            <div class="filter-left-controls">
+              <select class="filter-select" id="categoryFilter" onchange="filterInventoryTable()">
+                <option value="all" selected>All Categories</option>
+                <option value="Smartphones">Smartphones</option>
+                <option value="Laptops">Laptops</option>
+                <option value="Wearables">Wearables</option>
+                <option value="Cameras">Cameras</option>
+              </select>
+
+              <select class="filter-select" id="statusFilter" onchange="filterInventoryTable()">
+                <option value="all" selected>All Status</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+
+              <button type="button" class="btn-filter-more">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                More Filters
+              </button>
+            </div>
+
+            <span class="showing-count-label" id="showingCountLabel">SHOWING 5 OF 1,240 ITEMS</span>
+          </div>
+
+          <!-- Table Responsive Container -->
+          <div class="table-responsive">
+            <table class="inventory-table" id="inventoryTable">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>SKU</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Visibility</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                
+                <!-- Row 1: iPhone 17 Pro Max -->
+                <tr data-category="Smartphones" data-status="In Stock">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb-box">
+                        <img src="/images/avatar.jpg" alt="iPhone 17 Pro Max" class="product-thumb-img">
+                      </div>
+                      <div>
+                        <span class="product-title-text">iPhone 17 Pro Max</span>
+                        <span class="product-sub-text">Titanium Silver, 256GB</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="sku-text">IPH-17PM-SLV</span></td>
+                  <td><span class="category-pill">Smartphones</span></td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="stock-text">420 <span style="font-weight: 500; color: #718096;">84% Left</span></span>
+                      <div class="stock-progress-bg">
+                        <div class="stock-progress-fill purple" style="width: 84%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="price-text">₹1,59,900</span></td>
+                  <td>
+                    <span class="status-badge-pill in-stock">
+                      <span class="status-dot"></span> In Stock
+                    </span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggleProduct(this, 'iPhone 17 Pro Max')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Product" onclick="openEditProductModal(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: MacBook Air M5 -->
+                <tr data-category="Laptops" data-status="Low Stock">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb-box">
+                        <img src="/images/avatar.jpg" alt="MacBook Air M5" class="product-thumb-img">
+                      </div>
+                      <div>
+                        <span class="product-title-text">MacBook Air M5</span>
+                        <span class="product-sub-text">Midnight, 16GB RAM</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="sku-text">MBA-M5-MID</span></td>
+                  <td><span class="category-pill">Laptops</span></td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="stock-text">12 <span style="font-weight: 500; color: #718096;">15% Left</span></span>
+                      <div class="stock-progress-bg">
+                        <div class="stock-progress-fill orange" style="width: 15%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="price-text">₹1,24,900</span></td>
+                  <td>
+                    <span class="status-badge-pill low-stock">
+                      <span class="status-dot"></span> Low Stock
+                    </span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggleProduct(this, 'MacBook Air M5')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Product" onclick="openEditProductModal(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Apple Watch Ultra 2 -->
+                <tr data-category="Wearables" data-status="Out of Stock">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Apple Watch Ultra 2" class="product-thumb-img">
+                      </div>
+                      <div>
+                        <span class="product-title-text">Apple Watch Ultra 2</span>
+                        <span class="product-sub-text">Titanium, Ocean Band</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="sku-text">AWU-2-TIT</span></td>
+                  <td><span class="category-pill">Wearables</span></td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="stock-text">0 <span style="font-weight: 500; color: #718096;">0% Left</span></span>
+                      <div class="stock-progress-bg">
+                        <div class="stock-progress-fill red" style="width: 0%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="price-text">₹89,900</span></td>
+                  <td>
+                    <span class="status-badge-pill out-stock">
+                      <span class="status-dot"></span> Out of Stock
+                    </span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" onchange="handleVisibilityToggleProduct(this, 'Apple Watch Ultra 2')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Product" onclick="openEditProductModal(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: iPad Pro M4 -->
+                <tr data-category="Laptops" data-status="In Stock">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb-box">
+                        <img src="/images/avatar.jpg" alt="iPad Pro M4" class="product-thumb-img">
+                      </div>
+                      <div>
+                        <span class="product-title-text">iPad Pro M4</span>
+                        <span class="product-sub-text">13-inch, Space Black</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="sku-text">IPAD-M4-13</span></td>
+                  <td><span class="category-pill">Laptops</span></td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="stock-text">156 <span style="font-weight: 500; color: #718096;">60% Left</span></span>
+                      <div class="stock-progress-bg">
+                        <div class="stock-progress-fill purple" style="width: 60%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="price-text">₹1,29,900</span></td>
+                  <td>
+                    <span class="status-badge-pill in-stock">
+                      <span class="status-dot"></span> In Stock
+                    </span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Product" onclick="openEditProductModal(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Sony A7R V -->
+                <tr data-category="Cameras" data-status="Low Stock">
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Sony A7R V" class="product-thumb-img">
+                      </div>
+                      <div>
+                        <span class="product-title-text">Sony A7R V</span>
+                        <span class="product-sub-text">Body Only, 61MP</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="sku-text">SONY-A7RV</span></td>
+                  <td><span class="category-pill">Cameras</span></td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="stock-text">4 <span style="font-weight: 500; color: #718096;">5% Left</span></span>
+                      <div class="stock-progress-bg">
+                        <div class="stock-progress-fill orange" style="width: 5%;"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="price-text">₹3,49,900</span></td>
+                  <td>
+                    <span class="status-badge-pill low-stock">
+                      <span class="status-dot"></span> Low Stock
+                    </span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Product" onclick="openEditProductModal(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <span class="pagination-text">Page 1 of 248</span>
+            <div class="pagination-controls">
+              <button type="button" class="page-btn" disabled>&lt;</button>
+              <button type="button" class="page-btn active">1</button>
+              <button type="button" class="page-btn">2</button>
+              <button type="button" class="page-btn">3</button>
+              <span style="font-size: 12px; color: #718096; padding: 0 4px;">...</span>
+              <button type="button" class="page-btn">248</button>
+              <button type="button" class="page-btn">&gt;</button>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- ADMIN FOOTER -->
+      <footer class="admin-footer">
+        <div>© <%= new Date().getFullYear() %> Voltiq Global Electronics Admin. All rights reserved.</div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ================= REUSABLE ADD PRODUCT MODAL PARTIAL ================= -->
+  <%- include('partials/add-product-modal.ejs') %>
+
+  <!-- ================= REUSABLE EDIT PRODUCT MODAL PARTIAL ================= -->
+  <%- include('partials/edit-product-modal.ejs') %>
+
+  <!-- ================= REUSABLE DELETE PRODUCT MODAL PARTIAL ================= -->
+  <%- include('partials/delete-product-modal.ejs') %>
+
+  <!-- ================= REUSABLE INACTIVE PRODUCT MODAL PARTIAL ================= -->
+  <%- include('partials/inactive-product-modal.ejs') %>
+
+  <!-- INTERACTIVE CLIENT SCRIPT -->
+  <script>
+    let pendingDeleteProductRow = null;
+    let pendingInactiveProductCheckbox = null;
+
+    function filterInventoryTable() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const catVal = document.getElementById('categoryFilter').value;
+      const statusVal = document.getElementById('statusFilter').value;
+
+      const rows = document.querySelectorAll('#inventoryTableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const title = row.querySelector('.product-title-text').textContent.toLowerCase();
+        const sku = row.querySelector('.sku-text').textContent.toLowerCase();
+        const cat = row.getAttribute('data-category');
+        const status = row.getAttribute('data-status');
+
+        const matchesSearch = title.includes(searchVal) || sku.includes(searchVal);
+        const matchesCat = (catVal === 'all' || cat === catVal);
+        const matchesStatus = (statusVal === 'all' || status === statusVal);
+
+        if (matchesSearch && matchesCat && matchesStatus) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('showingCountLabel').textContent = `SHOWING ${visibleCount} OF 1,240 ITEMS`;
+    }
+
+    // Confirm Delete Product Modal Handlers
+    function deleteProductRow(btn) {
+      pendingDeleteProductRow = btn.closest('tr');
+      const prodName = pendingDeleteProductRow.querySelector('.product-title-text').textContent.trim();
+      const prodSku = pendingDeleteProductRow.querySelector('.sku-text').textContent.trim();
+      const prodImgSrc = pendingDeleteProductRow.querySelector('.product-thumb-img').src;
+
+      document.getElementById('deleteProductName').textContent = `"${prodName}"`;
+      document.getElementById('deleteProductCardTitle').textContent = prodName;
+      document.getElementById('deleteProductCardSubtext').textContent = `SKU: ${prodSku}`;
+      document.getElementById('deleteProductImg').src = prodImgSrc;
+
+      const backdrop = document.getElementById('deleteProductModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteProductModal() {
+      const backdrop = document.getElementById('deleteProductModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingDeleteProductRow = null;
+    }
+
+    function handleDeleteProductBackdropClick(event) {
+      if (event.target === document.getElementById('deleteProductModalBackdrop')) {
+        closeDeleteProductModal();
+      }
+    }
+
+    function makePendingProductInactive() {
+      if (pendingDeleteProductRow) {
+        const chk = pendingDeleteProductRow.querySelector('.toggle-switch input');
+        if (chk) chk.checked = false;
+        closeDeleteProductModal();
+        filterInventoryTable();
+      }
+    }
+
+    function confirmProductDelete() {
+      if (pendingDeleteProductRow) {
+        pendingDeleteProductRow.style.opacity = '0';
+        pendingDeleteProductRow.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          pendingDeleteProductRow.remove();
+          filterInventoryTable();
+          closeDeleteProductModal();
+        }, 150);
+      }
+    }
+
+    // Confirm Inactive Product Modal Handlers
+    function handleVisibilityToggleProduct(checkbox, productName) {
+      if (!checkbox.checked) {
+        // User turned switch OFF -> Revert switch state temporarily and show confirm inactive modal
+        checkbox.checked = true;
+        pendingInactiveProductCheckbox = checkbox;
+
+        const row = checkbox.closest('tr');
+        const prodSku = row.querySelector('.sku-text').textContent.trim();
+        const prodImgSrc = row.querySelector('.product-thumb-img').src;
+
+        document.getElementById('inactiveProductName').textContent = `"${productName}"`;
+        document.getElementById('inactiveProductCardTitle').textContent = productName;
+        document.getElementById('inactiveProductCardSubtext').textContent = `SKU: ${prodSku}`;
+        document.getElementById('inactiveProductImg').src = prodImgSrc;
+
+        const backdrop = document.getElementById('inactiveProductModalBackdrop');
+        backdrop.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function cancelProductInactive() {
+      const backdrop = document.getElementById('inactiveProductModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingInactiveProductCheckbox = null;
+    }
+
+    function handleInactiveProductBackdropClick(event) {
+      if (event.target === document.getElementById('inactiveProductModalBackdrop')) {
+        cancelProductInactive();
+      }
+    }
+
+    function confirmProductInactive() {
+      if (pendingInactiveProductCheckbox) {
+        pendingInactiveProductCheckbox.checked = false;
+        cancelProductInactive();
+        filterInventoryTable();
+      }
+    }
+
+    function exportCSV() {
+      alert('Exporting inventory product catalog to CSV...');
+    }
+
+    // ================= PRODUCT MODAL CONTROLLER =================
+
+    function openAddProductModal() {
+      document.getElementById('addProductForm').reset();
+      document.getElementById('productPreviewGrid').innerHTML = '';
+      document.getElementById('productPreviewGrid').classList.add('hidden');
+      document.getElementById('productUploadContent').classList.remove('hidden');
+      document.getElementById('productVisibilityText').textContent = 'Show this product on the public storefront';
+
+      const backdrop = document.getElementById('productModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProductModal() {
+      const backdrop = document.getElementById('productModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function handleProductBackdropClick(event) {
+      if (event.target === document.getElementById('productModalBackdrop')) {
+        closeProductModal();
+      }
+    }
+
+    function toggleProductVisibilityLabel(checkbox) {
+      const textElem = document.getElementById('productVisibilityText');
+      if (checkbox.checked) {
+        textElem.textContent = 'Show this product on the public storefront';
+        textElem.style.color = '#6B7280';
+      } else {
+        textElem.textContent = 'Inactive (Hidden from public storefront)';
+        textElem.style.color = '#D97706';
+      }
+    }
+
+    // Image Upload Handlers
+    function triggerProductFileInput(event) {
+      if (event && (event.target.tagName === 'INPUT' || event.target.closest('.thumb-remove-btn'))) return;
+      document.getElementById('productImagesInput').click();
+    }
+
+    function handleProductFilesSelect(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) displayProductPreviews(files);
+    }
+
+    function handleProductDragOver(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('productDropzone').classList.add('dragover');
+    }
+
+    function handleProductDragLeave(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('productDropzone').classList.remove('dragover');
+    }
+
+    function handleProductFileDrop(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('productDropzone').classList.remove('dragover');
+      
+      const files = event.dataTransfer.files;
+      if (files && files.length > 0) {
+        document.getElementById('productImagesInput').files = files;
+        displayProductPreviews(files);
+      }
+    }
+
+    function displayProductPreviews(files) {
+      const grid = document.getElementById('productPreviewGrid');
+
+      Array.from(files).forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const card = document.createElement('div');
+          card.className = 'preview-thumb-card';
+          card.innerHTML = `
+            <img src="${e.target.result}" alt="Preview ${idx + 1}">
+            <button type="button" class="thumb-remove-btn" title="Remove" onclick="event.stopPropagation(); this.parentElement.remove(); checkEmptyPreviews();">✕</button>
+          `;
+          grid.appendChild(card);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      grid.classList.remove('hidden');
+    }
+
+    function checkEmptyPreviews() {
+      const grid = document.getElementById('productPreviewGrid');
+      if (grid.children.length === 0) {
+        grid.classList.add('hidden');
+      }
+    }
+
+    // Dynamic Variant Rows
+    function addVariantRow() {
+      const container = document.getElementById('variantsContainer');
+      const rowCard = document.createElement('div');
+      rowCard.className = 'variant-row-card';
+      rowCard.innerHTML = `
+        <div class="form-field-group">
+          <label class="field-label-sm">Variant Name</label>
+          <input type="text" name="variantName[]" class="field-input-sm" placeholder="e.g. Space Black, 512GB">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Color</label>
+          <input type="text" name="variantColor[]" class="field-input-sm" placeholder="Black">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Storage</label>
+          <input type="text" name="variantStorage[]" class="field-input-sm" placeholder="512GB">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Addl. Price</label>
+          <input type="number" name="variantAddlPrice[]" class="field-input-sm" placeholder="0.00" step="0.01">
+        </div>
+        <button type="button" class="variant-cam-btn" title="Remove Variant" onclick="this.closest('.variant-row-card').remove()" style="color: #EF4444; border-color: #FECACA;">
+          ✕
+        </button>
+      `;
+      container.appendChild(rowCard);
+    }
+
+    // Dynamic Highlight Bullet Rows
+    function addHighlightRow() {
+      const container = document.getElementById('highlightsContainer');
+      const row = document.createElement('div');
+      row.className = 'highlight-row-input';
+      row.innerHTML = `
+        <span class="highlight-bullet">•</span>
+        <input type="text" name="highlights[]" class="field-input" placeholder="e.g. All-day battery life with fast charging support">
+        <button type="button" class="btn-remove-highlight" onclick="removeHighlightRow(this)">✕</button>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeHighlightRow(btn) {
+      const rows = document.querySelectorAll('.highlight-row-input');
+      if (rows.length > 1) {
+        btn.closest('.highlight-row-input').remove();
+      } else {
+        btn.closest('.highlight-row-input').querySelector('input').value = '';
+      }
+    }
+
+    // Handle Form Submit
+    function handleProductSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('productName').value.trim();
+      const category = document.getElementById('productCategoryId').value;
+      const brand = document.getElementById('productBrandId').value;
+      const price = document.getElementById('productPrice').value;
+      const isActive = document.getElementById('productIsActive').checked;
+      
+      const firstPreview = document.querySelector('.preview-thumb-card img');
+      const previewSrc = firstPreview ? firstPreview.src : '/images/avatar.jpg';
+
+      if (!name || !category || !price) return;
+
+      const formattedPrice = '₹' + parseFloat(price).toLocaleString('en-IN');
+      const generatedSku = (brand.substring(0, 3) + '-' + name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6)).toUpperCase();
+
+      const tbody = document.getElementById('inventoryTableBody');
+      const newRowHtml = `
+        <tr data-category="${category}" data-status="In Stock">
+          <td>
+            <div class="product-cell">
+              <div class="product-thumb-box">
+                <img src="${previewSrc}" alt="${name}" class="product-thumb-img">
+              </div>
+              <div>
+                <span class="product-title-text">${name}</span>
+                <span class="product-sub-text">${brand} Official SKU</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="sku-text">${generatedSku}</span></td>
+          <td><span class="category-pill">${category}</span></td>
+          <td>
+            <div class="stock-cell">
+              <span class="stock-text">100 <span style="font-weight: 500; color: #718096;">100% Left</span></span>
+              <div class="stock-progress-bg">
+                <div class="stock-progress-fill purple" style="width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td><span class="price-text">${formattedPrice}</span></td>
+          <td>
+            <span class="status-badge-pill in-stock">
+              <span class="status-dot"></span> In Stock
+            </span>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${isActive ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td class="text-right">
+            <div class="actions-cell">
+              <button type="button" class="action-icon-btn edit" title="Edit Product">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      tbody.insertAdjacentHTML('afterbegin', newRowHtml);
+      closeProductModal();
+      filterInventoryTable();
+    }
+
+    // ================= EDIT PRODUCT MODAL CONTROLLER =================
+
+    function openEditProductModal(btn) {
+      const row = btn.closest('tr');
+
+      // NOTE: the table row only carries name, SKU, category, price, image
+      // & visibility. Brand, description, variants, and highlights aren't
+      // part of the row's visible data yet, so those fields start blank
+      // below. Once a real backend exists (GET /admin/products/:id),
+      // replace this block with a fetch() call that returns the full
+      // product record and populates every field from it instead.
+
+      const name = row.querySelector('.product-title-text').textContent.trim();
+      const sku = row.querySelector('.sku-text').textContent.trim();
+      const category = row.getAttribute('data-category');
+      const priceText = row.querySelector('.price-text').textContent.trim();
+      const priceNumeric = priceText.replace(/[^0-9.]/g, '');
+      const imgSrc = row.querySelector('.product-thumb-img').src;
+      const imgAlt = row.querySelector('.product-thumb-img').alt;
+      const isActive = row.querySelector('.toggle-switch input').checked;
+
+      document.getElementById('editProductId').value = sku;
+      document.getElementById('editProductName').value = name;
+      document.getElementById('editProductCategoryId').value = category;
+      document.getElementById('editProductBrandId').value = '';
+      document.getElementById('editProductPrice').value = priceNumeric;
+      document.getElementById('editProductDescription').value = '';
+
+      // Preload the existing image as the current preview
+      const grid = document.getElementById('editProductPreviewGrid');
+      grid.innerHTML = `
+        <div class="preview-thumb-card">
+          <img src="${imgSrc}" alt="${imgAlt}">
+          <button type="button" class="thumb-remove-btn" title="Remove" onclick="event.stopPropagation(); this.parentElement.remove(); checkEmptyEditPreviews();">✕</button>
+        </div>
+      `;
+      grid.classList.remove('hidden');
+      document.getElementById('editProductUploadContent').classList.add('hidden');
+
+      // Reset variants to a single blank row
+      document.getElementById('editVariantsContainer').innerHTML = `
+        <div class="variant-row-card">
+          <div class="form-field-group">
+            <label class="field-label-sm">Variant Name</label>
+            <input type="text" name="variantName[]" class="field-input-sm" placeholder="e.g. Midnight, 256GB">
+          </div>
+          <div class="form-field-group">
+            <label class="field-label-sm">Color</label>
+            <input type="text" name="variantColor[]" class="field-input-sm" placeholder="Lilac">
+          </div>
+          <div class="form-field-group">
+            <label class="field-label-sm">Storage</label>
+            <input type="text" name="variantStorage[]" class="field-input-sm" placeholder="256GB">
+          </div>
+          <div class="form-field-group">
+            <label class="field-label-sm">Addl. Price</label>
+            <input type="number" name="variantAddlPrice[]" class="field-input-sm" placeholder="0.00" step="0.01">
+          </div>
+          <label class="variant-cam-btn" title="Attach Variant Image">
+            <input type="file" name="variantImage[]" accept="image/*" class="hidden-file-input" onchange="handleVariantImageSelect(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </label>
+        </div>
+      `;
+
+      // Reset highlights to a single blank row
+      document.getElementById('editHighlightsContainer').innerHTML = `
+        <div class="highlight-row-input">
+          <span class="highlight-bullet">•</span>
+          <input type="text" name="highlights[]" class="field-input" placeholder="e.g. Ceramic Shield front glass, 4x stronger drop performance" required>
+          <button type="button" class="btn-remove-highlight" onclick="removeEditHighlightRow(this)">✕</button>
+        </div>
+      `;
+
+      document.getElementById('editProductIsActive').checked = isActive;
+      toggleEditProductVisibilityLabel(document.getElementById('editProductIsActive'));
+
+      // Remember which row we're editing so submit can update it in place
+      window._editingProductRow = row;
+
+      const backdrop = document.getElementById('editProductModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditProductModal() {
+      const backdrop = document.getElementById('editProductModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+      window._editingProductRow = null;
+    }
+
+    function handleEditProductBackdropClick(event) {
+      if (event.target === document.getElementById('editProductModalBackdrop')) {
+        closeEditProductModal();
+      }
+    }
+
+    function toggleEditProductVisibilityLabel(checkbox) {
+      const textElem = document.getElementById('editProductVisibilityText');
+      if (checkbox.checked) {
+        textElem.textContent = 'Show this product on the public storefront';
+        textElem.style.color = '#6B7280';
+      } else {
+        textElem.textContent = 'Inactive (Hidden from public storefront)';
+        textElem.style.color = '#D97706';
+      }
+    }
+
+    // Image Upload Handlers (Edit modal)
+    function handleEditProductFilesSelect(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) displayEditProductPreviews(files);
+    }
+
+    function handleEditProductDragOver(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('editProductDropzone').classList.add('dragover');
+    }
+
+    function handleEditProductDragLeave(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('editProductDropzone').classList.remove('dragover');
+    }
+
+    function handleEditProductFileDrop(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('editProductDropzone').classList.remove('dragover');
+
+      const files = event.dataTransfer.files;
+      if (files && files.length > 0) {
+        document.getElementById('editProductImagesInput').files = files;
+        displayEditProductPreviews(files);
+      }
+    }
+
+    function displayEditProductPreviews(files) {
+      const grid = document.getElementById('editProductPreviewGrid');
+
+      Array.from(files).forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const card = document.createElement('div');
+          card.className = 'preview-thumb-card';
+          card.innerHTML = `
+            <img src="${e.target.result}" alt="Preview ${idx + 1}">
+            <button type="button" class="thumb-remove-btn" title="Remove" onclick="event.stopPropagation(); this.parentElement.remove(); checkEmptyEditPreviews();">✕</button>
+          `;
+          grid.appendChild(card);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      grid.classList.remove('hidden');
+      document.getElementById('editProductUploadContent').classList.add('hidden');
+    }
+
+    function checkEmptyEditPreviews() {
+      const grid = document.getElementById('editProductPreviewGrid');
+      if (grid.children.length === 0) {
+        grid.classList.add('hidden');
+        document.getElementById('editProductUploadContent').classList.remove('hidden');
+      }
+    }
+
+    // Dynamic Variant Rows (Edit modal)
+    function addEditVariantRow() {
+      const container = document.getElementById('editVariantsContainer');
+      const rowCard = document.createElement('div');
+      rowCard.className = 'variant-row-card';
+      rowCard.innerHTML = `
+        <div class="form-field-group">
+          <label class="field-label-sm">Variant Name</label>
+          <input type="text" name="variantName[]" class="field-input-sm" placeholder="e.g. Space Black, 512GB">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Color</label>
+          <input type="text" name="variantColor[]" class="field-input-sm" placeholder="Black">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Storage</label>
+          <input type="text" name="variantStorage[]" class="field-input-sm" placeholder="512GB">
+        </div>
+        <div class="form-field-group">
+          <label class="field-label-sm">Addl. Price</label>
+          <input type="number" name="variantAddlPrice[]" class="field-input-sm" placeholder="0.00" step="0.01">
+        </div>
+        <button type="button" class="variant-cam-btn" title="Remove Variant" onclick="this.closest('.variant-row-card').remove()" style="color: #EF4444; border-color: #FECACA;">
+          ✕
+        </button>
+      `;
+      container.appendChild(rowCard);
+    }
+
+    // Dynamic Highlight Bullet Rows (Edit modal)
+    function addEditHighlightRow() {
+      const container = document.getElementById('editHighlightsContainer');
+      const row = document.createElement('div');
+      row.className = 'highlight-row-input';
+      row.innerHTML = `
+        <span class="highlight-bullet">•</span>
+        <input type="text" name="highlights[]" class="field-input" placeholder="e.g. All-day battery life with fast charging support">
+        <button type="button" class="btn-remove-highlight" onclick="removeEditHighlightRow(this)">✕</button>
+      `;
+      container.appendChild(row);
+    }
+
+    function removeEditHighlightRow(btn) {
+      const rows = document.querySelectorAll('#editHighlightsContainer .highlight-row-input');
+      if (rows.length > 1) {
+        btn.closest('.highlight-row-input').remove();
+      } else {
+        btn.closest('.highlight-row-input').querySelector('input').value = '';
+      }
+    }
+
+    // Handle Edit Form Submit — updates the existing row in place
+    function handleEditProductSubmit(event) {
+      event.preventDefault();
+
+      const row = window._editingProductRow;
+      if (!row) return;
+
+      const name = document.getElementById('editProductName').value.trim();
+      const category = document.getElementById('editProductCategoryId').value;
+      const brand = document.getElementById('editProductBrandId').value;
+      const price = document.getElementById('editProductPrice').value;
+      const isActive = document.getElementById('editProductIsActive').checked;
+
+      const firstPreviewImg = document.querySelector('#editProductPreviewGrid .preview-thumb-card img');
+      const previewSrc = firstPreviewImg ? firstPreviewImg.src : row.querySelector('.product-thumb-img').src;
+
+      if (!name || !category || !price) return;
+
+      const formattedPrice = '₹' + parseFloat(price).toLocaleString('en-IN');
+
+      row.setAttribute('data-category', category);
+      row.querySelector('.product-thumb-img').src = previewSrc;
+      row.querySelector('.product-thumb-img').alt = name;
+      row.querySelector('.product-title-text').textContent = name;
+      if (brand) {
+        row.querySelector('.product-sub-text').textContent = brand + ' Official SKU';
+      }
+      row.querySelector('.category-pill').textContent = category;
+      row.querySelector('.price-text').textContent = formattedPrice;
+      row.querySelector('.toggle-switch input').checked = isActive;
+
+      closeEditProductModal();
+      filterInventoryTable();
+    }
+  </script>
+
+</body>
+</html>

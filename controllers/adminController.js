@@ -79,6 +79,35 @@ exports.upddateCustomerStatus = async (req, res) => {
 
 
 
+exports.getCategories = (req, res) => {
+
+    res.render('admin/categories');
+}
+
+exports.postCategory = async (req, res) => {
+
+    const result = await adminService.AddCategory(req.body, req.file);
+}
+
+
+exports.getBrands = (req, res) => {
+
+    res.render('admin/brand');
+}
+
+
+exports.getProducts = (req, res) => {
+
+    res.render('admin/inventory');
+}
+
+exports.postProducts = async (req, res) => {
+
+    const result = await adminService.products(req.body);
+}
+
+
+
 exports.logout = (req, res) => {
 
     req.session.destroy(() => {

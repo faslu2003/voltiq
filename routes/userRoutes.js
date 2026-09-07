@@ -16,14 +16,16 @@ router.post('/signup', userController.postSignup);
 router.get('/signup/verification', userController.getSignupVerification);
 router.post('/signup/verification', userController.postSignupVerification);
 
-
 router.get('/signin', userController.getSignin);
 router.post('/signin', userController.postSignin);
 
 router.post('/auth/google', userController.googleAuth);
 
-router.get('/signin/reset-password', userController.getResetPassword);
-router.post('/signin/reset-password', userController.postResetPassword);
+router.get('/signin/password/forgot', userController.getForgotPassword);
+router.post('/signin/password/forgot', userController.postForgotPassword);
+
+router.get('/signin/password/reset/:token', userController.getResetPassword);
+router.post('/signin/password/reset/:token', userController.postResetPassword);
 
 
 router.post('/resend-otp', userController.resendOtp);
@@ -67,6 +69,15 @@ router.get('/address/edit/:id', userController.getEditAddress);
 router.post('/address/edit/:id', userController.postEditAddress);
 
 router.post('/address/delete/:id', userController.deleteAddress);
+
+
+router.get('/products', userController.getProducts);
+router.get('/products/details', userController.getProductDetails);
+
+
+router.get('/wishlist', userController.getWishlist);
+
+router.get('/cart', userController.getCart);
 
 
 router.post('/logout', userController.logout);

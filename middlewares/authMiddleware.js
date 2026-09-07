@@ -24,14 +24,21 @@ exports.authenticateAdmin = async (req, res, next) => {
 
 exports.checkBlocked = async (req, res, next) => {
 
-    const user = await User.findById(req.session.user.id);
+    try {
 
-    if (user.isBlocked) {
-        req.session.error = "Your account has been blocked. Please contact support.";
+        const user = await User.findById(req.session.user.id);
 
-        delete req.session.user;
-        return res.redirect('/signin');
+        if (user.isBlocked) {
+            req.session.error = "Your account has been blocked. Please contact support.";
+
+            delete req.session.user;
+            return res.redirect('/signin');
+        }
+
+        next();
     }
-
-    next();
+    catch (err) {
+        console.error(err);
+        return res.status(500).send("Something went wrong.");
+    }
 }

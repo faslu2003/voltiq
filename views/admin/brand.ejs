@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Brand Management · Voltiq Admin Portal' %></title>
+  <link rel="stylesheet" href="/css/admin/brand.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+      <a href="/admin/dashboard" class="brand-wrapper">
+        <div class="brand-logo-text">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          voltiq
+        </div>
+        <span class="brand-subtitle">Admin Portal</span>
+      </a>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard Item -->
+        <a href="/admin/dashboard" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            Dashboard
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+
+        <!-- Sub Nav Items -->
+        <div class="sub-nav">
+          <a href="/admin/overview" class="sub-nav-item">Overview</a>
+          <a href="/admin/sales" class="sub-nav-item">Sales Performance</a>
+        </div>
+
+        <!-- Inventory -->
+        <a href="/admin/inventory" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </span>
+            Inventory
+          </div>
+        </a>
+
+        <!-- Categories -->
+        <a href="/admin/categories" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </span>
+            Categories
+          </div>
+        </a>
+
+        <!-- Orders -->
+        <a href="/admin/orders" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </span>
+            Orders
+          </div>
+        </a>
+
+        <!-- Customers -->
+        <a href="/admin/customers" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            Customers
+          </div>
+        </a>
+
+        <!-- Brand Management (ACTIVE) -->
+        <a href="/admin/brands" class="nav-item active">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </span>
+            Brand Management
+          </div>
+        </a>
+
+        <!-- Promotions -->
+        <a href="/admin/promotions" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            Promotions
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-search">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search brands, products, or specs..." onkeyup="filterBrands()">
+        </div>
+
+        <div class="header-right-actions">
+          <button class="icon-button" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <button class="icon-button" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+
+          <!-- Admin User Profile -->
+          <div class="admin-user-profile">
+            <div class="user-text-info">
+              <span class="user-name-text">Alex Rivera</span>
+              <span class="user-role-text">SENIOR ADMIN</span>
+            </div>
+            <img src="/images/avatar.jpg" alt="Admin Avatar" class="user-avatar-circle">
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        
+        <!-- Heading Bar -->
+        <div class="page-heading-bar">
+          <div class="heading-title-group">
+            <h1>Brand Management</h1>
+            <p>Manage and refine your product manufacturers, brand identities, and catalog availability.</p>
+          </div>
+
+          <div class="heading-actions-group">
+            <button type="button" class="btn-export-list" onclick="exportBrandList()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export List
+            </button>
+
+            <button type="button" class="btn-add-brand" onclick="openAddBrandModal()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add New Brand
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Cards Grid (3 Stat Cards) -->
+        <div class="metrics-grid-3">
+          
+          <!-- Card 1: TOTAL BRANDS -->
+          <div class="stat-card">
+            <div class="stat-icon-wrapper purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">TOTAL BRANDS</span>
+              <span class="stat-value" id="statTotalBrands">12</span>
+            </div>
+          </div>
+
+          <!-- Card 2: ACTIVE BRANDS -->
+          <div class="stat-card">
+            <div class="stat-icon-wrapper green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">ACTIVE BRANDS</span>
+              <span class="stat-value" id="statActiveBrands">10</span>
+            </div>
+          </div>
+
+          <!-- Card 3: NEW THIS MONTH -->
+          <div class="stat-card accent-purple">
+            <div class="stat-icon-wrapper purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">NEW THIS MONTH</span>
+              <div class="stat-value-row">
+                <span class="stat-value">+2</span>
+                <span class="stat-pill-badge">Growth</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Brands Data Table Card -->
+        <div class="table-card">
+          
+          <div class="table-card-header">
+            <h2 class="table-title">Registered Manufacturers</h2>
+            <div class="table-header-controls">
+              <button class="table-control-btn" title="Filter list">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="21" y1="10" x2="7" y2="10"></line>
+                  <line x1="21" y1="6" x2="3" y2="6"></line>
+                  <line x1="21" y1="14" x2="11" y2="14"></line>
+                  <line x1="21" y1="18" x2="15" y2="18"></line>
+                </svg>
+              </button>
+              <button class="table-control-btn" title="More options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="1"></circle>
+                  <circle cx="12" cy="5" r="1"></circle>
+                  <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="brands-table" id="brandsTable">
+              <thead>
+                <tr>
+                  <th>Brand Logo</th>
+                  <th>Brand Name</th>
+                  <th>Description</th>
+                  <th>Total Products</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="brandsTableBody">
+                
+                <!-- Row 1: Apple -->
+                <tr>
+                  <td>
+                    <div class="brand-logo-box">
+                      <img src="/images/avatar.jpg" alt="Apple" class="brand-logo-img">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="brand-name-info">
+                      <span class="brand-title-text">Apple</span>
+                      <span class="brand-location-text">Cupertino, USA</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="brand-desc-text">Premium consumer electronics specializing in...</span>
+                  </td>
+                  <td>
+                    <span class="products-count-badge">142 Products</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="updateBrandStats()">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('Apple', 'Cupertino, USA', 'Premium consumer electronics specializing in...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Samsung -->
+                <tr>
+                  <td>
+                    <div class="brand-logo-box">
+                      <img src="/images/avatar.jpg" alt="Samsung" class="brand-logo-img">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="brand-name-info">
+                      <span class="brand-title-text">Samsung</span>
+                      <span class="brand-location-text">Suwon, South Korea</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="brand-desc-text">Global leader in mobile displays, semiconduc...</span>
+                  </td>
+                  <td>
+                    <span class="products-count-badge">258 Products</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="updateBrandStats()">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('Samsung', 'Suwon, South Korea', 'Global leader in mobile displays, semiconduc...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Google -->
+                <tr>
+                  <td>
+                    <div class="brand-logo-box">
+                      <img src="/images/avatar.jpg" alt="Google" class="brand-logo-img">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="brand-name-info">
+                      <span class="brand-title-text">Google</span>
+                      <span class="brand-location-text">Mountain View, USA</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="brand-desc-text">AI-first hardware company producing clean A...</span>
+                  </td>
+                  <td>
+                    <span class="products-count-badge">64 Products</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="updateBrandStats()">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('Google', 'Mountain View, USA', 'AI-first hardware company producing clean A...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: OnePlus -->
+                <tr>
+                  <td>
+                    <div class="brand-logo-box">
+                      <img src="/images/avatar.jpg" alt="OnePlus" class="brand-logo-img">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="brand-name-info">
+                      <span class="brand-title-text">OnePlus</span>
+                      <span class="brand-location-text">Shenzhen, China</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="brand-desc-text">Boutique tech manufacturer focusing on high...</span>
+                  </td>
+                  <td>
+                    <span class="products-count-badge">31 Products</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" onchange="updateBrandStats()">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('OnePlus', 'Shenzhen, China', 'Boutique tech manufacturer focusing on high...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Sony -->
+                <tr>
+                  <td>
+                    <div class="brand-logo-box">
+                      <img src="/images/avatar.jpg" alt="Sony" class="brand-logo-img">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="brand-name-info">
+                      <span class="brand-title-text">Sony</span>
+                      <span class="brand-location-text">Tokyo, Japan</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="brand-desc-text">Leader in digital imaging, professional audio,</span>
+                  </td>
+                  <td>
+                    <span class="products-count-badge">118 Products</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="updateBrandStats()">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('Sony', 'Tokyo, Japan', 'Leader in digital imaging, professional audio,')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <span class="pagination-text" id="paginationLabel">Showing 5 of 12 registered brands</span>
+            <div class="pagination-controls">
+              <button type="button" class="page-btn" disabled>&lt;</button>
+              <button type="button" class="page-btn active">1</button>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- ADMIN FOOTER -->
+      <footer class="admin-footer">
+        <div>© <%= new Date().getFullYear() %> Voltiq Admin Portal. All rights reserved.</div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ================= ADD / EDIT BRAND MODAL ================= -->
+  <div class="modal-backdrop hidden" id="brandModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalHeaderTitle">Add New Brand</h3>
+        <button type="button" class="modal-close-btn" onclick="closeBrandModal()">✕</button>
+      </div>
+
+      <form action="/admin/brands/save" method="POST" class="modal-form" id="brandForm" onsubmit="handleBrandSave(event)">
+        <div class="form-group">
+          <label for="brandNameInput" class="form-label">Brand Name</label>
+          <input type="text" id="brandNameInput" name="name" class="form-input-text" placeholder="e.g. Nothing Tech" required>
+        </div>
+
+        <div class="form-group">
+          <label for="brandLocationInput" class="form-label">Headquarters / Country</label>
+          <input type="text" id="brandLocationInput" name="location" class="form-input-text" placeholder="e.g. London, UK">
+        </div>
+
+        <div class="form-group">
+          <label for="brandDescInput" class="form-label">Description</label>
+          <textarea id="brandDescInput" name="description" class="form-textarea" placeholder="Brief manufacturer bio..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="brandLogoInput" class="form-label">Brand Logo Image</label>
+          <input type="file" id="brandLogoInput" name="logo" class="form-input-text" accept="image/*">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeBrandModal()">Cancel</button>
+          <button type="submit" class="btn-submit" id="modalSubmitBtn">Save Brand</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CLIENT INTERACTION SCRIPT -->
+  <script>
+    function filterBrands() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#brandsTableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const title = row.querySelector('.brand-title-text').textContent.toLowerCase();
+        const desc = row.querySelector('.brand-desc-text').textContent.toLowerCase();
+        const location = row.querySelector('.brand-location-text').textContent.toLowerCase();
+
+        if (title.includes(searchVal) || desc.includes(searchVal) || location.includes(searchVal)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('paginationLabel').textContent = `Showing ${visibleCount} of ${rows.length} registered brands`;
+    }
+
+    function deleteBrandRow(btn) {
+      if (confirm('Are you sure you want to delete this manufacturer brand?')) {
+        btn.closest('tr').remove();
+        updateBrandStats();
+      }
+    }
+
+    function updateBrandStats() {
+      const rows = document.querySelectorAll('#brandsTableBody tr');
+      let active = 0;
+
+      rows.forEach(row => {
+        const chk = row.querySelector('.toggle-switch input');
+        if (chk && chk.checked) active++;
+      });
+
+      document.getElementById('statTotalBrands').textContent = rows.length;
+      document.getElementById('statActiveBrands').textContent = active;
+      document.getElementById('paginationLabel').textContent = `Showing ${rows.length} of ${rows.length} registered brands`;
+    }
+
+    function exportBrandList() {
+      alert('Exporting registered manufacturers list to CSV...');
+    }
+
+    function openAddBrandModal() {
+      document.getElementById('modalHeaderTitle').textContent = 'Add New Brand';
+      document.getElementById('modalSubmitBtn').textContent = 'Save Brand';
+      document.getElementById('brandNameInput').value = '';
+      document.getElementById('brandLocationInput').value = '';
+      document.getElementById('brandDescInput').value = '';
+      document.getElementById('brandModal').classList.remove('hidden');
+    }
+
+    function openEditBrandModal(name, location, desc) {
+      document.getElementById('modalHeaderTitle').textContent = 'Edit Brand';
+      document.getElementById('modalSubmitBtn').textContent = 'Update Brand';
+      document.getElementById('brandNameInput').value = name;
+      document.getElementById('brandLocationInput').value = location;
+      document.getElementById('brandDescInput').value = desc;
+      document.getElementById('brandModal').classList.remove('hidden');
+    }
+
+    function closeBrandModal() {
+      document.getElementById('brandModal').classList.add('hidden');
+    }
+
+    function handleBrandSave(event) {
+      event.preventDefault();
+      const name = document.getElementById('brandNameInput').value.trim();
+      const location = document.getElementById('brandLocationInput').value.trim();
+      const desc = document.getElementById('brandDescInput').value.trim();
+
+      if (!name) return;
+
+      const tbody = document.getElementById('brandsTableBody');
+      const newRow = `
+        <tr>
+          <td>
+            <div class="brand-logo-box">
+              <img src="/images/avatar.jpg" alt="${name}" class="brand-logo-img">
+            </div>
+          </td>
+          <td>
+            <div class="brand-name-info">
+              <span class="brand-title-text">${name}</span>
+              <span class="brand-location-text">${location || 'Global'}</span>
+            </div>
+          </td>
+          <td>
+            <span class="brand-desc-text">${desc || 'Manufacturer details'}</span>
+          </td>
+          <td>
+            <span class="products-count-badge">0 Products</span>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" checked onchange="updateBrandStats()">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td class="text-right">
+            <div class="actions-cell">
+              <button type="button" class="action-icon-btn edit" title="Edit Brand" onclick="openEditBrandModal('${name}', '${location}', '${desc}')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button type="button" class="action-icon-btn delete" title="Delete Brand" onclick="deleteBrandRow(this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      tbody.insertAdjacentHTML('afterbegin', newRow);
+      closeBrandModal();
+      updateBrandStats();
+    }
+  </script>
+
+</body>
+</html>

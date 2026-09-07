@@ -1,0 +1,86 @@
+<!-- ================= REUSABLE ADD / EDIT CATEGORY MODAL PARTIAL ================= -->
+<div class="category-modal-backdrop hidden" id="categoryModalBackdrop" onclick="handleModalBackdropClick(event)">
+  <div class="category-modal-dialog" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+    
+    <!-- Modal Header -->
+    <div class="category-modal-header">
+      <div class="header-text-group">
+        <h2 class="category-modal-title" id="modalTitle">Add New Category</h2>
+        <p class="category-modal-subtitle" id="modalSubtitle">Define a new collection for your inventory.</p>
+      </div>
+      <button type="button" class="category-modal-close" onclick="closeCategoryModal()" aria-label="Close modal">✕</button>
+    </div>
+
+    <!-- Form Body -->
+    <form action="/admin/categories/save" method="POST" enctype="multipart/form-data" class="category-modal-form" id="categoryForm" onsubmit="handleCategorySubmit(event)">
+      
+      <!-- Hidden Category ID for Edit mode -->
+      <input type="hidden" id="categoryId" name="id" value="">
+
+      <!-- Category Name Input -->
+      <div class="form-field-group">
+        <label for="categoryName" class="field-label">Category Name</label>
+        <input type="text" id="categoryName" name="name" class="field-input" placeholder="e.g. Premium Audio" required autocomplete="off">
+      </div>
+
+      <!-- Description Input -->
+      <div class="form-field-group">
+        <label for="categoryDescription" class="field-label">Description</label>
+        <textarea id="categoryDescription" name="description" class="field-textarea" placeholder="Describe the type of products in this category..."></textarea>
+      </div>
+
+      <!-- Category Image Upload -->
+      <div class="form-field-group">
+        <label class="field-label">Category Image</label>
+        <div class="image-upload-dropzone" id="dropzoneBox" onclick="triggerFileInput()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+          <input type="file" id="categoryImageInput" name="image" class="hidden-file-input" accept="image/png, image/jpeg, image/webp" onchange="handleFileSelect(event)">
+          
+          <div class="upload-zone-content" id="uploadZoneContent">
+            <div class="upload-icon-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 12 15 15"></polyline>
+              </svg>
+            </div>
+            <span class="upload-primary-text">Click to upload or drag and drop</span>
+            <span class="upload-secondary-text">PNG, JPG, or WEBP (Max 2MB, 800x800px)</span>
+          </div>
+
+          <div class="image-preview-container hidden" id="imagePreviewContainer">
+            <img src="" alt="Category Image Preview" id="imagePreviewImg" class="preview-img">
+            <button type="button" class="btn-remove-preview" onclick="removeImagePreview(event)">Remove / Change Image</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visibility Card -->
+      <div class="visibility-toggle-card">
+        <div class="visibility-info">
+          <div class="visibility-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div class="visibility-text">
+            <span class="visibility-title">Visibility</span>
+            <span class="visibility-subtitle">Show this category on the public storefront</span>
+          </div>
+        </div>
+        <label class="modal-toggle-switch">
+          <input type="checkbox" id="categoryVisibility" name="isVisible" checked>
+          <span class="modal-toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="category-modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeCategoryModal()">Cancel</button>
+        <button type="submit" class="btn-modal-save" id="btnSaveCategory">Save Category</button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -137,3 +137,58 @@ exports.updateCustomerStatus = async (userId, isBlocked) => {
         success: true
     }
 }
+
+
+exports.AddCategory = async (body, file) => {
+
+    const { name, description, isVisible } = body;
+
+    if (!name && !description) {
+        return {
+            success: false,
+            message: "Please fill in all the fields."
+        }
+    }
+
+    if (!name) {
+        return {
+            success: false,
+            message: "Please enter a category name."
+        }
+    }
+
+    if (!description) {
+        return {
+            success: false,
+            message: "Please enter the category description."
+        }
+    }
+
+    if (!file) {
+        return {
+            success: false,
+            message: "Please upload the category image."
+        }
+    }
+
+    const alreadyExists = Category.findOne({ categoryName: name });
+
+    if (alreadyExists !== null) {
+        return {
+            success: false,
+            message: "A category in the same name already exists."
+        }
+    }
+
+    
+}
+
+
+
+
+
+
+// exports.products = async () => {
+
+
+// }

@@ -153,11 +153,8 @@
                 <div class="card-head-right">
                   <span class="updated-pill">
                     Last Updated:
-                    <%= user.updatedAt.toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    }) %>
+                    <%= user.updatedAt.toLocaleDateString('en-IN', { day: 'numeric' , month: 'short' , year: 'numeric'
+                      }) %>
                   </span>
                   <a href="/profile/edit" class="edit-link">Edit</a>
                 </div>
@@ -198,50 +195,54 @@
               <div class="security-list">
 
                 <!-- 1. Change Password Row -->
-                <a href="/change-password" class="security-row" onclick="openChangePasswordModal(); return false;">
-                  <span class="security-icon violet">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 12a9 9 0 1 1 2.6 6.4" />
-                      <polyline points="3 16 3 12 7 12" />
-                      <rect x="9.5" y="10.5" width="7" height="6" rx="1" />
-                      <path d="M11 10.5V9a2 2 0 0 1 4 0v1.5" />
-                    </svg>
-                  </span>
-                  <span class="security-text">
-                    <span class="security-title">Change Password</span>
-                    <span class="security-sub">Recommended every 6 months to maintain high security</span>
-                  </span>
-                  <span class="security-right">
-                    <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </span>
-                </a>
+                <% if (user.authProvider==="google" ) { %>
+                  <p class="auth-note">Password changes aren't available for Google accounts</p>
+                <% } else { %>
+                    <a href="/change-password" class="security-row" onclick="openChangePasswordModal(); return false;">
+                      <span class="security-icon violet">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3 12a9 9 0 1 1 2.6 6.4" />
+                          <polyline points="3 16 3 12 7 12" />
+                          <rect x="9.5" y="10.5" width="7" height="6" rx="1" />
+                          <path d="M11 10.5V9a2 2 0 0 1 4 0v1.5" />
+                        </svg>
+                      </span>
+                      <span class="security-text">
+                        <span class="security-title">Change Password</span>
+                        <span class="security-sub">Recommended every 6 months to maintain high security</span>
+                      </span>
+                      <span class="security-right">
+                        <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </span>
+                    </a>
+                <% } %>
 
-                <!-- 2. Two-Factor Authentication Row -->
-                <a href="#" class="security-row">
-                  <span class="security-icon green">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5Z" />
-                      <path d="m9 12 2 2 4-4" />
-                    </svg>
-                  </span>
-                  <span class="security-text">
-                    <span class="security-title">Two-Factor Authentication</span>
-                    <span class="security-sub">Add an extra layer of security to your account</span>
-                  </span>
-                  <span class="security-right">
-                    <!-- <span class="active-badge">Active</span> -->
-                     <span class="disabled-badge">Disabled</span>
-                    <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </span>
-                </a>
+                      <!-- 2. Two-Factor Authentication Row -->
+                      <a href="#" class="security-row">
+                        <span class="security-icon green">
+                          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5Z" />
+                            <path d="m9 12 2 2 4-4" />
+                          </svg>
+                        </span>
+                        <span class="security-text">
+                          <span class="security-title">Two-Factor Authentication</span>
+                          <span class="security-sub">Add an extra layer of security to your account</span>
+                        </span>
+                        <span class="security-right">
+                          <!-- <span class="active-badge">Active</span> -->
+                          <span class="disabled-badge">Disabled</span>
+                          <svg class="icon chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </span>
+                      </a>
 
               </div>
             </section>

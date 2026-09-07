@@ -233,6 +233,20 @@ button{font-family:inherit;cursor:pointer;}
 }
 
 /* ============ SECURITY ============ */
+.auth-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--violet-soft);
+  border: 1px solid #ddd4f8;
+  border-radius: 11px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
 .security-list{
   display:flex;
   flex-direction:column;

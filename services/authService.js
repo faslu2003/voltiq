@@ -1,16 +1,23 @@
 const User = require('../src/models/User');
 
-const bcrypt = require('bcrypt');
-
 const { OAuth2Client } = require('google-auth-library');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const mailer = require('../utils/mailer');
 
 
 exports.signup = async (body) => {
 
     const { fullName, email, phoneNumber, password, confirmPassword } = body;
+
+    if (!fullName && !email && !phoneNumber && !password && !confirmPassword) {
+        return {
+            success: false,
+            message: "Please fill in all the fields."
+        }
+    }
 
     const existingUser = await User.findOne({ email });
 
@@ -329,7 +336,7 @@ exports.googleSignin = async (googleUser) => {
 }
 
 
-exports.resetPassword = async (body) => {
+exports.forgotPassword = async (body) => {
 
     const { email } = body;
 
@@ -350,8 +357,107 @@ exports.resetPassword = async (body) => {
         }
     }
 
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest('hex');
+
+    await User.updateOne(
+        { _id: user._id },
+        { resetPasswordToken: hashedToken, resetPasswordExpires: Date.now() + 15 * 60 * 1000 });
+
+    const resetLink = `http://localhost:3000/signin/password/reset/${resetToken}`;
+
+    await mailer.sendPasswordResetLink(email, resetLink);
+
+
     return {
         success: true,
         message: "Reset link has been sent to your email."
+    };
+}
+
+exports.validateResetToken = async (token) => {
+
+    const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+    const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        return {
+            success: false,
+            message: "This reset link is inavlid or has expired"
+        };
     }
+
+    return {
+        success: true
+    };
+}
+
+exports.resetPassword = async (token, body) => {
+
+    const { newPassword, confirmPassword } = body;
+
+    if (!newPassword) {
+        return {
+            success: false,
+            message: "Please enter your new password."
+        }
+    }
+
+    if (!confirmPassword) {
+        return {
+            success: false,
+            message: "Please confirm your new password."
+        }
+    }
+
+    if (newPassword !== confirmPassword) {
+        return {
+            success: false,
+            message: "Passwords do not match."
+        }
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_\-+=])[A-Za-z\d@$!%*?&^#()_\-+=]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        return {
+            success: false,
+            message: "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+        };
+    }
+
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        return {
+            success: false,
+            message: "This reset link is invalid or has expired."
+        }
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.updateOne({ _id: user._id }, { password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null });
+
+    return {
+        success: true,
+        message: "Password reset successfully."
+    };
 }

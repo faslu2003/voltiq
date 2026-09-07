@@ -1,0 +1,242 @@
+<!-- ================= REUSABLE ADD PRODUCT MODAL PARTIAL ================= -->
+<div class="product-modal-backdrop hidden" id="productModalBackdrop" onclick="handleProductBackdropClick(event)">
+  <div class="product-modal-dialog" role="dialog" aria-labelledby="productModalTitle" aria-modal="true">
+    
+    <!-- Modal Header -->
+    <div class="product-modal-header">
+      <div class="header-text-group">
+        <h2 class="product-modal-title" id="productModalTitle">Add New Product</h2>
+        <p class="product-modal-subtitle">Fill in the details to create a new SKU in your digital catalog.</p>
+      </div>
+      <button type="button" class="product-modal-close" onclick="closeProductModal()" aria-label="Close modal">✕</button>
+    </div>
+
+    <!-- Form Body -->
+    <form action="/admin/products/save" method="POST" enctype="multipart/form-data" class="product-modal-form" id="addProductForm" onsubmit="handleProductSubmit(event)">
+      
+      <!-- SECTION 1: BASIC INFORMATION -->
+      <div class="modal-form-section">
+        <div class="section-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          BASIC INFORMATION
+        </div>
+
+        <!-- Product Name (productName) -->
+        <div class="form-field-group">
+          <label for="productName" class="field-label">Product Name</label>
+          <input type="text" id="productName" name="productName" class="field-input" placeholder="e.g. Voltiq Ultra Pro Headphones" required autocomplete="off">
+        </div>
+
+        <!-- Category (categoryId) & Brand (brandId) 2-Column Grid -->
+        <div class="field-grid-2">
+          <div class="form-field-group">
+            <label for="productCategoryId" class="field-label">Category</label>
+            <div class="select-wrapper">
+              <select id="productCategoryId" name="categoryId" class="field-select" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="Smartphones">Smartphones</option>
+                <option value="Laptops">Laptops</option>
+                <option value="Audio">Audio</option>
+                <option value="Wearables">Wearables</option>
+                <option value="Cameras">Cameras</option>
+                <option value="Accessories">Accessories</option>
+              </select>
+              <svg class="select-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="form-field-group">
+            <label for="productBrandId" class="field-label">Brand</label>
+            <div class="select-wrapper">
+              <select id="productBrandId" name="brandId" class="field-select" required>
+                <option value="" disabled selected>Select Brand</option>
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Google">Google</option>
+                <option value="OnePlus">OnePlus</option>
+                <option value="Sony">Sony</option>
+                <option value="Voltiq">Voltiq Original</option>
+              </select>
+              <svg class="select-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Base Price (price) -->
+        <div class="form-field-group">
+          <label for="productPrice" class="field-label">Base Price (INR)</label>
+          <div class="price-input-wrapper">
+            <span class="currency-symbol">₹</span>
+            <input type="number" id="productPrice" name="price" class="field-input price-input" placeholder="0.00" step="0.01" min="0" required>
+          </div>
+        </div>
+
+        <!-- Description (description) -->
+        <div class="form-field-group">
+          <label for="productDescription" class="field-label">Description</label>
+          <textarea id="productDescription" name="description" class="field-textarea" placeholder="Describe key product features, specs, and details..." required></textarea>
+        </div>
+      </div>
+
+      <!-- SECTION 2: PRODUCT IMAGES (imgUrls) -->
+      <div class="modal-form-section">
+        <div class="section-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          PRODUCT IMAGES (imgUrls)
+        </div>
+
+        <div class="form-field-group">
+          <label class="field-label">Gallery Images</label>
+          
+          <!-- Native HTML Label Dropzone -->
+          <label for="productImagesInput" class="multi-image-dropzone" id="productDropzone" ondragover="handleProductDragOver(event)" ondragleave="handleProductDragLeave(event)" ondrop="handleProductFileDrop(event)">
+            <input type="file" id="productImagesInput" name="imgUrls" class="hidden-file-input" accept="image/png, image/jpeg, image/webp" multiple onchange="handleProductFilesSelect(event)">
+            
+            <div class="upload-zone-content" id="productUploadContent">
+              <div class="upload-icon-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <polyline points="9 15 12 12 15 15"></polyline>
+                </svg>
+              </div>
+              <span class="upload-primary-text">Click to upload or drag and drop product images</span>
+              <span class="upload-secondary-text">PNG, JPG, or WEBP (Select multiple images, Max 5MB each)</span>
+            </div>
+
+            <!-- Thumbnails Preview Grid Inside Dropzone Area -->
+            <div class="image-preview-grid hidden" id="productPreviewGrid" onclick="event.stopPropagation();"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- SECTION 3: VARIANTS -->
+      <div class="modal-form-section">
+        <div class="section-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          VARIANTS
+        </div>
+
+        <div class="variants-container" id="variantsContainer">
+          <!-- Default Variant Row 1 -->
+          <div class="variant-row-card">
+            <div class="form-field-group">
+              <label class="field-label-sm">Variant Name</label>
+              <input type="text" name="variantName[]" class="field-input-sm" placeholder="e.g. Midnight, 256GB">
+            </div>
+
+            <div class="form-field-group">
+              <label class="field-label-sm">Color</label>
+              <input type="text" name="variantColor[]" class="field-input-sm" placeholder="Lilac">
+            </div>
+
+            <div class="form-field-group">
+              <label class="field-label-sm">Storage</label>
+              <input type="text" name="variantStorage[]" class="field-input-sm" placeholder="256GB">
+            </div>
+
+            <div class="form-field-group">
+              <label class="field-label-sm">Addl. Price</label>
+              <input type="number" name="variantAddlPrice[]" class="field-input-sm" placeholder="0.00" step="0.01">
+            </div>
+
+            <label class="variant-cam-btn" title="Attach Variant Image">
+              <input type="file" name="variantImage[]" accept="image/*" class="hidden-file-input" onchange="handleVariantImageSelect(this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </label>
+          </div>
+        </div>
+
+        <button type="button" class="btn-add-variant-dashed" onclick="addVariantRow()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Another Variant
+        </button>
+      </div>
+
+      <!-- SECTION 4: PRODUCT HIGHLIGHTS (highlights) -->
+      <div class="modal-form-section">
+        <div class="section-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          PRODUCT HIGHLIGHTS (highlights)
+        </div>
+
+        <div class="highlights-container" id="highlightsContainer">
+          <div class="highlight-row-input">
+            <span class="highlight-bullet">•</span>
+            <input type="text" name="highlights[]" class="field-input" placeholder="e.g. Ceramic Shield front glass, 4x stronger drop performance" required>
+            <button type="button" class="btn-remove-highlight" onclick="removeHighlightRow(this)">✕</button>
+          </div>
+          <div class="highlight-row-input">
+            <span class="highlight-bullet">•</span>
+            <input type="text" name="highlights[]" class="field-input" placeholder="e.g. A18 Pro Bionic Chip with 6-core GPU">
+            <button type="button" class="btn-remove-highlight" onclick="removeHighlightRow(this)">✕</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-add-highlight-dashed" onclick="addHighlightRow()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Highlight Bullet
+        </button>
+      </div>
+
+      <!-- SECTION 5: VISIBILITY & STATUS (isActive) -->
+      <div class="visibility-toggle-card">
+        <div class="visibility-info">
+          <div class="visibility-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </div>
+          <div class="visibility-text">
+            <span class="visibility-title">Visibility (isActive)</span>
+            <span class="visibility-subtitle" id="productVisibilityText">Show this product on the public storefront</span>
+          </div>
+        </div>
+        <label class="modal-toggle-switch">
+          <input type="checkbox" id="productIsActive" name="isActive" checked onchange="toggleProductVisibilityLabel(this)">
+          <span class="modal-toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div class="product-modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeProductModal()">Cancel</button>
+        <button type="submit" class="btn-modal-save" id="btnSaveProduct">Add Product</button>
+      </div>
+
+    </form>
+  </div>
+</div>

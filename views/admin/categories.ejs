@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Category Management · Voltiq Admin Portal' %></title>
+  <link rel="stylesheet" href="/css/admin/categories.css">
+  <link rel="stylesheet" href="/css/admin/add-category-modal.css">
+  <link rel="stylesheet" href="/css/admin/delete-category-modal.css">
+  <link rel="stylesheet" href="/css/admin/inactive-category-modal.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+      <a href="/admin/dashboard" class="brand-wrapper">
+        <div class="brand-logo-text">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          voltiq
+        </div>
+        <span class="brand-subtitle">Admin Portal</span>
+      </a>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard Item -->
+        <a href="/admin/dashboard" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            Dashboard
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+
+        <!-- Sub Nav Items -->
+        <div class="sub-nav">
+          <a href="/admin/overview" class="sub-nav-item">Overview</a>
+          <a href="/admin/sales" class="sub-nav-item">Sales Performance</a>
+        </div>
+
+        <!-- Inventory -->
+        <a href="/admin/products" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </span>
+            Inventory
+          </div>
+        </a>
+
+        <!-- Categories (ACTIVE) -->
+        <a href="/admin/categories" class="nav-item active">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </span>
+            Categories
+          </div>
+        </a>
+
+        <!-- Orders -->
+        <a href="/admin/orders" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </span>
+            Orders
+          </div>
+        </a>
+
+        <!-- Customers -->
+        <a href="/admin/customers" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            Customers
+          </div>
+        </a>
+
+        <!-- Promotions -->
+        <a href="/admin/promotions" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            Promotions
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-search">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search categories..." onkeyup="filterCategories()">
+        </div>
+
+        <div class="header-right-actions">
+          <button class="icon-button" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <button class="icon-button" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+
+          <!-- Admin User Info -->
+          <div class="admin-user-profile">
+            <div class="user-text-info">
+              <span class="user-name-text">Alex Rivera</span>
+              <span class="user-role-text">Store Manager</span>
+            </div>
+            <img src="/images/avatar.jpg" alt="Admin Avatar" class="user-avatar-circle">
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        
+        <!-- Heading Bar -->
+        <div class="page-heading-bar">
+          <div class="heading-title-group">
+            <h1>Category Management</h1>
+            <p>Organize and refine your electronics catalog.</p>
+          </div>
+
+          <button type="button" class="btn-add-category" onclick="openAddModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add New Category
+          </button>
+        </div>
+
+        <!-- Metrics Cards Grid -->
+        <div class="metrics-grid">
+          
+          <!-- Card 1: Total Categories -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+              </div>
+              <span class="stat-badge">+4% this month</span>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Total Categories</span>
+              <span class="stat-value" id="statTotal">12</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Categories -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper gray">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="9 12 11 14 15 10"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Active Categories</span>
+              <span class="stat-value" id="statActive">10</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Inactive Categories -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon-wrapper red">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Inactive Categories</span>
+              <span class="stat-value" id="statInactive">2</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Categories Table Card -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="categories-table" id="categoriesTable">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Description</th>
+                  <th>Total Products</th>
+                  <th>Visibility</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categoriesTableBody">
+                
+                <!-- Row 1: Smartphones -->
+                <tr data-id="1">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Smartphones" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Smartphones</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">Latest mobile devices and flagship...</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">148 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggle(this, 'Smartphones')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Smartphones', 'Latest mobile devices and flagship...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Laptops -->
+                <tr data-id="2">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Laptops" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Laptops</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">High-performance workstations &...</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">86 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggle(this, 'Laptops')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Laptops', 'High-performance workstations &...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Audio -->
+                <tr data-id="3">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Audio" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Audio</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">Premium headphones and speaker...</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">210 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggle(this, 'Audio')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Audio', 'Premium headphones and speaker...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Wearables -->
+                <tr data-id="4">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Wearables" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Wearables</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">Smartwatches, fitness trackers & IoT</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">64 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggle(this, 'Wearables')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Wearables', 'Smartwatches, fitness trackers & IoT')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Cameras -->
+                <tr data-id="5">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Cameras" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Cameras</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">Mirrorless, DSLRs and professional...</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">42 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" onchange="handleVisibilityToggle(this, 'Cameras')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Cameras', 'Mirrorless, DSLRs and professional...')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 6: Accessories -->
+                <tr data-id="6">
+                  <td>
+                    <div class="category-item-cell">
+                      <div class="category-thumb-box">
+                        <img src="/images/avatar.jpg" alt="Accessories" class="category-thumb-img">
+                      </div>
+                      <span class="category-name-text">Accessories</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-desc-text">Cables, chargers, cases and essential</span>
+                  </td>
+                  <td>
+                    <span class="product-count-text">312 Items</span>
+                  </td>
+                  <td>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked onchange="handleVisibilityToggle(this, 'Accessories')">
+                      <span class="slider"></span>
+                    </label>
+                  </td>
+                  <td class="text-right">
+                    <div class="actions-cell">
+                      <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('Accessories', 'Cables, chargers, cases and essential')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls Bar -->
+          <div class="pagination-bar">
+            <span class="pagination-text" id="paginationText">Showing 6 of 12 categories</span>
+            <div class="pagination-controls">
+              <button type="button" class="page-btn" disabled>Previous</button>
+              <button type="button" class="page-btn active">1</button>
+              <button type="button" class="page-btn">2</button>
+              <button type="button" class="page-btn">Next</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- ADMIN FOOTER -->
+      <footer class="admin-footer">
+        <div>© <%= new Date().getFullYear() %> Voltiq Electronics Admin Portal. Atmospheric Precision Design.</div>
+        <div class="footer-links">
+          <a href="/privacy" class="footer-link">Privacy Policy</a>
+          <a href="/terms" class="footer-link">Terms of Service</a>
+          <a href="/support" class="footer-link">Help Center</a>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ================= REUSABLE ADD / EDIT CATEGORY MODAL PARTIAL ================= -->
+  <%- include('partials/add-category-modal.ejs') %>
+
+  <!-- ================= REUSABLE DELETE CATEGORY MODAL PARTIAL ================= -->
+  <%- include('partials/delete-category-modal.ejs') %>
+
+  <!-- ================= REUSABLE INACTIVE CATEGORY MODAL PARTIAL ================= -->
+  <%- include('partials/inactive-category-modal.ejs') %>
+
+  <!-- INTERACTIVE CLIENT JAVASCRIPT -->
+  <script>
+    let pendingDeleteRow = null;
+    let pendingInactiveCheckbox = null;
+    let pendingInactiveCategoryName = '';
+
+    // Search Filter
+    function filterCategories() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#categoriesTableBody tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const name = row.querySelector('.category-name-text').textContent.toLowerCase();
+        const desc = row.querySelector('.category-desc-text').textContent.toLowerCase();
+        if (name.includes(query) || desc.includes(query)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      document.getElementById('paginationText').textContent = `Showing ${visibleCount} of ${rows.length} categories`;
+    }
+
+    // Toggle Visibility with Confirmation Modal for Inactive
+    function handleVisibilityToggle(checkbox, categoryName) {
+      if (!checkbox.checked) {
+        // User turned switch OFF -> Revert switch state temporarily and show modal
+        checkbox.checked = true;
+        pendingInactiveCheckbox = checkbox;
+        pendingInactiveCategoryName = categoryName;
+
+        const row = checkbox.closest('tr');
+        const catCount = row.querySelector('.product-count-text').textContent.trim();
+        const catImgSrc = row.querySelector('.category-thumb-img').src;
+
+        document.getElementById('inactiveCategoryName').textContent = `"${categoryName}"`;
+        document.getElementById('inactiveCardTitle').textContent = categoryName;
+        document.getElementById('inactiveCardSubtext').textContent = `${catCount} Storefront Items`;
+        document.getElementById('inactiveCategoryImg').src = catImgSrc;
+
+        const backdrop = document.getElementById('inactiveModalBackdrop');
+        backdrop.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } else {
+        // User turned switch ON -> Direct activation
+        updateStats();
+      }
+    }
+
+    function cancelCategoryInactive() {
+      const backdrop = document.getElementById('inactiveModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingInactiveCheckbox = null;
+    }
+
+    function handleInactiveBackdropClick(event) {
+      if (event.target === document.getElementById('inactiveModalBackdrop')) {
+        cancelCategoryInactive();
+      }
+    }
+
+    function confirmCategoryInactive() {
+      if (pendingInactiveCheckbox) {
+        pendingInactiveCheckbox.checked = false;
+        updateStats();
+        cancelCategoryInactive();
+      }
+    }
+
+    // Open Confirm Delete Modal
+    function deleteCategoryRow(btn) {
+      pendingDeleteRow = btn.closest('tr');
+      const catName = pendingDeleteRow.querySelector('.category-name-text').textContent.trim();
+      const catCount = pendingDeleteRow.querySelector('.product-count-text').textContent.trim();
+      const catImgSrc = pendingDeleteRow.querySelector('.category-thumb-img').src;
+
+      document.getElementById('deleteCategoryName').textContent = `"${catName}"`;
+      document.getElementById('deleteCardTitle').textContent = catName;
+      document.getElementById('deleteCardSubtext').textContent = `${catCount} Associated Items`;
+      document.getElementById('deleteCategoryImg').src = catImgSrc;
+
+      const backdrop = document.getElementById('deleteModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+      const backdrop = document.getElementById('deleteModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingDeleteRow = null;
+    }
+
+    function handleDeleteBackdropClick(event) {
+      if (event.target === document.getElementById('deleteModalBackdrop')) {
+        closeDeleteModal();
+      }
+    }
+
+    function makePendingCategoryInactive() {
+      if (pendingDeleteRow) {
+        const chk = pendingDeleteRow.querySelector('.toggle-switch input');
+        if (chk) chk.checked = false;
+        updateStats();
+        closeDeleteModal();
+      }
+    }
+
+    function confirmCategoryDelete() {
+      if (pendingDeleteRow) {
+        pendingDeleteRow.style.opacity = '0';
+        pendingDeleteRow.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          pendingDeleteRow.remove();
+          updateStats();
+          closeDeleteModal();
+        }, 150);
+      }
+    }
+
+    // Recalculate Metrics Stats
+    function updateStats() {
+      const rows = document.querySelectorAll('#categoriesTableBody tr');
+      let active = 0;
+      let inactive = 0;
+
+      rows.forEach(row => {
+        const chk = row.querySelector('.toggle-switch input');
+        if (chk && chk.checked) {
+          active++;
+        } else {
+          inactive++;
+        }
+      });
+
+      document.getElementById('statTotal').textContent = rows.length;
+      document.getElementById('statActive').textContent = active;
+      document.getElementById('statInactive').textContent = inactive;
+      document.getElementById('paginationText').textContent = `Showing ${rows.length} of ${rows.length} categories`;
+    }
+
+    // ================= MODAL CONTROLLER FUNCTIONS =================
+
+    // Open Modal for Add New Category
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Add New Category';
+      document.getElementById('modalSubtitle').textContent = 'Define a new collection for your inventory.';
+      document.getElementById('btnSaveCategory').textContent = 'Save Category';
+      document.getElementById('categoryId').value = '';
+      document.getElementById('categoryForm').reset();
+      removeImagePreview();
+      
+      const backdrop = document.getElementById('categoryModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Open Modal for Edit Existing Category
+    function openEditModal(name, desc, isVisible = true, imgUrl = '/images/avatar.jpg', id = '') {
+      document.getElementById('modalTitle').textContent = 'Edit Category';
+      document.getElementById('modalSubtitle').textContent = 'Modify category details, imagery, or storefront visibility.';
+      document.getElementById('btnSaveCategory').textContent = 'Update Category';
+      document.getElementById('categoryId').value = id || name;
+      document.getElementById('categoryName').value = name;
+      document.getElementById('categoryDescription').value = desc;
+      document.getElementById('categoryVisibility').checked = isVisible;
+      
+      // Show existing image in dropzone preview if available
+      if (imgUrl) {
+        document.getElementById('imagePreviewImg').src = imgUrl;
+        document.getElementById('uploadZoneContent').classList.add('hidden');
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+      } else {
+        removeImagePreview();
+      }
+
+      const backdrop = document.getElementById('categoryModalBackdrop');
+      backdrop.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close Modal
+    function closeCategoryModal() {
+      const backdrop = document.getElementById('categoryModalBackdrop');
+      backdrop.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // Close Modal when clicking outside the modal box
+    function handleModalBackdropClick(event) {
+      if (event.target === document.getElementById('categoryModalBackdrop')) {
+        closeCategoryModal();
+      }
+    }
+
+    // File Upload Input & Drag-and-Drop Handlers
+    function triggerFileInput() {
+      document.getElementById('categoryImageInput').click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) displayImagePreview(file);
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('dropzoneBox').classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('dropzoneBox').classList.remove('dragover');
+    }
+
+    function handleFileDrop(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      document.getElementById('dropzoneBox').classList.remove('dragover');
+      
+      const files = event.dataTransfer.files;
+      if (files && files.length > 0) {
+        document.getElementById('categoryImageInput').files = files;
+        displayImagePreview(files[0]);
+      }
+    }
+
+    function displayImagePreview(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('imagePreviewImg').src = e.target.result;
+        document.getElementById('uploadZoneContent').classList.add('hidden');
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImagePreview(event) {
+      if (event) event.stopPropagation();
+      document.getElementById('categoryImageInput').value = '';
+      document.getElementById('imagePreviewImg').src = '';
+      document.getElementById('uploadZoneContent').classList.remove('hidden');
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+    }
+
+    // Handle Form Submission (Add / Edit)
+    function handleCategorySubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById('categoryId').value;
+      const name = document.getElementById('categoryName').value.trim();
+      const desc = document.getElementById('categoryDescription').value.trim();
+      const isVisible = document.getElementById('categoryVisibility').checked;
+      const previewSrc = document.getElementById('imagePreviewImg').src || '/images/avatar.jpg';
+
+      if (!name) return;
+
+      const tbody = document.getElementById('categoriesTableBody');
+
+      // If Editing an existing category row
+      if (id) {
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => {
+          const rowName = row.querySelector('.category-name-text').textContent.trim();
+          if (row.getAttribute('data-id') === id || rowName === id) {
+            row.querySelector('.category-name-text').textContent = name;
+            row.querySelector('.category-desc-text').textContent = desc || 'No description provided';
+            row.querySelector('.category-thumb-img').src = previewSrc;
+            const chk = row.querySelector('.toggle-switch input');
+            if (chk) chk.checked = isVisible;
+          }
+        });
+      } else {
+        // If Adding a new category row
+        const newRowHtml = `
+          <tr data-id="${Date.now()}">
+            <td>
+              <div class="category-item-cell">
+                <div class="category-thumb-box">
+                  <img src="${previewSrc}" alt="${name}" class="category-thumb-img">
+                </div>
+                <span class="category-name-text">${name}</span>
+              </div>
+            </td>
+            <td>
+              <span class="category-desc-text">${desc || 'No description provided'}</span>
+            </td>
+            <td>
+              <span class="product-count-text">0 Items</span>
+            </td>
+            <td>
+              <label class="toggle-switch">
+                <input type="checkbox" ${isVisible ? 'checked' : ''} onchange="handleVisibilityToggle(this, '${name}')">
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td class="text-right">
+              <div class="actions-cell">
+                <button type="button" class="action-icon-btn edit" title="Edit Category" onclick="openEditModal('${name}', '${desc}', ${isVisible}, '${previewSrc}', '${Date.now()}')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button type="button" class="action-icon-btn delete" title="Delete Category" onclick="deleteCategoryRow(this)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        tbody.insertAdjacentHTML('afterbegin', newRowHtml);
+      }
+
+      closeCategoryModal();
+      updateStats();
+    }
+  </script>
+
+</body>
+</html>

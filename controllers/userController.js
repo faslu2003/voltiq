@@ -176,7 +176,7 @@ exports.googleAuth = async (req, res) => {
 }
 
 
-exports.getResetPassword = (req, res) => {
+exports.getForgotPassword = (req, res) => {
 
     const error = req.session.error || null;
     req.session.error = null;
@@ -184,30 +184,80 @@ exports.getResetPassword = (req, res) => {
     const message = req.session.message || null;
     req.session.message = null;
 
-    res.render('user/reset-password', { error, message });
+    res.render('user/forgot-password', { error, message });
 }
 
-exports.postResetPassword = async (req, res) => {
+exports.postForgotPassword = async (req, res) => {
 
     try {
 
-        const result = await authService.resetPassword(req.body);
+        const result = await authService.forgotPassword(req.body);
 
         if (!result.success) {
             req.session.error = result.message;
-            return res.redirect('/signin/reset-password');
+            return res.redirect('/signin/password/forgot');
         }
 
         if (result.success) {
             req.session.message = result.message;
-            return res.redirect('/signin/reset-password');
+            return res.redirect('/signin/password/forgot');
         }
     }
 
     catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
-        return res.redirect('/signin/reset-password');
+        return res.redirect('/signin/password/forgot');
+    }
+}
+
+exports.getResetPassword = async (req, res) => {
+
+    try {
+
+        const { token } = req.params;
+
+        const result = await authService.validateResetToken(token);
+
+        if (!result.success) {
+            return res.render('user/reset-password', { error: result.message, token });
+        }
+
+        return res.render('user/reset-password', { error: null, token });
+    }
+    catch (err) {
+        console.log(err);
+
+        return res.render('user/reset-password', { error: "Something went wrong. Please try again.", token });
+    }
+}
+
+exports.postResetPassword = async (req, res) => {
+
+    try {
+
+        console.log("POST RESET ROUTE HIT");
+
+        const result = await authService.resetPassword(req.params.token, req.body);
+
+        const { token } = req.params;
+
+        if (!result.success) {
+            return res.render("user/reset-password", {
+                error: result.message,
+                token
+            });
+        }
+
+        return res.redirect('/signin');
+    }
+    catch (err) {
+        console.error(err);
+
+        return res.render("user/reset-password", {
+            error: "Something went wrong. Please try again.",
+            token
+        });
     }
 }
 
@@ -432,7 +482,7 @@ exports.resendOtp = async (req, res) => {
 
     const result = await userService.resendOtp(req.session);
 
-    res.json(result);
+    return res.json(result);
 }
 
 
@@ -572,6 +622,31 @@ exports.deleteAddress = async (req, res) => {
 
         res.redirect('/address');
     }
+}
+
+
+
+exports.getProducts = (req, res) => {
+
+    res.render('user/products');
+}
+
+exports.getProductDetails = (req, res) => {
+
+    res.render('user/product-details');
+}
+
+
+
+exports.getWishlist = (req, res) => {
+
+    res.render('user/wishlist');
+}
+
+
+exports.getCart = (req, res) => {
+
+    res.render('user/cart');
 }
 
 
