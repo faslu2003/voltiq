@@ -12,7 +12,7 @@
     </div>
 
     <!-- Form Body -->
-    <form action="/admin/categories/save" method="POST" enctype="multipart/form-data" class="category-modal-form" id="categoryForm" onsubmit="handleCategorySubmit(event)">
+    <form action="/admin/categories" method="POST" enctype="multipart/form-data" class="category-modal-form" id="categoryForm">
       
       <!-- Hidden Category ID for Edit mode -->
       <input type="hidden" id="categoryId" name="id" value="">
@@ -70,7 +70,7 @@
           </div>
         </div>
         <label class="modal-toggle-switch">
-          <input type="checkbox" id="categoryVisibility" name="isVisible" checked>
+          <input type="checkbox" id="categoryVisibility" name="isVisible">
           <span class="modal-toggle-slider"></span>
         </label>
       </div>

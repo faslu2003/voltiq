@@ -1,6 +1,11 @@
 const User = require('../src/models/User');
+const Category = require('../src/models/Category');
+const Brand = require('../src/models/Brand');
+const Product = require('../src/models/Product');
 
 const adminService = require('../services/adminService');
+
+const STATUS_CODES = require('../constants/statusCode');
 
 
 
@@ -30,7 +35,7 @@ exports.postSignin = async (req, res) => {
 
         res.redirect('/admin/customers');
     }
-    catch(err) {
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
 
@@ -69,41 +74,199 @@ exports.upddateCustomerStatus = async (req, res) => {
 
         res.json(result);
     }
-    catch(err) {
+    catch (err) {
 
         console.log(err);
 
-        res.status(500).json({ success: false, message: "Something went wrong. Please try again."});
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: "Something went wrong. Please try again." });
     }
 }
 
 
 
-exports.getCategories = (req, res) => {
+exports.getCategories = async (req, res) => {
 
-    res.render('admin/categories');
+    try {
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+
+        const result = await adminService.getCategories(page, limit);
+
+        return res.render('admin/categories', result);
+    }
+    catch (err) {
+        console.log(err);
+
+        res.send("Something went wrong");
+    }
 }
 
 exports.postCategory = async (req, res) => {
 
-    const result = await adminService.AddCategory(req.body, req.file);
+    try {
+
+        const result = await adminService.AddCategory(req.body, req.file);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/admin/categories');
+        }
+
+        req.session.message = result.message;
+        return res.redirect('/admin/categories');
+    }
+    catch (err) {
+        console.log(err);
+
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/admin/categories');
+    }
+}
+
+exports.editCategory = async (req, res) => {
+
+    try {
+
+        const result = await adminService.editCategory(req.body, req.file);
+
+        req.session.message = result.message;
+        return res.redirect('/admin/categories');
+    }
+    catch (err) {
+        console.log(err);
+
+        req.session.error = "Something went wrong. Please try again";
+        return res.redirect('/admin/categories');
+    }
+}
+
+exports.toggleCategoryStatus = async (req, res) => {
+
+    try {
+
+        const result = await adminService.toggleCategoryStatus(req.body);
+
+        return res.json(result);
+    }
+    catch (err) {
+        console.log(err);
+
+        return res.json({
+            sucess: false,
+            message: "Something went wrong."
+        });
+    }
+}
+
+
+
+exports.getProducts = async (req, res) => {
+
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+
+        const categories = await Category.find({ isActive: true });
+        const brands = await Brand.find({ isActive: true });
+
+        const result = await adminService.getProducts(page, limit);
+
+        return res.render('admin/inventory', { ...result, categories, brands });
+    }
+    catch (err) {
+        console.log(err);
+
+        return res.send("Error loading products.");
+    }
+}
+
+exports.postProducts = async (req, res) => {
+
+    try {
+        const result = await adminService.AddProducts(req.body, req.files);
+
+        if (!result.success) {
+            console.log(result.message);
+            req.session.error = result.message;
+            return res.redirect('/admin/products');
+        }
+
+        req.session.message = result.message;
+        return res.redirect('/admin/products');
+    }
+    catch (err) {
+        console.log(err);
+
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/admin/products');
+    }
+}
+
+exports.toggleProductStatus = async (req, res) => {
+
+    try {
+        const { id } = req.body;
+
+        const result = await adminService.toggleProductStatus(id);
+
+        if (!result.success) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.message
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: result.message,
+            isActive: result.isActive
+        });
+    }
+    catch (err) {
+        console.log(err);
+
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong."
+        });
+    }
+}
+
+exports.editProduct = async (req, res) => {
+
+    try {
+        console.log("EDIT CONTROLLER REACHED");
+
+        console.log("BODY:", req.body);
+
+        console.log("FILES:", req.files);
+
+
+        const result = await adminService.editProduct(req.body, req.files);
+
+        console.log("SERVICE RESULT:", result);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/admin/products');
+        }
+
+        req.session.message = result.message;
+        return res.redirect('/admin/products');
+    }
+    catch (err) {
+        console.log(err);
+
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/admin/products');
+    }
 }
 
 
 exports.getBrands = (req, res) => {
 
-    res.render('admin/brand');
-}
-
-
-exports.getProducts = (req, res) => {
-
-    res.render('admin/inventory');
-}
-
-exports.postProducts = async (req, res) => {
-
-    const result = await adminService.products(req.body);
+    res.render('admin/brands');
 }
 
 

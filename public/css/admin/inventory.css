@@ -598,12 +598,12 @@ body {
 }
 
 /* Stock Cell with Progress Bar */
-.stock-cell {
+/* .stock-cell {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 90px;
-}
+} */
 
 .stock-text {
   font-size: 12px;

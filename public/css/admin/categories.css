@@ -224,6 +224,56 @@ body {
   box-shadow: 0 0 0 3px rgba(101, 59, 182, 0.1);
 }
 
+.search-clear-btn {
+
+  position: absolute;
+
+  right: 10px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 22px;
+
+  height: 22px;
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background-color: #e7e5eb;
+
+  color: #653BB6;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  transition: all 0.2s ease;
+
+}
+
+.search-clear-btn:hover {
+
+  background-color: #d1c9e1;
+
+  color: #334155;
+
+}
+
 .header-right-actions {
   display: flex;
   align-items: center;
@@ -623,9 +673,15 @@ input:checked + .slider:before {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-.page-btn:hover:not(:disabled) {
+.page-btn:hover {
   border-color: var(--primary-purple);
   color: var(--primary-purple);
   background-color: #FAF8FC;
