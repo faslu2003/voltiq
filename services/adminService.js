@@ -404,7 +404,16 @@ exports.AddProducts = async (body, files) => {
         if (!variant.color) {
             return {
                 success: false,
-                message: `Please enter a color for varaint ${idx + 1}.`
+                message: `Please enter a color for variant ${idx + 1}.`
+            }
+        }
+
+        for (let idx = 0; idx < variants.length; idx++) {
+            if (variant.color === variants[idx].color && variant.storage === variants[idx].storage) {
+                return {
+                    success: false,
+                    message: "Variant with the same color and storage already exists."
+                }
             }
         }
 
@@ -428,6 +437,12 @@ exports.AddProducts = async (body, files) => {
                 message: `Please enter stock for variant ${idx + 1}.`
             }
         }
+        if (variant.stock < 0) {
+            return {
+                success: false,
+                message: `The stock quantity entered for variant ${idx + 1} is negative.`
+            }
+        }
 
         if (!variant.price) {
             return {
@@ -435,11 +450,17 @@ exports.AddProducts = async (body, files) => {
                 message: `Please enter a price for variant ${idx + 1}.`
             }
         }
+        if (variant.price < 0) {
+            return {
+                success: false,
+                message: `The price entered for variant ${idx + 1} is negative.`
+            }
+        }
 
-        console.log("ALL FILES:", files.map(file => ({
+        files.map(file => ({
             fieldname: file.fieldname,
             filename: file.filename
-        })));
+        }));
 
         const variantImages = files.filter(file => file.fieldname === `variantImages_${idx}[]`);
         if (variantImages.length === 0) {
@@ -448,7 +469,7 @@ exports.AddProducts = async (body, files) => {
                 message: `Please upload at least one image for variant ${idx + 1}.`
             }
         }
-        console.log("VARIANT IMAGES:", variantImages.map(file => file.filename));
+        variantImages.map(file => file.filename);
 
         formattedVariants.push({
             color: variant.color,
@@ -540,8 +561,31 @@ exports.editProduct = async (body, files) => {
 
             if (!variant) return;
 
+            if (variantData.stock < 0) {
+                return {
+                    success: false,
+                    message: "The stock entered for the variant is a negative number."
+                }
+            }
+
+            if (variantData.price < 0) {
+                return {
+                    success: false,
+                    message: "The price entered for the variant is a negative number."
+                }
+            }
+
+            for (let idx = 0; idx < variants.length; idx++) {
+                if (variantData.color === variants[idx].color && variantData.storage === variants[idx].storage) {
+                    return {
+                        success: false,
+                        message: "A variant with the same color & storage already exists."
+                    }
+                }
+            }
+
             variant.color = variantData.color;
-            variant.colorCode = variantData.colorCode;
+            // variant.colorCode = variantData.colorCode;
             variant.storage = variantData.storage;
             variant.stock = Number(variantData.stock);
             variant.price = Number(variantData.price);

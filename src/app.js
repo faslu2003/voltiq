@@ -19,6 +19,7 @@ app.use('/uploads', express.static('uploads'));
 
 const session = require('express-session');
 app.use(session({
+    name: 'voltiq.sid',
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

@@ -11,6 +11,8 @@ const STATUS_CODES = require('../constants/statusCode');
 
 exports.getSignin = (req, res) => {
 
+    if (req.session.admin) return res.redirect('/admin/customers');
+
     const error = req.session.error || null;
     req.session.error = null;
 
@@ -358,6 +360,7 @@ exports.getBrands = (req, res) => {
 exports.logout = (req, res) => {
 
     req.session.destroy(() => {
-        res.redirect('/admin/signin');
-    })
+        res.clearCookie('voliq.sid');
+        return res.redirect('/admin/signin');
+    });
 }
