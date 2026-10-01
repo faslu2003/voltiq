@@ -1,6 +1,7 @@
 const User = require('../src/models/User');
-
 const Address = require('../src/models/Address');
+const Product = require('../src/models/Product');
+
 const addressService = require('./addressService');
 
 const bcrypt = require('bcrypt');
@@ -497,4 +498,86 @@ exports.deleteAddress = async (addressId, session) => {
     return {
         success: true
     }
+}
+
+
+
+exports.getProducts = async (categoryId, search, sort, maxPrice, selectedBrands, page, limit) => {
+
+    const query = {
+        categoryId,
+        isActive: true
+    };
+
+    if (search) {
+        query.name = {
+            $regex: search,
+            $options: 'i'
+        };
+    }
+
+    if (selectedBrands.length > 0) {
+        query.brandId = {
+            $in: selectedBrands
+        };
+    }
+
+    if (maxPrice) {
+        query.variants = {
+            $elemMatch: {
+                price: { $lte: maxPrice }
+            }
+        };
+    }
+
+    let sortOption = {};
+
+    switch (sort) {
+        case 'price-low': {
+            sortOption = { 'variants.0.price': 1 };
+            break;
+        }
+        case 'price-high': {
+            sortOption = { 'variants.0.price': -1 };
+            break;
+        }
+        case 'a-z': {
+            sortOption = { name: 1 };
+            break;
+        }
+        case 'z-a': {
+            sortOption = { name: -1 };
+            break;
+        }
+        case 'newest': default:
+            sortOption = { createdAt: -1 };
+            break;
+    }
+
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
+    const currentPage = Math.min(page, Math.max(totalPages, 1));
+    const skip = (currentPage - 1) * limit;
+
+    const products = await Product.find(query).sort(sortOption).skip(skip).limit(limit);
+
+    products.forEach(product => {
+        if (maxPrice) {
+            const matchingVariant = product.variants.find(
+                variant => variant.price <= maxPrice
+            );
+
+            product.displayVariant = matchingVariant;
+        }
+        else {
+            product.displayVariant = product.variants[0];
+        }
+    });
+
+    return {
+        products,
+        currentPage,
+        totalPages,
+        totalProducts
+    };
 }

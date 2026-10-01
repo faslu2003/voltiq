@@ -93,7 +93,14 @@ exports.getCategories = async (req, res) => {
 
         const result = await adminService.getCategories(page, limit);
 
-        return res.render('admin/categories', result);
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        const message = req.session.message || null;
+        req.session.message = null;
+
+
+        return res.render('admin/categories', { ...result, error, message });
     }
     catch (err) {
         console.log(err);
@@ -160,6 +167,22 @@ exports.toggleCategoryStatus = async (req, res) => {
 }
 
 
+exports.deleteCategory = async (req, res) => {
+
+    const { id } = req.body;
+
+    const result = await adminService.deleteCategory(id);
+
+    if (!result.success) {
+        req.session.error = result.message;
+        return res.redirect('/admin/categories');
+    }
+
+    req.session.message = result.message;
+    return res.redirect('/admin/categories');
+}
+
+
 
 exports.getProducts = async (req, res) => {
 
@@ -167,12 +190,41 @@ exports.getProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
 
+        const search = req.query.search || '';
+        const categoryFilter = req.query.category || 'all';
+        const statusFilter = req.query.status || 'all';
+
         const categories = await Category.find({ isActive: true });
         const brands = await Brand.find({ isActive: true });
 
-        const result = await adminService.getProducts(page, limit);
+        const result = await adminService.getProducts(
+            page, limit, search, categoryFilter, statusFilter
+        );
 
-        return res.render('admin/inventory', { ...result, categories, brands });
+        const products = await Product.find({}, 'variants');
+        let lowStockCount = 0;
+        let outOfStockCount = 0;
+
+        products.forEach((product) => {
+            product.variants.forEach(variant => {
+                if (variant.stock > 0 && variant.stock <= 10) {
+                    lowStockCount++;
+                }
+                else if (variant.stock === 0) {
+                    outOfStockCount++;
+                }
+            });
+        });
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        const message = req.session.message || null;
+        req.session.message = null;
+
+        return res.render('admin/inventory', {
+            ...result, categories, brands, search, categoryFilter, statusFilter, lowStockCount, outOfStockCount, error, message
+        });
     }
     catch (err) {
         console.log(err);
@@ -202,6 +254,7 @@ exports.postProducts = async (req, res) => {
         return res.redirect('/admin/products');
     }
 }
+
 
 exports.toggleProductStatus = async (req, res) => {
 
@@ -262,6 +315,37 @@ exports.editProduct = async (req, res) => {
         return res.redirect('/admin/products');
     }
 }
+
+
+exports.deleteProduct = async (req, res) => {
+
+    try {
+        const { id } = req.body;
+
+        const result = await adminService.deleteProduct(id);
+
+        if (!result.success) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
+                success: false,
+                message: result.message
+            })
+        }
+
+        return res.json({
+            success: true,
+            message: result.message
+        });
+    }
+    catch (err) {
+        console.log(err);
+
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong."
+        });
+    }
+}
+
 
 
 exports.getBrands = (req, res) => {

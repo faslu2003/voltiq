@@ -1,8 +1,13 @@
 const User = require('../src/models/User');
 const Address = require('../src/models/Address');
+const Category = require('../src/models/Category');
+const Product = require('../src/models/Product');
+const Brand = require('../src/models/Brand');
 
 const authService = require('../services/authService');
 const userService = require('../services/userService');
+
+const STATUS_CODES = require('../constants/statusCode');
 
 
 
@@ -330,7 +335,6 @@ exports.postEditProfile = async (req, res) => {
 }
 
 
-
 // EMAIL 
 
 exports.getVerifyCurrentEmail = async (req, res) => {
@@ -505,11 +509,11 @@ exports.postChangePassword = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
-            res.redirect('/change-password');
+            return res.redirect('/change-password');
         }
 
         req.session.message = result.message;
-        res.redirect('/profile');
+        return res.redirect('/profile');
     }
     catch (err) {
         console.log(err);
@@ -525,7 +529,7 @@ exports.postChangePassword = async (req, res) => {
 
 exports.getAddress = async (req, res) => {
 
-    const user = User.findById(req.session.user.id);
+    const user = await User.findById(req.session.user.id);
 
     const addresses = await Address.find({ userId: req.session.user.id });
 
@@ -626,9 +630,57 @@ exports.deleteAddress = async (req, res) => {
 
 
 
-exports.getProducts = (req, res) => {
+exports.getProducts = async (req, res) => {
 
-    res.render('user/products');
+    try {
+        const categories = await Category.find({ isActive: true });
+        const brands = await Brand.find({ isActive: true });
+
+        let selectedCategoryId = req.params.categoryId;
+
+        if (!selectedCategoryId) {
+            const smartphones = categories.find(category => category.categoryName === "Smartphones");
+
+            if (smartphones) {
+                selectedCategoryId = smartphones._id.toString();
+            }
+        }
+
+        const search = req.query.search || "";
+        const sort = req.query.sort || "newest";
+
+        const maxPrice = Number(req.query.maxPrice) || 500000;
+        const selectedBrands = req.query.brands
+            ? Array.isArray(req.query.brands)
+                ? req.query.brands
+                : [req.query.brands]
+            : [];
+
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = 6;
+
+        const result = await userService.getProducts(selectedCategoryId, search, sort, maxPrice, selectedBrands, page, limit);
+
+        const expanded = req.query.expanded === 'true';
+
+        return res.render('user/products', {
+            categories,
+            brands,
+            products: result.products,
+            selectedCategoryId,
+            search,
+            sort,
+            maxPrice,
+            selectedBrands,
+            currentPage: result.currentPage,
+            totalPages: result.totalPages,
+            expanded
+        });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Something went wrong.");
+    }
 }
 
 exports.getProductDetails = (req, res) => {

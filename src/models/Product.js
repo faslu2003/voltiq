@@ -6,11 +6,15 @@ const variantSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // colorCode: {
+    //     type: String,
+    //     required: true
+    // },
     storage: {
         type: String,
         required: true
     },
-    additionalPrice: {
+    price: {
         type: Number,
         required: true,
         default: 0
@@ -34,14 +38,6 @@ const productSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
-    },
-    imgUrls: {
-        type: [String],
-        required: true
-    },
-    basePrice: {
-        type: Number,
         required: true
     },
     highlights: {

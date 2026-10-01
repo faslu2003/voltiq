@@ -4,6 +4,9 @@ const Product = require('../src/models/Product');
 
 const bcrypt = require('bcrypt');
 
+const fs = require('fs');
+const path = require('path');
+
 
 
 exports.signin = async (body) => {
@@ -148,13 +151,23 @@ exports.getCategories = async (page, limit) => {
     const categories = await Category.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const totalCategories = await Category.countDocuments();
+
+    const activeCategories = await Category.countDocuments({ isActive: true});
+    const inactiveCategories = await Category.countDocuments({ isActive: false });
+
+    for (category of categories) {
+        category.productCount = await Product.countDocuments({ categoryId: category._id });
+    }
+
     const totalPages = Math.ceil(totalCategories / limit);
 
     return {
         categories,
         currentPage: page,
         totalPages,
-        totalCategories
+        totalCategories,
+        activeCategories,
+        inactiveCategories,
     };
 }
 
@@ -239,26 +252,96 @@ exports.toggleCategoryStatus = async (body) => {
     }
 }
 
+exports.deleteCategory = async (id) => {
 
+    const category = await Category.findById(id);
 
-exports.getProducts = async (page, limit) => {
+    if (!category) {
+        return {
+            success: false,
+            message: "Category not found."
+        }
+    }
 
-    const skip = (page - 1) * limit;
-
-    const products = await Product.find()
-    .populate('categoryId', 'categoryName')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-    const totalProducts = await Product.countDocuments();
-
-    const totalPages = Math.ceil(totalProducts / limit);
+    await Category.findByIdAndDelete(id);
 
     return {
-        products,
+        success: true,
+        message: "Category deleted successfully."
+    };
+}
+
+
+
+exports.getProducts = async (
+    page, limit, search, categoryFilter, statusFilter
+) => {
+
+    const searchQuery = {};
+
+    if (search) {
+        searchQuery.name = {
+            $regex: search,
+            $options: 'i'
+        };
+    }
+
+    if (categoryFilter && categoryFilter !== 'all') {
+        searchQuery.categoryId = categoryFilter;
+    }
+
+    const products = await Product.find(searchQuery)
+        .populate('categoryId', 'categoryName')
+        .sort({ createdAt: -1 })
+
+    const inventory = [];
+
+    products.forEach(product => {
+        product.variants.forEach(variant => {
+            inventory.push({ product, variant });
+        });
+    });
+
+    let filteredInventory = inventory;
+
+    if (statusFilter && statusFilter !== 'all') {
+        filteredInventory = inventory.filter(item => {
+            const stock = item.variant.stock;
+
+            if (statusFilter === 'Out of Stock') {
+                return stock === 0;
+            }
+
+            if (statusFilter === 'Low Stock') {
+                return stock > 0 && stock <= 10;
+            }
+
+            if (statusFilter === 'In Stock') {
+                return stock > 10;
+            }
+
+            return true;
+        });
+    }
+
+    const totalItems = filteredInventory.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const skip = (page - 1) * limit;
+
+    const paginatedInventory = filteredInventory.slice(skip, skip + limit);
+
+    // Number of total products for the card
+    const totalProducts = await Product.countDocuments();
+
+    // allProducts -> to populate the edit product modal
+
+    return {
+        products: paginatedInventory,
+        allProducts: products,
         currentPage: page,
         totalPages,
+        totalItems,
+        search,
         totalProducts
     }
 }
@@ -266,7 +349,7 @@ exports.getProducts = async (page, limit) => {
 
 exports.AddProducts = async (body, files) => {
 
-    const { name, description, basePrice, highlights, categoryId, brandId, isActive } = body;
+    const { name, description, highlights, categoryId, brandId, isActive } = body;
 
     if (!name) {
         return {
@@ -279,13 +362,6 @@ exports.AddProducts = async (body, files) => {
         return {
             success: false,
             message: "Please enter a product description."
-        }
-    }
-
-    if (!basePrice) {
-        return {
-            success: false,
-            message: "Please enter a base price."
         }
     }
 
@@ -303,12 +379,12 @@ exports.AddProducts = async (body, files) => {
         }
     }
 
-    // if (!brandId) {
-    //     return {
-    //         success: false,
-    //         message: "Please select a brand."
-    //     }
-    // }
+    if (!brandId) {
+        return {
+            success: false,
+            message: "Please select a brand."
+        }
+    }
 
     if (!files || files.length === 0) {
         return {
@@ -316,24 +392,6 @@ exports.AddProducts = async (body, files) => {
             message: "Please upload at least one product image."
         }
     }
-
-    const productImages = files.filter(file => file.fieldname === "productImages");
-    if (productImages.length === 0) {
-        return {
-            success: false,
-            message: "Please upload at least one product image."
-        };
-    }
-
-    if (productImages.length > 7) {
-        return {
-            success: false,
-            message: "You can upload a maximum of 7 product images."
-        }
-    }
-
-    const imgUrls = productImages.map(file => `/uploads/${file.filename}`);
-
 
     const variants = body.variants || [];
     const formattedVariants = [];
@@ -350,6 +408,13 @@ exports.AddProducts = async (body, files) => {
             }
         }
 
+        // if (!variant.colorCode) {
+        //     return {
+        //         success: false,
+        //         message: `Please select a color for variant ${idx + 1}`
+        //     }
+        // }
+
         if (!variant.storage) {
             return {
                 success: false,
@@ -357,12 +422,24 @@ exports.AddProducts = async (body, files) => {
             }
         }
 
-        if (!variant.stock === undefined || variant.stock === "") {
+        if (variant.stock === undefined || variant.stock === "") {
             return {
                 success: false,
                 message: `Please enter stock for variant ${idx + 1}.`
             }
         }
+
+        if (!variant.price) {
+            return {
+                success: false,
+                message: `Please enter a price for variant ${idx + 1}.`
+            }
+        }
+
+        console.log("ALL FILES:", files.map(file => ({
+            fieldname: file.fieldname,
+            filename: file.filename
+        })));
 
         const variantImages = files.filter(file => file.fieldname === `variantImages_${idx}[]`);
         if (variantImages.length === 0) {
@@ -371,12 +448,14 @@ exports.AddProducts = async (body, files) => {
                 message: `Please upload at least one image for variant ${idx + 1}.`
             }
         }
+        console.log("VARIANT IMAGES:", variantImages.map(file => file.filename));
 
         formattedVariants.push({
             color: variant.color,
+            colorCode: variant.colorCode,
             storage: variant.storage,
             stock: variant.stock,
-            additionalPrice: variant.additionalPrice,
+            price: Number(variant.price),
             imgUrls: variantImages.map(file => `/uploads/${file.filename}`)
         });
     }
@@ -391,12 +470,10 @@ exports.AddProducts = async (body, files) => {
     await Product.create({
         name,
         description,
-        basePrice: Number(basePrice),
         highlights,
         isActive: isActive === "on",
         categoryId,
         brandId,
-        imgUrls,
         variants: formattedVariants
     });
 
@@ -430,11 +507,13 @@ exports.toggleProductStatus = async (id) => {
     };
 }
 
+
 exports.editProduct = async (body, files) => {
 
-    const { productId, variantId, name, description, basePrice, highlights, categoryId, brandId, color, storage, additionalPrice, isActive } = body;
+    const { productId, name, description, highlights, categoryId, brandId, isActive } = body;
 
     const product = await Product.findById(productId);
+
     if (!product) {
         return {
             success: false,
@@ -442,84 +521,80 @@ exports.editProduct = async (body, files) => {
         }
     }
 
-    const variant = product.variants.id(variantId);
-    if (!variant) {
-        return {
-            success: false,
-            message: "Variant not found."
-        }
-    }
-
     product.name = name;
     product.description = description;
-    product.basePrice = basePrice;
-    product.highlights = Array.isArray(highlights) ? highlights : [highlights];
+    product.highlights = Array.isArray(highlights)
+        ? highlights
+        : [highlights];
     product.categoryId = categoryId;
     product.brandId = brandId;
     product.isActive = isActive === "on";
 
-    variant.color = color;
-    variant.storage = storage;
-    variant.additionalPrice = Number(additionalPrice);
+    const variants = body.variants || [];
 
+    variants.forEach((variantData) => {
 
-    if (body.removedProductImages) {
-        const removedImages = JSON.parse(body.removedProductImages);
+        if (variantData.variantId) {
 
-        product.imgUrls = product.imgUrls.filter(url => !removedImages.includes(url));
+            const variant = product.variants.id(variantData.variantId);
+
+            if (!variant) return;
+
+            variant.color = variantData.color;
+            variant.colorCode = variantData.colorCode;
+            variant.storage = variantData.storage;
+            variant.stock = Number(variantData.stock);
+            variant.price = Number(variantData.price);
+        }
+        else {
+            const newVariant = product.variants.create({
+                color: variantData.color,
+                colorCode: variantData.colorCode,
+                storage: variantData.storage,
+                price: Number(variantData.price),
+                stock: Number(variantData.stock),
+                imgUrls: []
+            });
+
+            product.variants.push(newVariant);
+            variantData.variantId = newVariant._id.toString();
+        }
+    });
+
+    if (files && files.length > 0) {
+
+        files.forEach((file) => {
+
+            const match = file.fieldname.match(/^variantImages_(\d+)\[\]$/);
+
+            if (!match) return;
+
+            const variantIndex = Number(match[1]);
+            const variantData = variants[variantIndex];
+
+            if (!variantData) return;
+
+            const variant = product.variants.id(variantData.variantId);
+
+            if (!variant) return;
+
+            const imgUrl = `/uploads/${file.filename}`;
+            variant.imgUrls.push(imgUrl);
+        });
     }
 
     if (body.removedVariantImages) {
-        const removedVariantImages = JSON.parse(body.removedVariantImages);
 
-        variant.imgUrls = variant.imgUrls.filter(url => !removedVariantImages.includes(url));
-    }
+        const removedImages = JSON.parse(body.removedVariantImages);
 
+        removedImages.forEach((item) => {
 
-    if (files) {
+            const variant = product.variants.id(item.variantId);
 
-        const productImages = files.filter(file => file.fieldname === "productImages");
+            if (!variant) return;
 
-        if (productImages.length > 7) {
-            return {
-                success: false,
-                message: "You can upload a maximum of 7 product images."
-            }
-        }
-
-        if (productImages.length > 0) {
-            const newProductImages = productImages.map(file => `/uploads/${file.filename}`);
-
-            product.imgUrls.push(...newProductImages);
-        }
-
-
-        const replacementFiles = files.filter(file => file.fieldname === "replacedProductImagesFiles");
-
-        if (replacementFiles.length > 0) {
-            const replacements = body.replacedProductImages
-                ? JSON.parse(body.replacedProductImages)
-                : [];
-            replacements.forEach(replacement => {
-                const replacementFile =
-                    replacementFiles[replacement.fileIndex];
-                if (!replacementFile) return;
-
-                const newUrl = `/uploads/${replacementFile.filename}`;
-
-                const imageIndex = product.imgUrls.indexOf(replacement.oldUrl);
-                if (imageIndex !== -1) product.imgUrls[imageIndex] = newUrl;
-            });
-        }
-
-
-        const variantImages = files.filter(file => file.fieldname === "variantImages");
-
-        if (variantImages.length > 0) {
-            const newVariantImages = variantImages.map(file => `/uploads/${file.filename}`);
-
-            variant.imgUrls.push(...newVariantImages);
-        }
+            variant.imgUrls = variant.imgUrls.filter(url => url !== item.imageUrl);
+        });
     }
 
     await product.save();
@@ -527,5 +602,40 @@ exports.editProduct = async (body, files) => {
     return {
         success: true,
         message: "Product edited successfully."
+    };
+}
+
+
+exports.deleteProduct = async (id) => {
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+        return {
+            success: false,
+            message: "Product not found."
+        }
+    }
+
+    const imgUrls = [];
+
+    product.variants.forEach(variant => {
+        variant.imgUrls.forEach(url => {
+            imgUrls.push(url);
+        })
+    })
+
+    await Product.findByIdAndDelete(id);
+
+    imgUrls.forEach(imgUrl => {
+        const fileName = path.basename(imgUrl);
+        const filePath = path.join(__dirname, '../uploads/', fileName);
+
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    });
+
+    return {
+        success: true,
+        message: "Product deleted successfully."
     };
 }

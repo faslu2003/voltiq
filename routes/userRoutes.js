@@ -32,7 +32,7 @@ router.post('/resend-otp', userController.resendOtp);
 
 
 
-router.use(['/home', '/profile', '/email', '/change-password', '/address', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
 
 
@@ -72,6 +72,7 @@ router.post('/address/delete/:id', userController.deleteAddress);
 
 
 router.get('/products', userController.getProducts);
+router.get('/products/:categoryId', userController.getProducts);
 router.get('/products/details', userController.getProductDetails);
 
 

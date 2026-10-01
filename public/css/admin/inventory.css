@@ -171,6 +171,24 @@ body {
 }
 
 /* ================= MAIN CONTENT AREA ================= */
+.alert{
+  width:100%;
+  font-size:13.5px;
+  font-weight:500;
+  padding:11px 14px;
+  border-radius:10px;
+  margin-bottom:18px;
+}
+.alert-error{
+    background: #e6484f;
+    color: #fdeceb;
+}
+.alert-success{
+    background:#e8f7ee;
+    color:#0f7b3b;
+    border:1px solid #b7e4c7;
+}
+
 .admin-main {
   display: flex;
   flex-direction: column;
@@ -199,6 +217,37 @@ body {
   width: 440px;
 }
 
+.search-clear {
+    position: absolute;
+
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+
+    font-size: 20px;
+    line-height: 1;
+    color: #6B7280;
+
+    cursor: pointer;
+}
+
+.search-clear:hover {
+    color: #111827;
+    background-color: #F3F4F6;
+    border-radius: 50%;
+}
+
 .search-icon {
   position: absolute;
   left: 16px;
@@ -211,7 +260,7 @@ body {
 .search-input {
   width: 100%;
   height: 44px;
-  padding: 0 16px 0 46px;
+  padding: 0 40px 0 46px;
   border-radius: 22px;
   border: 1px solid var(--border-color);
   background-color: #F3EFF8;
@@ -653,7 +702,7 @@ body {
   color: var(--orange-low-stock);
 }
 
-.status-badge-pill.out-stock {
+.status-badge-pill.out-of-stock {
   color: var(--red-out-stock);
 }
 
@@ -665,7 +714,7 @@ body {
 
 .status-badge-pill.in-stock .status-dot { background-color: var(--green-in-stock); }
 .status-badge-pill.low-stock .status-dot { background-color: var(--orange-low-stock); }
-.status-badge-pill.out-stock .status-dot { background-color: var(--red-out-stock); }
+.status-badge-pill.out-of-stock .status-dot { background-color: var(--red-out-stock); }
 
 /* TOGGLE SWITCH */
 .toggle-switch {

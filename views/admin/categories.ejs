@@ -186,6 +186,18 @@
       <!-- PAGE CONTENT -->
       <main class="page-content">
 
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (message) { %>
+          <div class="alert alert-success">
+            <%= message %>
+          </div>
+        <% } %>
+
         <!-- Heading Bar -->
         <div class="page-heading-bar">
           <div class="heading-title-group">
@@ -222,7 +234,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Total Categories</span>
-              <span class="stat-value" id="statTotal">12</span>
+              <span class="stat-value" id="statTotal">
+                <%= totalCategories %>
+              </span>
             </div>
           </div>
 
@@ -239,7 +253,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Active Categories</span>
-              <span class="stat-value" id="statActive">10</span>
+              <span class="stat-value" id="statActive">
+                <%= activeCategories %>
+              </span>
             </div>
           </div>
 
@@ -257,7 +273,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Inactive Categories</span>
-              <span class="stat-value" id="statInactive">2</span>
+              <span class="stat-value" id="statInactive">
+                <%= inactiveCategories %>
+              </span>
             </div>
           </div>
 
@@ -265,6 +283,7 @@
 
         <!-- Categories Table Card -->
         <div class="table-card">
+          
           <div class="table-responsive">
             <table class="categories-table" id="categoriesTable">
               <thead>
@@ -298,7 +317,7 @@
                       </span>
                     </td>
                     <td>
-                      <span class="product-count-text">48 Items</span>
+                      <span class="product-count-text"><%= category.productCount %></span>
                     </td>
                     <td>
                       <label class="toggle-switch">
@@ -318,7 +337,7 @@
                           </svg>
                         </button>
                         <button type="button" class="action-icon-btn delete" title="Delete Category"
-                          onclick="deleteCategoryRow(this)">
+                          onclick="deleteCategoryRow(this, '<%= category._id %>')">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -541,12 +560,13 @@
           }
 
           // Open Confirm Delete Modal
-          function deleteCategoryRow(btn) {
+          function deleteCategoryRow(btn, categoryId) {
             pendingDeleteRow = btn.closest('tr');
             const catName = pendingDeleteRow.querySelector('.category-name-text').textContent.trim();
             const catCount = pendingDeleteRow.querySelector('.product-count-text').textContent.trim();
             const catImgSrc = pendingDeleteRow.querySelector('.category-thumb-img').src;
 
+            document.getElementById('deleteCategoryId').value = categoryId;
             document.getElementById('deleteCategoryName').textContent = `"${catName}"`;
             document.getElementById('deleteCardTitle').textContent = catName;
             document.getElementById('deleteCardSubtext').textContent = `${catCount} Associated Items`;
@@ -576,19 +596,6 @@
             }
             const categoryId = pendingDeleteRow.dataset.id;
             await updateCategoryStatus(categoryId, false);
-          }
-
-
-          function confirmCategoryDelete() {
-            if (pendingDeleteRow) {
-              pendingDeleteRow.style.opacity = '0';
-              pendingDeleteRow.style.transform = 'translateY(-10px)';
-              setTimeout(() => {
-                pendingDeleteRow.remove();
-                updateStats();
-                closeDeleteModal();
-              }, 150);
-            }
           }
 
           // Recalculate Metrics Stats

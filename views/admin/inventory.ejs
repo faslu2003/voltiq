@@ -155,6 +155,18 @@
     <!-- ================= MAIN CONTENT ================= -->
     <div class="admin-main">
 
+      <% if (error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <% } %>
+
+      <% if (message) { %>
+          <div class="alert alert-success">
+            <%= message %>
+          </div>
+        <% } %>
+
       <!-- TOP HEADER BAR (SEARCH BAR MATCHING CATEGORIES PAGE) -->
       <header class="top-header">
         <h2 class="header-title-text">Inventory</h2>
@@ -165,8 +177,15 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search products, SKUs, or categories..."
-            onkeyup="filterInventoryTable()">
+
+          <input type="text" id="searchInput" class="search-input" placeholder="Search products..."
+            value="<%= search || '' %>" onkeydown="handleSearch(event)">
+
+          <% if (search) { %>
+            <button type="button" class="search-clear" onclick="clearSearch()">
+              ×
+            </button>
+            <% } %>
         </div>
 
         <div class="header-right-actions">
@@ -234,11 +253,13 @@
                   </path>
                 </svg>
               </div>
-              <span class="stat-badge-green">+2.4%</span>
+              <!-- <span class="stat-badge-green">+2.4%</span> -->
             </div>
             <div class="stat-body">
               <span class="stat-label">Total Products</span>
-              <span class="stat-value">1,240</span>
+              <span class="stat-value">
+                <%= totalProducts %>
+              </span>
             </div>
           </div>
 
@@ -254,7 +275,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Categories</span>
-              <span class="stat-value">12</span>
+              <span class="stat-value">
+                <%= categories.length %>
+              </span>
             </div>
           </div>
 
@@ -273,7 +296,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Low Stock Items</span>
-              <span class="stat-value orange">45</span>
+              <span class="stat-value orange">
+                <%= lowStockCount %>
+              </span>
             </div>
           </div>
 
@@ -290,7 +315,9 @@
             </div>
             <div class="stat-body">
               <span class="stat-label">Out of Stock</span>
-              <span class="stat-value red">8</span>
+              <span class="stat-value red">
+                <%= outOfStockCount %>
+              </span>
             </div>
           </div>
 
@@ -302,31 +329,34 @@
           <!-- Table Controls Toolbar -->
           <div class="filter-toolbar">
             <div class="filter-left-controls">
-              <select class="filter-select" id="categoryFilter" onchange="filterInventoryTable()">
-                <option value="all" selected>All Categories</option>
-                <option value="Smartphones">Smartphones</option>
-                <option value="Laptops">Laptops</option>
-                <option value="Wearables">Wearables</option>
-                <option value="Cameras">Cameras</option>
+              <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
+                <option value="all" <%=categoryFilter==='all' ? 'selected' : '' %>>All Categories</option>
+
+                <% categories.forEach(category=> { %>
+                  <option value="<%= category._id %>" <%=categoryFilter===category._id.toString() ? 'selected' : '' %>>
+                    <%= category.categoryName %>
+                  </option>
+                  <% }) %>
               </select>
 
-              <select class="filter-select" id="statusFilter" onchange="filterInventoryTable()">
-                <option value="all" selected>All Status</option>
-                <option value="In Stock">In Stock</option>
-                <option value="Low Stock">Low Stock</option>
-                <option value="Out of Stock">Out of Stock</option>
+              <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                <option value="all" <%=statusFilter==='all' ? 'selected' : '' %>>All Status</option>
+                <option value="In Stock" <%=statusFilter==='In Stock' ? 'selected' : '' %>>In Stock</option>
+                <option value="Low Stock" <%=statusFilter==='Low Stock' ? 'selected' : '' %>>Low Stock</option>
+                <option value="Out of Stock" <%=statusFilter==='Out of Stock' ? 'selected' : '' %>>Out of Stock</option>
               </select>
 
-              <button type="button" class="btn-filter-more">
+              <!-- <button type="button" class="btn-filter-more">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                 </svg>
                 More Filters
-              </button>
+              </button> -->
             </div>
 
-            <span class="showing-count-label" id="showingCountLabel">SHOWING <%= products.length %> OF <%= totalProducts %> ITEMS</span>
+            <span class="showing-count-label" id="showingCountLabel">SHOWING <%= products.length %> OF <%= totalItems %>
+                  ITEMS</span>
           </div>
 
           <!-- Table Responsive Container -->
@@ -335,7 +365,7 @@
               <thead>
                 <tr>
                   <th>Product Name</th>
-                  <th>Description</th>
+                  <!-- <th>Description</th> -->
                   <th>Category</th>
                   <th>Stock</th>
                   <th>Price</th>
@@ -346,32 +376,32 @@
               </thead>
               <tbody id="inventoryTableBody">
 
-                <% products.forEach((product)=> { %>
+                <% products.forEach(item=> { %>
 
-                  <% product.variants.forEach((variant)=> { %>
+                  <% const product=item.product; const variant=item.variant; %>
 
-                    <tr
+                    <tr data-product-id="<%= product._id %>"
                       data-category="<%= product.categoryId ? (product.categoryId.categoryName || product.categoryId) : 'Smartphones' %>"
                       data-status="<%= variant.stock === 0 ? 'Out of Stock' : (variant.stock < 10 ? 'Low Stock' : 'In Stock') %>"
-                      data-product='<%- JSON.stringify(product).replace(/' /g, "&#39;" ) %>'>
+                    >
                       <td>
-                        <div class="product-cell">
-                          <div class="product-thumb-box">
-                            <img src="<%= product.imgUrls[0] %>" alt="iPhone 17 Pro Max" class="product-thumb-img">
-                          </div>
-                          <div>
-                            <span class="product-title-text">
-                              <%= product.name %>
-                            </span>
-                            <span class="product-sub-text">
-                              <%= variant.color %>, <%= variant.storage %>
-                            </span>
-                          </div>
+                      <div class="product-cell">
+                        <div class="product-thumb-box">
+                          <img src="<%= variant.imgUrls[0] %>" alt="<%= product.name %>" class="product-thumb-img">
                         </div>
+                        <div>
+                          <span class="product-title-text">
+                            <%= product.name %>
+                          </span>
+                          <span class="product-sub-text">
+                            <%= variant.color %>, <%= variant.storage %>
+                          </span>
+                        </div>
+                      </div>
                       </td>
-                      <td><span class="sku-text">
+                      <!-- <td><span class="sku-text">
                           <%= product.description %>
-                        </span></td>
+                        </span></td> -->
                       <td><span class="category-pill">
                           <%= product.categoryId.categoryName %>
                         </span></td>
@@ -382,19 +412,22 @@
                           </span>
                         </div>
                       </td>
-                      <td><span class="price-text">₹<%= product.basePrice + variant.additionalPrice %></span></td>
+                      <td><span class="price-text">₹<%= variant.price.toLocaleString('en-IN') %></span></td>
                       <td>
                         <span class="status-dot"></span>
                         <% if (variant.stock===0) { %>
                           <span class="status-badge-pill out-of-stock">
+                            <span class="status-dot"></span>
                             <%= 'Out of Stock' %>
                           </span>
                           <% } else if (variant.stock < 10) { %>
                             <span class="status-badge-pill low-stock">
+                              <span class="status-dot"></span>
                               <%= 'Low Stock' %>
                             </span>
                             <% } else { %>
                               <span class="status-badge-pill in-stock">
+                                <span class="status-dot"></span>
                                 <%= 'In Stock' %>
                               </span>
                               <% } %>
@@ -418,7 +451,7 @@
                             </svg>
                           </button>
                           <button type="button" class="action-icon-btn delete" title="Delete Product"
-                            onclick="deleteProductRow(this)">
+                            onclick="deleteProductRow(this, '<%= product._id %>')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
                               <polyline points="3 6 5 6 21 6"></polyline>
@@ -432,8 +465,6 @@
 
                     <% }) %>
 
-                      <% }) %>
-
               </tbody>
             </table>
           </div>
@@ -446,9 +477,11 @@
             <div class="pagination-controls">
               <!-- Previous -->
               <button type="button" class="page-btn" <%=currentPage===1 ? 'disabled' : '' %>
-                onclick="window.location.href='/admin/products?page=<%= currentPage - 1 %>'"
-                  >
-                  &lt;
+                <% if (currentPage> 1) { %>
+                  onclick="window.location.href='/admin/products?page=<%= currentPage - 1 %>'"
+                    <% } %>
+                      >
+                      &lt;
               </button>
               <!-- Page Numbers -->
               <% for (let i=1; i <=totalPages; i++) { %>
@@ -492,7 +525,12 @@
 
           <!-- INTERACTIVE CLIENT SCRIPT -->
           <script>
+            const allProducts = <%- JSON.stringify(allProducts) %>;
+          </script>
+          <script>
             let pendingDeleteProductRow = null;
+            let pendingDeleteProductId = null;
+
             let pendingInactiveProductCheckbox = null;
             let pendingInactiveProductId = null;
 
@@ -525,16 +563,67 @@
               document.getElementById('showingCountLabel').textContent = `SHOWING ${visibleCount} OF 1,240 ITEMS`;
             }
 
+
+            function handleSearch(event) {
+              if (event.key === 'Enter') {
+                const search = document
+                  .getElementById('searchInput')
+                  .value
+                  .trim();
+
+                if (search) {
+                  window.location.href =
+                    `/admin/products?search=${encodeURIComponent(search)}`;
+                } else {
+                  window.location.href = '/admin/products';
+                }
+              }
+            }
+
+
+            function clearSearch() {
+              window.location.href = '/admin/products';
+            }
+
+
+            function applyFilters() {
+              const category = document.getElementById('categoryFilter').value;
+
+              const status = document.getElementById('statusFilter').value;
+
+              const search = document.getElementById('searchInput').value.trim();
+
+              const params = new URLSearchParams();
+
+              if (search) {
+                params.set('search', search);
+              }
+
+              if (category !== 'all') {
+                params.set('category', category);
+              }
+
+              if (status !== 'all') {
+                params.set('status', status);
+              }
+
+              window.location.href =
+                `/admin/products?${params.toString()}`;
+            }
+
+
             // Confirm Delete Product Modal Handlers
-            function deleteProductRow(btn) {
+            function deleteProductRow(btn, productId) {
               pendingDeleteProductRow = btn.closest('tr');
-              const prodName = pendingDeleteProductRow.querySelector('.product-title-text').textContent.trim();
-              const prodSku = pendingDeleteProductRow.querySelector('.sku-text').textContent.trim();
-              const prodImgSrc = pendingDeleteProductRow.querySelector('.product-thumb-img').src;
+              pendingDeleteProductId = productId;
+
+              const prodName = pendingDeleteProductRow.querySelector('.product-title-text')?.textContent.trim() || 'Product';
+              const prodImg = pendingDeleteProductRow.querySelector('.product-thumb-img');
+              const prodImgSrc = prodImg ? prodImg.src : '/images/avatar.jpg';
 
               document.getElementById('deleteProductName').textContent = `"${prodName}"`;
               document.getElementById('deleteProductCardTitle').textContent = prodName;
-              document.getElementById('deleteProductCardSubtext').textContent = `SKU: ${prodSku}`;
+              document.getElementById('deleteProductCardSubtext').textContent = 'This product and all its variants will be permanently deleted.';
               document.getElementById('deleteProductImg').src = prodImgSrc;
 
               const backdrop = document.getElementById('deleteProductModalBackdrop');
@@ -547,6 +636,7 @@
               backdrop.classList.add('hidden');
               document.body.style.overflow = '';
               pendingDeleteProductRow = null;
+              pendingDeleteProductId = null;
             }
 
             function handleDeleteProductBackdropClick(event) {
@@ -555,24 +645,61 @@
               }
             }
 
-            function makePendingProductInactive() {
-              if (pendingDeleteProductRow) {
-                const chk = pendingDeleteProductRow.querySelector('.toggle-switch input');
-                if (chk) chk.checked = false;
-                closeDeleteProductModal();
-                filterInventoryTable();
-              }
+            async function makePendingProductInactive() {
+              if (!pendingDeleteProductId) return;
+
+              const productId = pendingDeleteProductId;
+
+              const row = pendingDeleteProductRow;
+
+              const checkbox = row?.querySelector('.toggle-switch input');
+
+              if (!checkbox) return;
+
+              closeDeleteProductModal();
+
+              // The checkbox is currently ON.
+              // toggleProductStatus will turn the product OFF.
+
+              await toggleProductStatus(productId, checkbox);
             }
 
-            function confirmProductDelete() {
-              if (pendingDeleteProductRow) {
-                pendingDeleteProductRow.style.opacity = '0';
-                pendingDeleteProductRow.style.transform = 'translateY(-10px)';
-                setTimeout(() => {
-                  pendingDeleteProductRow.remove();
-                  filterInventoryTable();
-                  closeDeleteProductModal();
-                }, 150);
+            async function confirmProductDelete() {
+
+              if (!pendingDeleteProductId) return;
+
+              const productId = pendingDeleteProductId;
+
+              try {
+                const response = await fetch('/admin/products/delete', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    id: productId
+                  })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                  throw new Error(result.message);
+                }
+
+                // Remove every row belonging to this product
+                const rows = document.querySelectorAll(
+                  `tr[data-product-id="${productId}"]`
+                );
+
+                rows.forEach(row => {
+                  row.remove();
+                });
+
+                closeDeleteProductModal();
+              } catch (err) {
+                console.error('Failed to delete product:', err);
+                alert(err.message || 'Failed to delete product.');
               }
             }
 
@@ -585,13 +712,14 @@
                 pendingInactiveProductId = productId;
 
                 const row = checkbox.closest('tr');
-                const prodSku = row.querySelector('.sku-text').textContent.trim();
-                const prodImgSrc = row.querySelector('.product-thumb-img').src;
+
+                const prodImg = row.querySelector('.product-thumb-img');
+                const prodImgSrc = prodImg ? prodImg.src : '';
 
                 document.getElementById('inactiveProductName').textContent = `"${productName}"`;
                 document.getElementById('inactiveProductCardTitle').textContent = productName;
-                document.getElementById('inactiveProductCardSubtext').textContent = `SKU: ${prodSku}`;
-                document.getElementById('inactiveProductImg').src = prodImgSrc;
+                document.getElementById('inactiveProductCardSubtext').textContent = 'This product will be hidden from the public storefront.';
+                if (prodImgSrc) document.getElementById('inactiveProductImg').src = prodImgSrc;
 
                 const backdrop = document.getElementById('inactiveProductModalBackdrop');
                 backdrop.classList.remove('hidden');
@@ -638,16 +766,32 @@
                   throw new Error(result.message);
                 }
 
-                pendingInactiveProductCheckbox.checked = false;
+                updateProductVisibilityUI(pendingInactiveProductId, result.isActive);
 
                 cancelProductInactive();
-                filterInventoryTable();
               }
               catch (err) {
                 console.log(err);
                 alert('Failed to deactivate product.');
               }
             }
+
+
+            function updateProductVisibilityUI(productId, isActive) {
+              const rows = document.querySelectorAll(
+                `tr[data-product-id="${productId}"]`
+              );
+
+              rows.forEach(row => {
+                const checkbox =
+                  row.querySelector('.toggle-switch input');
+
+                if (checkbox) {
+                  checkbox.checked = isActive;
+                }
+              });
+            }
+
 
             async function toggleProductStatus(productId, checkbox) {
 
@@ -668,7 +812,7 @@
                   throw new Error(result.message);
                 }
 
-                checkbox.checked = result.isActive;
+                updateProductVisibilityUI(productId, result.isActive);
               }
               catch (err) {
                 console.log(err);
@@ -688,19 +832,19 @@
             let activeCroppingInput = null;
             let activeCroppingFileIndex = null;
             let activeCroppingExistingUrl = null;
+            let activeCroppingVariantId = null;
             let variantCardCount = 0;
 
             function openAddProductModal() {
               document.getElementById('addProductForm').reset();
-              document.getElementById('productPreviewGrid').innerHTML = '';
-              document.getElementById('productPreviewGrid').classList.add('hidden');
-              document.getElementById('productUploadContent').classList.remove('hidden');
+
               document.getElementById('productVisibilityText').textContent = 'Show this product on the public storefront';
 
               // Initialize Variants
               const vContainer = document.getElementById('variantsContainer');
               vContainer.innerHTML = '';
               variantCardCount = 0;
+
               addVariantRow(); // Add default Variant #1
 
               const backdrop = document.getElementById('productModalBackdrop');
@@ -733,11 +877,12 @@
 
             // ================= CROPPER MODAL CONTROLLER =================
 
-            function openCropModal(imgElem, fileInput, fileIndex, existingUrl) {
+            function openCropModal(imgElem, fileInput = null, fileIndex = null, existingUrl = null, variantId = null) {
               activeCroppingImgElem = imgElem;
               activeCroppingInput = fileInput;
               activeCroppingFileIndex = fileIndex;
               activeCroppingExistingUrl = existingUrl;
+              activeCroppingVariantId = variantId;
 
               const targetImg = document.getElementById('cropperTargetImage');
               targetImg.src = imgElem.src;
@@ -817,55 +962,72 @@
                   }
                 );
 
-                if (activeCroppingInput) {
-                  // Replace the original file in the input
+                if (activeCroppingInput && activeCroppingFileIndex !== null && activeCroppingFileIndex !== undefined) {
+
                   const dataTransfer = new DataTransfer();
+
                   const files = Array.from(activeCroppingInput.files);
+
                   files[activeCroppingFileIndex] = croppedFile;
+
                   files.forEach(file => {
                     dataTransfer.items.add(file);
                   });
 
                   activeCroppingInput.files = dataTransfer.files;
+                  activeCroppingInput._selectedFiles = Array.from(dataTransfer.files);
                 }
-                else if (activeCroppingExistingUrl) {
+                else if (
+                  activeCroppingExistingUrl &&
+                  activeCroppingInput &&
+                  activeCroppingVariantId
+                ) {
 
-                  const replacementInput =
-                    document.getElementById('replacedProductImagesInput');
+                  /*
+                   * Remove the old image URL from the DB.
+                   */
+
+                  const removedInput = document.getElementById('removedVariantImages');
+
+                  const removedImages =
+                    removedInput.value
+                      ? JSON.parse(removedInput.value)
+                      : [];
+
+                  const alreadyRemoved =
+                    removedImages.some(item =>
+                      item.variantId === activeCroppingVariantId &&
+                      item.imageUrl === activeCroppingExistingUrl
+                    );
+
+                  if (!alreadyRemoved) {
+
+                    removedImages.push({
+                      variantId: activeCroppingVariantId,
+                      imageUrl: activeCroppingExistingUrl
+                    });
+
+                    removedInput.value = JSON.stringify(removedImages);
+                  }
+
+                  /*
+                   * Add the cropped image to the
+                   * variant's upload input.
+                   */
+
+                  const existingFiles = activeCroppingInput._selectedFiles || [];
+
+                  const allFiles = [...existingFiles, croppedFile];
+
+                  activeCroppingInput._selectedFiles = allFiles;
 
                   const dataTransfer = new DataTransfer();
 
-                  // Keep previously cropped existing images
-                  Array.from(replacementInput.files).forEach(file => {
+                  allFiles.forEach(file => {
                     dataTransfer.items.add(file);
                   });
 
-                  // Add the newly cropped existing image
-                  dataTransfer.items.add(croppedFile);
-
-                  replacementInput.files = dataTransfer.files;
-
-                  // Store information about which existing image this replaces
-                  const replacementInfoInput =
-                    document.getElementById('replacedProductImages');
-
-                  const replacements =
-                    replacementInfoInput.value
-                      ? JSON.parse(replacementInfoInput.value)
-                      : [];
-
-                  replacements.push({
-                    oldUrl: activeCroppingExistingUrl,
-                    fileIndex: replacementInput.files.length - 1
-                  });
-
-                  replacementInfoInput.value =
-                    JSON.stringify(replacements);
-
-                  console.log("Replacement added:", {
-                    oldUrl: activeCroppingExistingUrl,
-                    croppedFile
-                  });
+                  activeCroppingInput.files = dataTransfer.files;
                 }
 
                 // Update preview
@@ -960,8 +1122,8 @@
             <input type="number" name="variants[${vIdx}][stock]" class="field-input-sm stock-input" placeholder="50" min="0" required>
           </div>
           <div class="form-field-group">
-            <label class="field-label-sm">Addl. Price (₹)</label>
-            <input type="number" name="variants[${vIdx}][additionalPrice]" class="field-input-sm" placeholder="0.00" step="0.01">
+            <label class="field-label-sm">Price (₹)</label>
+            <input type="number" name="variants[${vIdx}][price]" class="field-input-sm" placeholder="0.00" step="0.01">
           </div>
           <button type="button" class="btn-remove-variant" title="Remove Variant" onclick="removeVariantCard(${vIdx})">✕</button>
         </div>
@@ -990,29 +1152,100 @@
             }
 
             function handleVariantFilesSelect(fileInput, vIdx) {
-              const files = fileInput.files;
-              if (!files || files.length === 0) return;
+              const newFiles = Array.from(fileInput.files);
+              if (newFiles.length === 0) return;
+
+              // Get previously selected files for this variant
+              const existingFiles = fileInput._selectedFiles || [];
+
+              // Add the newly selected files
+              const allFiles = [...existingFiles, ...newFiles];
+
+              // Store them on the input
+              fileInput._selectedFiles = allFiles;
+
+              // Update the actual input.files
+              const dataTransfer = new DataTransfer();
+
+              allFiles.forEach(file => dataTransfer.items.add(file));
+
+              fileInput.files = dataTransfer.files;
 
               const grid = document.getElementById(`variantPreviewGrid_${vIdx}`);
 
-              Array.from(files).forEach((file) => {
+              newFiles.forEach((file, fileIndex) => {
+                const actualFileIndex = existingFiles.length + fileIndex;
+
                 const reader = new FileReader();
+
                 reader.onload = function (e) {
                   const thumbCard = document.createElement('div');
                   thumbCard.className = 'variant-thumb-card';
                   thumbCard.innerHTML = `
-            <img src="${e.target.result}" alt="Variant Image">
-            <div class="thumb-action-overlay">
-              <button type="button" class="thumb-crop-btn" onclick="openCropModal(this.closest('.variant-thumb-card').querySelector('img'))" title="Crop & Resize">✂️</button>
-              <button type="button" class="thumb-remove-btn" onclick="this.closest('.variant-thumb-card').remove(); checkEmptyVariantGrid(${vIdx});" title="Remove">✕</button>
-            </div>
-          `;
+                <img src="${e.target.result}" alt="Variant Image">
+                <div class="thumb-action-overlay">
+                    <button
+                        type="button"
+                        class="thumb-crop-btn"
+                        onclick="
+                            openCropModal(
+                                this.closest('.variant-thumb-card').querySelector('img'),
+                                document.getElementById('${fileInput.id}'),
+                                ${actualFileIndex}
+                            )
+                        "
+                        title="Crop & Resize">
+                        ✂️
+                    </button>
+                    <button
+                        type="button"
+                        class="thumb-remove-btn"
+                        onclick="removeVariantFile(this, ${vIdx})"
+                        title="Remove">
+                        ✕
+                    </button>
+                </div>
+            `;
                   grid.appendChild(thumbCard);
                 };
                 reader.readAsDataURL(file);
               });
-
               grid.classList.remove('hidden');
+            }
+
+
+            function removeVariantFile(button, vIdx) {
+
+              const thumbCard = button.closest('.variant-thumb-card');
+              const fileIndex = Number(thumbCard.dataset.fileIndex);
+
+              const fileInput = document.getElementById(`variantFileInput_${vIdx}`);
+
+              // Remove the file from our stored list
+              fileInput._selectedFiles.splice(fileIndex, 1);
+
+              // Rebuild FileList
+              const dataTransfer = new DataTransfer();
+
+              fileInput._selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+              });
+
+              fileInput.files = dataTransfer.files;
+
+              // Remove preview
+              thumbCard.remove();
+
+              // Re-index remaining thumbnails
+              const remainingCards = document.querySelectorAll(
+                `#variantPreviewGrid_${vIdx} .variant-thumb-card`
+              );
+
+              remainingCards.forEach((card, index) => {
+                card.dataset.fileIndex = index;
+              });
+
+              checkEmptyVariantGrid(vIdx);
             }
 
             function checkEmptyVariantGrid(vIdx) {
@@ -1044,293 +1277,162 @@
               }
             }
 
-            // Handle Form Submit
-            function handleProductSubmit(event) {
-              event.preventDefault();
-              const name = document.getElementById('productName').value.trim();
-              const category = document.getElementById('productCategoryId').value;
-              const brand = document.getElementById('productBrandId').value;
-              const price = document.getElementById('productPrice').value;
-              const isActive = document.getElementById('productIsActive').checked;
-
-              const firstPreview = document.querySelector('.preview-thumb-card img');
-              const previewSrc = firstPreview ? firstPreview.src : '/images/avatar.jpg';
-
-              if (!name || !category || !price) return;
-
-              const formattedPrice = '₹' + parseFloat(price).toLocaleString('en-IN');
-              const generatedSku = (brand.substring(0, 3) + '-' + name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6)).toUpperCase();
-
-              const tbody = document.getElementById('inventoryTableBody');
-              const newRowHtml = `
-        <tr data-category="${category}" data-status="In Stock">
-          <td>
-            <div class="product-cell">
-              <div class="product-thumb-box">
-                <img src="${previewSrc}" alt="${name}" class="product-thumb-img">
-              </div>
-              <div>
-                <span class="product-title-text">${name}</span>
-                <span class="product-sub-text">${brand} Official SKU</span>
-              </div>
-            </div>
-          </td>
-          <td><span class="sku-text">${generatedSku}</span></td>
-          <td><span class="category-pill">${category}</span></td>
-          <td>
-            <div class="stock-cell">
-              <span class="stock-text">100 <span style="font-weight: 500; color: #718096;">100% Left</span></span>
-              <div class="stock-progress-bg">
-                <div class="stock-progress-fill purple" style="width: 100%;"></div>
-              </div>
-            </div>
-          </td>
-          <td><span class="price-text">${formattedPrice}</span></td>
-          <td>
-            <span class="status-badge-pill in-stock">
-              <span class="status-dot"></span> In Stock
-            </span>
-          </td>
-          <td>
-            <label class="toggle-switch">
-              <input type="checkbox" ${isActive ? 'checked' : ''}>
-              <span class="slider"></span>
-            </label>
-          </td>
-          <td class="text-right">
-            <div class="actions-cell">
-              <button type="button" class="action-icon-btn edit" title="Edit Product">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button type="button" class="action-icon-btn delete" title="Delete Product" onclick="deleteProductRow(this)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-
-              tbody.insertAdjacentHTML('afterbegin', newRowHtml);
-              closeProductModal();
-              filterInventoryTable();
-            }
-
             // ================= EDIT PRODUCT MODAL CONTROLLER =================
 
             function openEditProductModal(btn) {
+
               const row = btn.closest('tr');
               window._editingProductRow = row;
 
               const productId = btn.dataset.productId;
-              const variantId = btn.dataset.variantId;
 
+              const productData = allProducts.find(
+                product => product._id.toString() === productId
+              );
+
+              if (!productData) {
+                console.error('Product not found:', productId);
+                return;
+              }
+
+              // Product ID
               document.getElementById('editProductId').value = productId;
-              document.getElementById('editVariantId').value = variantId;
 
-              let productData = null;
-              try {
-                const prodJson = row.getAttribute('data-product');
-                if (prodJson) {
-                  productData = JSON.parse(prodJson);
-                }
-              } catch (err) {
-                console.error("Failed to parse data-product JSON:", err);
-              }
+              // Basic Information
+              document.getElementById('editProductName').value =
+                productData.name || '';
 
-              // Fallback values from DOM row elements if productData property is not available
-              const rowName = row.querySelector('.product-title-text') ? row.querySelector('.product-title-text').textContent.trim() : '';
-              const rowSku = row.querySelector('.sku-text') ? row.querySelector('.sku-text').textContent.trim() : '';
-              const rowCategory = row.getAttribute('data-category') || '';
-              const rowPriceText = row.querySelector('.price-text') ? row.querySelector('.price-text').textContent.trim().replace(/[^0-9.]/g, '') : '0';
-              const rowImgSrc = row.querySelector('.product-thumb-img') ? row.querySelector('.product-thumb-img').src : '';
-              const rowImgAlt = row.querySelector('.product-thumb-img') ? row.querySelector('.product-thumb-img').alt : rowName;
-              const rowIsActive = row.querySelector('.toggle-switch input') ? row.querySelector('.toggle-switch input').checked : true;
-              const rowSubText = row.querySelector('.product-sub-text') ? row.querySelector('.product-sub-text').textContent.trim() : '';
-              const rowStockText = row.querySelector('.stock-text') ? row.querySelector('.stock-text').textContent.trim() : '50';
-              const rowStockNumeric = parseInt(rowStockText.replace(/[^0-9]/g, '')) || 50;
+              document.getElementById('editProductDescription').value =
+                productData.description || '';
 
-              let fallbackColor = '';
-              let fallbackStorage = '256GB';
-              if (rowSubText.includes(',')) {
-                const parts = rowSubText.split(',');
-                fallbackColor = parts[0].trim();
-                fallbackStorage = parts[1].trim();
-              } else if (rowSubText.match(/(\d+GB|\d+TB)/i)) {
-                const match = rowSubText.match(/(\d+GB|\d+TB)/i);
-                fallbackStorage = match[0];
-                fallbackColor = rowSubText.replace(match[0], '').replace(/,/g, '').trim();
-              } else {
-                fallbackColor = rowSubText;
-              }
 
-              const prodId = productId;
-              const name = productData?.name || rowName;
-              const categoryVal = productData?.categoryId?._id || productData?.categoryId?.categoryName || productData?.categoryId || rowCategory;
-              const brandVal = productData?.brandId?._id || productData?.brandId?.name || productData?.brandId || '';
-              const price = productData?.basePrice ?? productData?.price ?? rowPriceText;
-              const description = productData?.description || rowSku;
+              // Category
+              const catSelect =
+                document.getElementById('editProductCategoryId');
 
-              document.getElementById('editProductId').value = prodId;
-              document.getElementById('editProductName').value = name;
-              document.getElementById('editProductPrice').value = price;
-              document.getElementById('editProductDescription').value = description;
-
-              // Set Category dropdown value or matching text
-              const catSelect = document.getElementById('editProductCategoryId');
               if (catSelect) {
-                let matched = false;
-                for (let opt of catSelect.options) {
-                  if (opt.value === String(categoryVal) || opt.textContent.trim().toLowerCase() === String(categoryVal).toLowerCase()) {
-                    opt.selected = true;
-                    matched = true;
-                    break;
-                  }
-                }
-                if (!matched && catSelect.options.length > 0) catSelect.value = categoryVal;
+
+                const categoryId =
+                  productData.categoryId?._id ||
+                  productData.categoryId ||
+                  '';
+
+                catSelect.value = categoryId;
               }
 
-              // Set Brand dropdown value or matching text
-              const brandSelect = document.getElementById('editProductBrandId');
+
+              // Brand
+              const brandSelect =
+                document.getElementById('editProductBrandId');
+
               if (brandSelect) {
-                let matched = false;
-                for (let opt of brandSelect.options) {
-                  if (opt.value === String(brandVal) || opt.textContent.trim().toLowerCase() === String(brandVal).toLowerCase()) {
-                    opt.selected = true;
-                    matched = true;
-                    break;
-                  }
-                }
-                if (!matched && brandSelect.options.length > 0) brandSelect.value = brandVal;
+
+                const brandId =
+                  productData.brandId?._id ||
+                  productData.brandId ||
+                  '';
+
+                brandSelect.value = brandId;
               }
 
-              // Populate Main Gallery Images
-              const mainImages = (productData?.imgUrls && productData.imgUrls.length) ? productData.imgUrls : (rowImgSrc ? [rowImgSrc] : []);
-              const grid = document.getElementById('editProductPreviewGrid');
-              grid.innerHTML = '';
-              mainImages.forEach((src) => {
-                const card = document.createElement('div');
-                card.className = 'preview-thumb-card';
-                card.innerHTML = `
-      <img src="${src}" alt="${name}">
-      <div class="thumb-action-overlay">
-        <button
-          type="button"
-          class="thumb-crop-btn"
-          onclick="
-            event.stopPropagation();
-            openCropModal(
-              this.closest('.preview-thumb-card').querySelector('img'),
-              null,
-              null,
-              '${src}'
-            )
-          "
-        >
-          ✂️ Crop
-        </button>
-        <button
-          type="button"
-          class="thumb-remove-btn"
-          onclick="
-    event.stopPropagation();
-    removeExistingProductImage(this, '${src}');
-"
-        >
-          ✕
-        </button>
-      </div>
-    `;
-                grid.appendChild(card);
-              });
-              if (mainImages.length > 0) {
-                grid.classList.remove('hidden');
-                document.getElementById('editProductUploadContent').classList.add('hidden');
-              } else {
-                grid.classList.add('hidden');
-                document.getElementById('editProductUploadContent').classList.remove('hidden');
-              }
 
-              // Pre-populate Variants
-              const editVContainer = document.getElementById('editVariantsContainer');
+              // Variants
+              const editVContainer =
+                document.getElementById('editVariantsContainer');
+
               editVContainer.innerHTML = '';
+
               editVariantCardCount = 0;
 
-              const variantData = productData?.variants?.find(variant => String(variant._id) === String(variantId));
-              if (variantData) {
-                addEditVariantRow(variantData);
-              }
+              productData.variants.forEach((variant) => {
+                addEditVariantRow(variant);
+              });
 
-              // Pre-populate Highlights
-              const editHContainer = document.getElementById('editHighlightsContainer');
+
+              // Highlights
+              const editHContainer =
+                document.getElementById('editHighlightsContainer');
+
               editHContainer.innerHTML = '';
-              const highlightsList = (productData?.highlights && productData.highlights.length > 0) ? productData.highlights : [];
 
-              if (highlightsList.length > 0) {
-                highlightsList.forEach((hlText) => {
+              if (productData.highlights && productData.highlights.length > 0) {
+
+                productData.highlights.forEach((hlText) => {
+
                   const row = document.createElement('div');
+
                   row.className = 'highlight-row-input';
+
                   row.innerHTML = `
-                    <span class="highlight-bullet">•</span>
-                    <input type="text" name="highlights[]" class="field-input" value="${hlText}" placeholder="e.g. High quality build">
-                    <button type="button" class="btn-remove-highlight" onclick="removeEditHighlightRow(this)">✕</button>
-                  `;
+                <span class="highlight-bullet">•</span>
+
+                <input
+                    type="text"
+                    name="highlights[]"
+                    class="field-input"
+                    value="${hlText}"
+                    placeholder="e.g. High quality build">
+
+                <button
+                    type="button"
+                    class="btn-remove-highlight"
+                    onclick="removeEditHighlightRow(this)">
+                    ✕
+                </button>
+            `;
+
                   editHContainer.appendChild(row);
                 });
+
               } else {
-                // Default single highlight input
+
                 const row = document.createElement('div');
+
                 row.className = 'highlight-row-input';
+
                 row.innerHTML = `
-                  <span class="highlight-bullet">•</span>
-                  <input type="text" name="highlights[]" class="field-input" placeholder="e.g. All-day battery life with fast charging support">
-                  <button type="button" class="btn-remove-highlight" onclick="removeEditHighlightRow(this)">✕</button>
-                `;
+            <span class="highlight-bullet">•</span>
+
+            <input
+                type="text"
+                name="highlights[]"
+                class="field-input"
+                placeholder="e.g. All-day battery life with fast charging support">
+
+            <button
+                type="button"
+                class="btn-remove-highlight"
+                onclick="removeEditHighlightRow(this)">
+                ✕
+            </button>
+        `;
+
                 editHContainer.appendChild(row);
               }
 
-              // Pre-populate Visibility Toggle
-              const isActive = productData?.isActive ?? rowIsActive;
-              document.getElementById('editProductIsActive').checked = isActive;
-              toggleEditProductVisibilityLabel(document.getElementById('editProductIsActive'));
 
-              const backdrop = document.getElementById('editProductModalBackdrop');
+              // Visibility
+              const isActive = productData.isActive;
+
+              const visibilityCheckbox =
+                document.getElementById('editProductIsActive');
+
+              visibilityCheckbox.checked = isActive;
+
+              toggleEditProductVisibilityLabel(visibilityCheckbox);
+
+
+              // Open Modal
+              const backdrop =
+                document.getElementById('editProductModalBackdrop');
+
               backdrop.classList.remove('hidden');
+
               document.body.style.overflow = 'hidden';
             }
 
 
-            function removeExistingProductImage(button, imageUrl) {
-
-              // Remove the preview from the screen
-              button.closest('.preview-thumb-card').remove();
-
-              // Get the hidden input
-              const removedInput =
-                document.getElementById('removedProductImages');
-
-              // Get existing removed images
-              const removedImages =
-                removedInput.value
-                  ? JSON.parse(removedInput.value)
-                  : [];
-
-              // Add this image URL
-              if (!removedImages.includes(imageUrl)) {
-                removedImages.push(imageUrl);
-              }
-
-              // Save it back into the hidden input
-              removedInput.value =
-                JSON.stringify(removedImages);
-
-              console.log("Removed existing product image:", imageUrl);
-
-              checkEmptyEditPreviews();
-            }
-
-
-
-            function removeExistingVariantImage(button, imageUrl) {
+            function removeExistingVariantImage(button, imageUrl, variantId) {
 
               // Remove the preview from the screen
               button.closest('.variant-thumb-card').remove();
@@ -1345,19 +1447,21 @@
                   ? JSON.parse(removedInput.value)
                   : [];
 
-              // Add this image URL
-              if (!removedImages.includes(imageUrl)) {
-                removedImages.push(imageUrl);
+              const alreadyRemoved = removedImages.some(item =>
+                item.variantId === variantId &&
+                item.imageUrl === imageUrl
+              );
+
+              if (!alreadyRemoved) {
+                removedImages.push({
+                  variantId: variantId,
+                  imageUrl: imageUrl
+                });
               }
 
               // Store it in the hidden input
               removedInput.value =
                 JSON.stringify(removedImages);
-
-              console.log(
-                "Removed existing variant image:",
-                imageUrl
-              );
             }
 
 
@@ -1452,66 +1556,38 @@
 
             // Dynamic Variant Rows (Edit modal)
             function addEditVariantRow(data = {}) {
-              editVariantCardCount++;
               const vIdx = editVariantCardCount;
+              editVariantCardCount++;
               const container = document.getElementById('editVariantsContainer');
               const card = document.createElement('div');
               card.className = 'variant-card-box';
               card.id = `editVariantBox_${vIdx}`;
 
               const color = data.color || '';
-              const storage = data.storage || '256GB';
-              const stock = (data.stock !== undefined && data.stock !== null) ? data.stock : 50;
-              const additionalPrice = data.additionalPrice || 0;
+              const storage = data.storage || '';
+              const stock = (data.stock !== undefined && data.stock !== null) ? data.stock : '';
+              const price = data.price || 0;
               const variantImages = data.variantImages || data.imgUrls || (data.imgUrl ? [data.imgUrl] : []);
 
-              card.innerHTML = `voltiq> db.products.find()
-[
-  {
-    _id: ObjectId('6aa537c6a2a170216f8376ce'),
-    name: 'iPhone 17',
-    description: 'iPhone 17_description',
-    imgUrls: [ '/uploads/2931b6f7-18f0-4f44-998b-26fa54eab5b8-17-1.webp' ],
-    basePrice: 79900,
-    highlights: [ 'highlight1', 'highlight2', 'highlight3' ],
-    isActive: false,
-    categoryId: ObjectId('6a9fb4a614359025028735ce'),
-    variants: [
-      {
-        color: 'Purple',
-        storage: '256GB',
-        additionalPrice: 0,
-        stock: 70,
-        imgUrls: [
-          '/uploads/13718d7a-df4d-4dd3-8630-ca7564e71403-17-2.webp',
-          '/uploads/4fd93ef7-a422-4578-9b90-47e5851bb24d-17-3.webp'
-        ],
-        _id: ObjectId('6aa537c6a2a170216f8376cf')
-      }
-    ],
-    createdAt: ISODate('2026-09-12T11:30:14.150Z'),
-    updatedAt: ISODate('2026-09-15T03:15:36.661Z'),
-    __v: 0
-  }
-]
-voltiq> 
+              card.innerHTML = `
                 <!-- 5-Column Inputs Grid (Color, Storage, Stock [Readonly], Price, Remove) -->
+                <input type="hidden" name="variants[${vIdx}][variantId]" value="${data._id || ''}">
                 <div class="variant-inputs-grid">
                   <div class="form-field-group">
                     <label class="field-label-sm">Color</label>
-                    <input type="text" name="color" class="field-input-sm" value="${color}" placeholder="Lilac">
+                    <input type="text" name="variants[${vIdx}][color]" class="field-input-sm" value="${color}" placeholder="Lavender">
                   </div>
                   <div class="form-field-group">
                     <label class="field-label-sm">Storage</label>
-                    <input type="text" name="storage" class="field-input-sm" value="${storage}" placeholder="256GB">
+                    <input type="text" name="variants[${vIdx}][storage]" class="field-input-sm" value="${storage}" placeholder="256GB">
                   </div>
                   <div class="form-field-group">
                     <label class="field-label-sm">Stock Quantity</label>
-                    <input type="number" name="stock" class="field-input-sm stock-input readonly-stock" value="${stock}" readonly placeholder="50" min="0">
+                    <input type="number" name="variants[${vIdx}][stock]" class="field-input-sm stock-input" value="${stock}" placeholder="50" min="0">
                   </div>
                   <div class="form-field-group">
-                    <label class="field-label-sm">Addl. Price (₹)</label>
-                    <input type="number" name="additionalPrice" class="field-input-sm" value="${additionalPrice}" placeholder="0.00" step="0.01">
+                    <label class="field-label-sm">Price (₹)</label>
+                    <input type="number" name="variants[${vIdx}][price]" class="field-input-sm" value="${price}" placeholder="0.00" step="0.01">
                   </div>
                   <button type="button" class="btn-remove-variant" title="Remove Variant" onclick="removeEditVariantCard(${vIdx})">✕</button>
                 </div>
@@ -1526,7 +1602,7 @@ voltiq>
                     <label for="editVariantFileInput_${vIdx}" class="btn-upload-variant-imgs">
                       📷 + Add Variant Images
                     </label>
-                    <input type="file" id="editVariantFileInput_${vIdx}" name="variantImages" accept="image/*" multiple class="hidden-file-input" onchange="handleEditVariantFilesSelect(this, ${vIdx})">
+                    <input type="file" id="editVariantFileInput_${vIdx}" name="variantImages_${vIdx}[]" accept="image/*" multiple class="hidden-file-input" onchange="handleEditVariantFilesSelect(this, ${vIdx})">
                   </div>
                   <div class="variant-preview-grid ${variantImages.length === 0 ? 'hidden' : ''}" id="editVariantPreviewGrid_${vIdx}"></div>
                 </div>
@@ -1541,8 +1617,18 @@ voltiq>
                   thumbCard.innerHTML = `
                     <img src="${imgSrc}" alt="Variant Image">
                     <div class="thumb-action-overlay">
-                      <button type="button" class="thumb-crop-btn" onclick="openCropModal(this.closest('.variant-thumb-card').querySelector('img'))" title="Crop & Resize">✂️</button>
-                      <button type="button" class="thumb-remove-btn" onclick="removeExistingVariantImage(this, '${imgSrc}'); checkEmptyEditVariantGrid(${vIdx});" title="Remove"> ✕ </button>                    </div>
+                      <button type="button" class="thumb-crop-btn"
+    onclick="openCropModal(
+        this.closest('.variant-thumb-card').querySelector('img'),
+        document.getElementById('editVariantFileInput_${vIdx}'),
+        null,
+        '${imgSrc}',
+        '${data._id}'
+    )"
+    title="Crop & Resize">
+    ✂️
+</button>
+                      <button type="button" class="thumb-remove-btn" onclick="removeExistingVariantImage(this, '${imgSrc}', '${data._id}'); checkEmptyEditVariantGrid(${vIdx});" title="Remove"> ✕ </button>                    </div>
                   `;
                   grid.appendChild(thumbCard);
                 });
@@ -1555,23 +1641,64 @@ voltiq>
             }
 
             function handleEditVariantFilesSelect(fileInput, vIdx) {
-              const files = fileInput.files;
-              if (!files || files.length === 0) return;
+              const newFiles = Array.from(fileInput.files);
 
-              const grid = document.getElementById(`editVariantPreviewGrid_${vIdx}`);
+              if (newFiles.length === 0) return;
 
-              Array.from(files).forEach((file, index) => {
+              const existingFiles = fileInput._selectedFiles || [];
+              const allFiles = [...existingFiles, ...newFiles];
+              fileInput._selectedFiles = allFiles;
+              const dataTransfer = new DataTransfer();
+
+              allFiles.forEach(file => {
+                dataTransfer.items.add(file);
+              });
+
+              fileInput.files = dataTransfer.files;
+              const grid = document.getElementById(
+                `editVariantPreviewGrid_${vIdx}`
+              );
+
+              newFiles.forEach((file, fileIndex) => {
+
+                const actualFileIndex =
+                  existingFiles.length + fileIndex;
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                  const thumbCard = document.createElement('div');
-                  thumbCard.className = 'variant-thumb-card';
+
+                  const thumbCard =
+                    document.createElement('div');
+                  thumbCard.className =
+                    'variant-thumb-card';
+                  thumbCard.dataset.fileIndex =
+                    actualFileIndex;
                   thumbCard.innerHTML = `
-            <img src="${e.target.result}" alt="Variant Image">
-            <div class="thumb-action-overlay">
-              <button type="button" class="thumb-crop-btn" onclick="openCropModal(this.closest('.variant-thumb-card').querySelector('img'),document.getElementById('${fileInput.id}'),${index})" title="Crop & Resize">✂️</button>
-              <button type="button" class="thumb-remove-btn" onclick="this.closest('.variant-thumb-card').remove(); checkEmptyEditVariantGrid(${vIdx});" title="Remove">✕</button>
-            </div>
-          `;
+                <img
+                    src="${e.target.result}"
+                    alt="Variant Image">
+                <div class="thumb-action-overlay">
+                    <button
+                        type="button"
+                        class="thumb-crop-btn"
+                        onclick="
+                            openCropModal(
+                                this.closest('.variant-thumb-card').querySelector('img'),
+                                document.getElementById('${fileInput.id}'),
+                                ${actualFileIndex}
+                            )
+                        "
+                        title="Crop & Resize">
+                        ✂️
+                    </button>
+                    <button
+                        type="button"
+                        class="thumb-remove-btn"
+                        onclick="removeEditVariantFile(this, ${vIdx})"
+                        title="Remove">
+                        ✕
+                    </button>
+                </div>
+            `;
                   grid.appendChild(thumbCard);
                 };
                 reader.readAsDataURL(file);
@@ -1579,6 +1706,41 @@ voltiq>
 
               grid.classList.remove('hidden');
             }
+
+
+            function removeEditVariantFile(button, vIdx) {
+
+              const thumbCard = button.closest('.variant-thumb-card');
+
+              const fileIndex =
+                Number(thumbCard.dataset.fileIndex);
+
+              const fileInput =
+                document.getElementById(`editVariantFileInput_${vIdx}`);
+
+              fileInput._selectedFiles.splice(fileIndex, 1);
+
+              const dataTransfer = new DataTransfer();
+
+              fileInput._selectedFiles.forEach(file => {
+                dataTransfer.items.add(file);
+              });
+
+              fileInput.files = dataTransfer.files;
+
+              thumbCard.remove();
+
+              const remainingCards = document.querySelectorAll(
+                `#editVariantPreviewGrid_${vIdx} .variant-thumb-card`
+              );
+
+              remainingCards.forEach((card, index) => {
+                card.dataset.fileIndex = index;
+              });
+
+              checkEmptyEditVariantGrid(vIdx);
+            }
+
 
             function checkEmptyEditVariantGrid(vIdx) {
               const grid = document.getElementById(`editVariantPreviewGrid_${vIdx}`);

@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Smartphones · Voltiq' %></title>
+  <title>
+    <%= typeof title !=='undefined' ? title : 'Smartphones · Voltiq' %>
+  </title>
   <link rel="stylesheet" href="/css/user/products.css">
 </head>
+
 <body>
 
   <!-- SITE HEADER -->
@@ -20,27 +24,39 @@
     </div>
 
     <div class="header-search">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" class="search-input" placeholder="Search..." aria-label="Search products">
+
+      <input type="text" class="search-input" id="productSearch" placeholder="Search..." aria-label="Search products"
+        value="<%= search || '' %>">
+
+      <button type="button" class="search-clear" id="searchClear" aria-label="Clear search">
+        ×
+      </button>
     </div>
 
     <div class="header-actions">
       <a href="/account" class="icon-btn" aria-label="User Account">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </a>
       <a href="/wishlist" class="icon-btn" aria-label="Wishlist">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+          </path>
         </svg>
       </a>
       <a href="/cart" class="icon-btn" aria-label="Shopping Cart">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="9" cy="21" r="1"></circle>
           <circle cx="20" cy="21" r="1"></circle>
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -52,10 +68,10 @@
   <!-- MAIN WRAPPER -->
   <main class="main-wrapper">
     <div class="shop-container">
-      
+
       <!-- SIDEBAR FILTERS -->
       <aside class="shop-sidebar">
-        
+
         <!-- Category Header -->
         <div class="sidebar-header">
           <h2>Categories</h2>
@@ -64,59 +80,47 @@
 
         <!-- Category Nav Links -->
         <nav class="category-nav">
-          <a href="/shop/smartphones" class="category-nav-item active">
-            <span class="cat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                <line x1="12" y1="18" x2="12.01" y2="18"></line>
-              </svg>
-            </span>
-            Smartphones
-          </a>
 
-          <a href="/shop/laptops" class="category-nav-item">
-            <span class="cat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="12" rx="2" ry="2"></rect>
-                <line x1="2" y1="20" x2="22" y2="20"></line>
-              </svg>
-            </span>
-            Laptops
-          </a>
+          <% categories.forEach((category, index)=> { %>
 
-          <a href="/shop/audio" class="category-nav-item">
-            <span class="cat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-              </svg>
-            </span>
-            Audio
-          </a>
+            <a href="/products/<%= category._id %>" class="category-nav-item <%= index >= 5 ? 'extra-category' : '' %> <%= selectedCategoryId === category._id.toString() ? 'active' : '' %>">
 
-          <a href="/shop/accessories" class="category-nav-item">
-            <span class="cat-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-              </svg>
-            </span>
-            Accessories
-          </a>
+              <span class="cat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </span>
 
-          <a href="#" class="see-more-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            See More
-          </a>
+              <%= category.categoryName %>
+
+            </a>
+
+            <% }) %>
+
+
+              <% if (categories.length> 5) { %>
+
+                <a href="javascript:void(0)" class="see-more-link" id="seeMoreBtn">
+
+                  <span>See More</span>
+
+                </a>
+
+                <% } %>
+
         </nav>
 
         <!-- Price Range Filter -->
         <div class="filter-section">
           <span class="filter-title">PRICE RANGE</span>
           <div class="price-slider-box">
-            <input type="range" class="range-slider" min="20000" max="200000" value="140000">
+            <input type="range" class="range-slider" id="priceSlider" min="10000" max="500000" step="10000"
+              value="<%= maxPrice || 500000 %>">
             <div class="price-range-labels">
-              <span>₹20k</span>
-              <span>₹2L+</span>
+              <span>₹10k</span>
+              <span id="maxPriceLabel">₹<%= Number(maxPrice || 500000).toLocaleString('en-IN') %></span>
             </div>
           </div>
         </div>
@@ -125,47 +129,26 @@
         <div class="filter-section">
           <span class="filter-title">BRAND</span>
           <div class="checkbox-list">
-            <label class="checkbox-label">
-              <input type="checkbox" checked>
-              <span class="custom-checkbox"></span>
-              Apple
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox">
-              <span class="custom-checkbox"></span>
-              Samsung
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox">
-              <span class="custom-checkbox"></span>
-              Google
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox">
-              <span class="custom-checkbox"></span>
-              OnePlus
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox">
-              <span class="custom-checkbox"></span>
-              Xiaomi
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox">
-              <span class="custom-checkbox"></span>
-              Vivo
-            </label>
+            <% brands.forEach(brand=> { %>
+              <label class="checkbox-label">
+                <input type="checkbox" class="brand-checkbox" value="<%= brand._id %>" <%=selectedBrands &&
+                  selectedBrands.includes(brand._id.toString()) ? 'checked' : '' %>>
+                <span class="custom-checkbox"></span>
+                <%= brand.name %>
+              </label>
+              <% }) %>
           </div>
         </div>
 
         <!-- Sort By Dropdown Filter -->
         <div class="filter-section">
           <span class="filter-title">SORT BY</span>
-          <select class="sort-select">
-            <option value="newest" selected>Newest Arrivals</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="popular">Most Popular</option>
+          <select class="sort-select" id="sortSelect">
+            <option value="newest" <%=sort==='newest' ? 'selected' : '' %>>Newest Arrivals</option>
+            <option value="price-low" <%=sort==='price-low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="price-high" <%=sort==='price-high' ? 'selected' : '' %>>Price: High to Low</option>
+            <option value="a-z" <%=sort==='a-z' ? 'selected' : '' %>>A - Z</option>
+            <option value="z-a" <%=sort==='z-a' ? 'selected' : '' %>>Z - A</option>
           </select>
         </div>
 
@@ -173,122 +156,96 @@
 
       <!-- MAIN PRODUCTS AREA -->
       <section class="products-content-area">
-        
+
         <!-- Category Heading Group -->
         <div class="category-heading-group">
           <h1>Smartphones</h1>
-          <p>Discover the pinnacle of mobile engineering. Precision-crafted devices designed for those who demand uncompromising performance and atmospheric aesthetics.</p>
+          <p>Discover the pinnacle of mobile engineering. Precision-crafted devices designed for those who demand
+            uncompromising performance and atmospheric aesthetics.</p>
         </div>
 
-        <!-- Products Grid (3 Columns) -->
-        <div class="products-grid">
-          
-          <!-- Card 1: iPhone 17 Pro Max -->
-          <a href="/product/iphone-17-pro-max" class="product-card">
-            <div class="product-image-box">
-              <span class="product-badge bestseller">Best Seller</span>
-              <img src="/images/avatar.jpg" alt="iPhone 17 Pro Max" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">iPhone 17 Pro Max</h3>
-              <div class="product-footer">
-                <span class="product-price">₹1,39,900</span>
-                <div class="color-swatches">
-                  <span class="swatch-dot black"></span>
-                  <span class="swatch-dot purple"></span>
-                </div>
-              </div>
-            </div>
-          </a>
+        <% const colorMap={ black: '#1F2937' , obsidian: '#474545' , white: '#FFFFFF' , purple: '#A78BFA' ,
+          lavender: '#D8B4FE' , blue: '#3B82F6' , indigo: '#69778a' , blush: '#f4e6f5' , red: '#EF4444' ,
+          green: '#22C55E' , sage: '#A9B689' , pistachio: '#98a36a' , mint: '#99F6E4' , yellow: '#FACC15' ,
+          orange: '#F97316' , pink: '#F472B6' , silver: '#C0C0C0' , gray: '#6B7280' , grey: '#6B7280' , gold: '#D4AF37'
+          , brown: '#92400E' }; %>
 
-          <!-- Card 2: Galaxy S24 Ultra -->
-          <a href="/product/galaxy-s24-ultra" class="product-card">
-            <div class="product-image-box">
-              <span class="product-badge new">New Arrival</span>
-              <img src="/images/avatar.jpg" alt="Galaxy S24 Ultra" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">Galaxy S24 Ultra</h3>
-              <div class="product-footer">
-                <span class="product-price">₹1,29,999</span>
-                <div class="color-swatches">
-                  <span class="swatch-dot black"></span>
-                  <span class="swatch-dot lavender"></span>
-                </div>
-              </div>
-            </div>
-          </a>
+          <!-- Products Grid (3 Columns) -->
+          <div class="products-grid">
 
-          <!-- Card 3: iPhone 17 Pro -->
-          <a href="/product/iphone-17-pro" class="product-card">
-            <div class="product-image-box">
-              <img src="/images/avatar.jpg" alt="iPhone 17 Pro" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">iPhone 17 Pro</h3>
-              <div class="product-footer">
-                <span class="product-price">₹1,19,900</span>
-                <div class="color-swatches">
-                  <span class="swatch-dot lavender"></span>
-                </div>
-              </div>
-            </div>
-          </a>
+            <% products.forEach((product)=> { %>
 
-          <!-- Card 4: iPhone 17 -->
-          <a href="/product/iphone-17" class="product-card">
-            <div class="product-image-box">
-              <img src="/images/avatar.jpg" alt="iPhone 17" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">iPhone 17</h3>
-              <div class="product-footer">
-                <span class="product-price">₹79,900</span>
-              </div>
-            </div>
-          </a>
+              <% const displayVariant=product.displayVariant; %>
 
-          <!-- Card 5: Pixel 9 Pro -->
-          <a href="/product/pixel-9-pro" class="product-card">
-            <div class="product-image-box">
-              <img src="/images/avatar.jpg" alt="Pixel 9 Pro" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">Pixel 9 Pro</h3>
-              <div class="product-footer">
-                <span class="product-price">₹1,09,900</span>
-                <div class="color-swatches">
-                  <span class="swatch-dot mint"></span>
-                </div>
-              </div>
-            </div>
-          </a>
+                <!-- Card 1: iPhone 17 Pro Max -->
+                <a href="/products/<%= product._id %>" class="product-card">
+                  <div class="product-image-box">
+                    <!-- <span class="product-badge bestseller">Best Seller</span> -->
+                    <img src="<%= displayVariant.imgUrls[0] %>" alt="<%= product.name %>" class="product-image">
+                  </div>
+                  <div class="product-details">
+                    <h3 class="product-title">
+                      <%= product.name %>
+                    </h3>
+                    <div class="product-footer">
+                      <span class="product-price">₹<%= displayVariant.price.toLocaleString('en-IN') %></span>
+                      <div class="color-swatches">
 
-          <!-- Card 6: OnePlus 12 -->
-          <a href="/product/oneplus-12" class="product-card">
-            <div class="product-image-box">
-              <img src="/images/avatar.jpg" alt="OnePlus 12" class="product-image">
-            </div>
-            <div class="product-details">
-              <h3 class="product-title">OnePlus 12</h3>
-              <div class="product-footer">
-                <span class="product-price">₹64,999</span>
-              </div>
-            </div>
-          </a>
+                        <% const displayedColors=new Set(); product.variants.forEach((variant)=> {
 
-        </div>
+                          const colorName = variant.color.trim().toLowerCase();
 
-        <!-- Pagination Controls Wrapper -->
-        <div class="pagination-wrapper">
-          <a href="#" class="page-btn disabled">&lt;</a>
-          <a href="#" class="page-btn active">1</a>
-          <a href="#" class="page-btn">2</a>
-          <a href="#" class="page-btn">3</a>
-          <span style="font-size: 13px; color: #718096; padding: 0 4px;">...</span>
-          <a href="#" class="page-btn">10</a>
-          <a href="#" class="page-btn">&gt;</a>
-        </div>
+                          if (displayedColors.has(colorName)) return;
+                          displayedColors.add(colorName);
+
+                          const colorValue = colorMap[colorName] || '#CBD5E1';
+                          %>
+
+                          <span class="swatch-dot" style="background-color: <%= colorValue %>;"
+                            title="<%= variant.color %>"></span>
+
+                          <% }) %>
+
+                      </div>
+                    </div>
+                  </div>
+                </a>
+                <% }) %>
+          </div>
+
+
+          <% const paginationParams=new URLSearchParams(); if (search) { paginationParams.set('search', search); } if
+            (sort) { paginationParams.set('sort', sort); } if (maxPrice) { paginationParams.set('maxPrice', maxPrice); }
+            selectedBrands.forEach(brandId=> {
+            paginationParams.append('brands', brandId);
+            });
+            %>
+            <div class="pagination-wrapper">
+              <% if (currentPage> 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="page-btn">
+                  &lt;
+                </a>
+                <% } else { %>
+                  <span class="page-btn disabled">
+                    &lt;
+                  </span>
+                  <% } %>
+                    <% for (let i=1; i <=totalPages; i++) { %>
+                      <a href="?page=<%= i %>" class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                        <%= i %>
+                      </a>
+                      <% } %>
+
+                        <% if (currentPage < totalPages) { %>
+                          <a href="?page=<%= currentPage + 1 %>" class="page-btn">
+                            &gt;
+                          </a>
+                          <% } else { %>
+                            <span class="page-btn disabled">
+                              &gt;
+                            </span>
+                            <% } %>
+            </div>
 
       </section>
 
@@ -309,5 +266,164 @@
     </div>
   </footer>
 
+  <script>
+    const searchInput = document.getElementById('productSearch');
+    const searchClear = document.getElementById('searchClear');
+
+    function updateClearButton() {
+      searchClear.style.display =
+        searchInput.value.trim() ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', updateClearButton);
+
+    searchInput.addEventListener('keydown', (event) => {
+
+      if (event.key === 'Enter') {
+
+        const search = searchInput.value.trim();
+
+        const url = new URL(window.location.href);
+
+        if (search) {
+          url.searchParams.set('search', search);
+        } else {
+          url.searchParams.delete('search');
+        }
+
+        window.location.href = url.toString();
+      }
+    });
+
+    searchClear.addEventListener('click', () => {
+
+      searchInput.value = '';
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete('search');
+
+      window.location.href = url.toString();
+    });
+
+    updateClearButton();
+  </script>
+
+  <script>
+    const seeMoreBtn = document.getElementById('seeMoreBtn');
+    const extraCategories = document.querySelectorAll('.extra-category');
+
+    function showExtraCategories() {
+      extraCategories.forEach(category => {
+        category.classList.remove('hidden');
+      });
+
+      if (seeMoreBtn) {
+        seeMoreBtn.querySelector('span').textContent = 'See Less';
+      }
+    }
+
+    function hideExtraCategories() {
+      extraCategories.forEach(category => {
+        category.classList.add('hidden');
+      });
+
+      if (seeMoreBtn) {
+        seeMoreBtn.querySelector('span').textContent = 'See More';
+      }
+    }
+
+    // Restore the state after page reload/navigation
+    if (sessionStorage.getItem('categoryNavExpanded') === 'true') {
+      showExtraCategories();
+    } else {
+      hideExtraCategories();
+    }
+
+    // See More / See Less
+    if (seeMoreBtn) {
+      seeMoreBtn.addEventListener('click', function () {
+
+        const isExpanded =
+          sessionStorage.getItem('categoryNavExpanded') === 'true';
+
+        if (isExpanded) {
+          sessionStorage.removeItem('categoryNavExpanded');
+          hideExtraCategories();
+        } else {
+          sessionStorage.setItem('categoryNavExpanded', 'true');
+          showExtraCategories();
+        }
+
+      });
+    }
+  </script>
+
+  <script>
+    const sortSelect = document.getElementById('sortSelect');
+
+    sortSelect.addEventListener('change', () => {
+
+      const sort = sortSelect.value;
+
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('sort', sort);
+
+      window.location.href = url.toString();
+    });
+  </script>
+
+  <script>
+    const priceSlider = document.getElementById('priceSlider');
+    const maxPriceLabel = document.getElementById('maxPriceLabel');
+
+    priceSlider.addEventListener('input', () => {
+
+      const value = Number(priceSlider.value);
+
+      maxPriceLabel.textContent =
+        `₹${value.toLocaleString('en-IN')}`;
+    });
+
+    priceSlider.addEventListener('change', () => {
+
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('maxPrice', priceSlider.value);
+
+      window.location.href = url.toString();
+    });
+  </script>
+
+  <script>
+    const brandCheckboxes =
+      document.querySelectorAll('.brand-checkbox');
+
+    brandCheckboxes.forEach(checkbox => {
+
+      checkbox.addEventListener('change', () => {
+
+        const url = new URL(window.location.href);
+
+        // Remove existing brand filters
+        url.searchParams.delete('brands');
+
+        // Get currently selected brands
+        const selectedBrands = Array.from(
+          document.querySelectorAll('.brand-checkbox:checked')
+        ).map(checkbox => checkbox.value);
+
+        // Add selected brands
+        selectedBrands.forEach(brandId => {
+          url.searchParams.append('brands', brandId);
+        });
+
+        window.location.href = url.toString();
+      });
+
+    });
+  </script>
+
 </body>
+
 </html>
