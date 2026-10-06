@@ -155,358 +155,352 @@
     <!-- ================= MAIN CONTENT ================= -->
     <div class="admin-main">
 
-      <% if (error) { %>
-            <div class="alert alert-error">
-                <%= error %>
-            </div>
-        <% } %>
+              <!-- TOP HEADER BAR (SEARCH BAR MATCHING CATEGORIES PAGE) -->
+              <header class="top-header">
+                <h2 class="header-title-text">Inventory</h2>
 
-      <% if (message) { %>
-          <div class="alert alert-success">
-            <%= message %>
-          </div>
-        <% } %>
+                <div class="header-search">
+                  <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
 
-      <!-- TOP HEADER BAR (SEARCH BAR MATCHING CATEGORIES PAGE) -->
-      <header class="top-header">
-        <h2 class="header-title-text">Inventory</h2>
+                  <input type="text" id="searchInput" class="search-input" placeholder="Search products..."
+                    value="<%= search || '' %>" onkeydown="handleSearch(event)">
 
-        <div class="header-search">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+                  <% if (search) { %>
+                    <button type="button" class="search-clear" onclick="clearSearch()">
+                      ×
+                    </button>
+                    <% } %>
+                </div>
 
-          <input type="text" id="searchInput" class="search-input" placeholder="Search products..."
-            value="<%= search || '' %>" onkeydown="handleSearch(event)">
+                <div class="header-right-actions">
+                  <button class="icon-button" aria-label="Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                  </button>
 
-          <% if (search) { %>
-            <button type="button" class="search-clear" onclick="clearSearch()">
-              ×
-            </button>
-            <% } %>
-        </div>
+                  <button class="icon-button" aria-label="User Account">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </header>
 
-        <div class="header-right-actions">
-          <button class="icon-button" aria-label="Notifications">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-          </button>
+              <!-- PAGE CONTENT -->
+              <main class="page-content">
 
-          <button class="icon-button" aria-label="User Account">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </button>
-        </div>
-      </header>
+                <!-- Page Heading Bar -->
+                <div class="page-heading-bar">
+                  <div class="heading-title-group">
+                    <h1>Product Catalog</h1>
+                    <p>Manage your global inventory and stock levels across regions.</p>
+                  </div>
 
-      <!-- PAGE CONTENT -->
-      <main class="page-content">
+                  <div class="heading-actions-group">
+                    <button type="button" class="btn-export-csv" onclick="exportCSV()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      Export CSV
+                    </button>
 
-        <!-- Page Heading Bar -->
-        <div class="page-heading-bar">
-          <div class="heading-title-group">
-            <h1>Product Catalog</h1>
-            <p>Manage your global inventory and stock levels across regions.</p>
-          </div>
+                    <button type="button" class="btn-add-product" onclick="openAddProductModal()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Add New Product
+                    </button>
+                  </div>
+                </div>
 
-          <div class="heading-actions-group">
-            <button type="button" class="btn-export-csv" onclick="exportCSV()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              Export CSV
-            </button>
+                <!-- Metrics Cards Grid (4 Stat Cards) -->
+                <div class="metrics-grid-4">
 
-            <button type="button" class="btn-add-product" onclick="openAddProductModal()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Add New Product
-            </button>
-          </div>
-        </div>
+                  <!-- Card 1: Total Products -->
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <div class="stat-icon-wrapper purple">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                          </path>
+                        </svg>
+                      </div>
+                      <!-- <span class="stat-badge-green">+2.4%</span> -->
+                    </div>
+                    <div class="stat-body">
+                      <span class="stat-label">Total Products</span>
+                      <span class="stat-value">
+                        <%= totalProducts %>
+                      </span>
+                    </div>
+                  </div>
 
-        <!-- Metrics Cards Grid (4 Stat Cards) -->
-        <div class="metrics-grid-4">
+                  <!-- Card 2: Categories -->
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <div class="stat-icon-wrapper gray">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="stat-body">
+                      <span class="stat-label">Categories</span>
+                      <span class="stat-value">
+                        <%= categories.length %>
+                      </span>
+                    </div>
+                  </div>
 
-          <!-- Card 1: Total Products -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon-wrapper purple">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
-                  </path>
-                </svg>
-              </div>
-              <!-- <span class="stat-badge-green">+2.4%</span> -->
-            </div>
-            <div class="stat-body">
-              <span class="stat-label">Total Products</span>
-              <span class="stat-value">
-                <%= totalProducts %>
-              </span>
-            </div>
-          </div>
+                  <!-- Card 3: Low Stock Items -->
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <div class="stat-icon-wrapper orange">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                          </path>
+                          <line x1="12" y1="9" x2="12" y2="13"></line>
+                          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="stat-body">
+                      <span class="stat-label">Low Stock Items</span>
+                      <span class="stat-value orange">
+                        <%= lowStockCount %>
+                      </span>
+                    </div>
+                  </div>
 
-          <!-- Card 2: Categories -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon-wrapper gray">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
-              </div>
-            </div>
-            <div class="stat-body">
-              <span class="stat-label">Categories</span>
-              <span class="stat-value">
-                <%= categories.length %>
-              </span>
-            </div>
-          </div>
+                  <!-- Card 4: Out of Stock -->
+                  <div class="stat-card">
+                    <div class="stat-header">
+                      <div class="stat-icon-wrapper red">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="stat-body">
+                      <span class="stat-label">Out of Stock</span>
+                      <span class="stat-value red">
+                        <%= outOfStockCount %>
+                      </span>
+                    </div>
+                  </div>
 
-          <!-- Card 3: Low Stock Items -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon-wrapper orange">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                  </path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-              </div>
-            </div>
-            <div class="stat-body">
-              <span class="stat-label">Low Stock Items</span>
-              <span class="stat-value orange">
-                <%= lowStockCount %>
-              </span>
-            </div>
-          </div>
+                </div>
 
-          <!-- Card 4: Out of Stock -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-icon-wrapper red">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                </svg>
-              </div>
-            </div>
-            <div class="stat-body">
-              <span class="stat-label">Out of Stock</span>
-              <span class="stat-value red">
-                <%= outOfStockCount %>
-              </span>
-            </div>
-          </div>
+                <!-- Product Table Card -->
+                <div class="table-card">
 
-        </div>
+                  <!-- Table Controls Toolbar -->
+                  <div class="filter-toolbar">
+                    <div class="filter-left-controls">
+                      <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
+                        <option value="all" <%=categoryFilter==='all' ? 'selected' : '' %>>All Categories</option>
 
-        <!-- Product Table Card -->
-        <div class="table-card">
+                        <% categories.forEach(category=> { %>
+                          <option value="<%= category._id %>" <%=categoryFilter===category._id.toString() ? 'selected'
+                            : '' %>>
+                            <%= category.categoryName %>
+                          </option>
+                          <% }) %>
+                      </select>
 
-          <!-- Table Controls Toolbar -->
-          <div class="filter-toolbar">
-            <div class="filter-left-controls">
-              <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
-                <option value="all" <%=categoryFilter==='all' ? 'selected' : '' %>>All Categories</option>
+                      <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                        <option value="all" <%=statusFilter==='all' ? 'selected' : '' %>>All Status</option>
+                        <option value="In Stock" <%=statusFilter==='In Stock' ? 'selected' : '' %>>In Stock</option>
+                        <option value="Low Stock" <%=statusFilter==='Low Stock' ? 'selected' : '' %>>Low Stock</option>
+                        <option value="Out of Stock" <%=statusFilter==='Out of Stock' ? 'selected' : '' %>>Out of Stock
+                        </option>
+                      </select>
 
-                <% categories.forEach(category=> { %>
-                  <option value="<%= category._id %>" <%=categoryFilter===category._id.toString() ? 'selected' : '' %>>
-                    <%= category.categoryName %>
-                  </option>
-                  <% }) %>
-              </select>
-
-              <select class="filter-select" id="statusFilter" onchange="applyFilters()">
-                <option value="all" <%=statusFilter==='all' ? 'selected' : '' %>>All Status</option>
-                <option value="In Stock" <%=statusFilter==='In Stock' ? 'selected' : '' %>>In Stock</option>
-                <option value="Low Stock" <%=statusFilter==='Low Stock' ? 'selected' : '' %>>Low Stock</option>
-                <option value="Out of Stock" <%=statusFilter==='Out of Stock' ? 'selected' : '' %>>Out of Stock</option>
-              </select>
-
-              <!-- <button type="button" class="btn-filter-more">
+                      <!-- <button type="button" class="btn-filter-more">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                 </svg>
                 More Filters
               </button> -->
-            </div>
+                    </div>
 
-            <span class="showing-count-label" id="showingCountLabel">SHOWING <%= products.length %> OF <%= totalItems %>
-                  ITEMS</span>
-          </div>
+                    <span class="showing-count-label" id="showingCountLabel">SHOWING <%= products.length %> OF <%=
+                          totalItems %>
+                          ITEMS</span>
+                  </div>
 
-          <!-- Table Responsive Container -->
-          <div class="table-responsive">
-            <table class="inventory-table" id="inventoryTable">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <!-- <th>Description</th> -->
-                  <th>Category</th>
-                  <th>Stock</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Visibility</th>
-                  <th class="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="inventoryTableBody">
+                  <!-- Table Responsive Container -->
+                  <div class="table-responsive">
+                    <table class="inventory-table" id="inventoryTable">
+                      <thead>
+                        <tr>
+                          <th>Product Name</th>
+                          <!-- <th>Description</th> -->
+                          <th>Category</th>
+                          <th>Stock</th>
+                          <th>Price</th>
+                          <th>Status</th>
+                          <th>Visibility</th>
+                          <th class="text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="inventoryTableBody">
 
-                <% products.forEach(item=> { %>
+                        <% products.forEach(item=> { %>
 
-                  <% const product=item.product; const variant=item.variant; %>
+                          <% const product=item.product; const variant=item.variant; %>
 
-                    <tr data-product-id="<%= product._id %>"
-                      data-category="<%= product.categoryId ? (product.categoryId.categoryName || product.categoryId) : 'Smartphones' %>"
-                      data-status="<%= variant.stock === 0 ? 'Out of Stock' : (variant.stock < 10 ? 'Low Stock' : 'In Stock') %>"
-                    >
-                      <td>
-                      <div class="product-cell">
-                        <div class="product-thumb-box">
-                          <img src="<%= variant.imgUrls[0] %>" alt="<%= product.name %>" class="product-thumb-img">
-                        </div>
-                        <div>
-                          <span class="product-title-text">
-                            <%= product.name %>
-                          </span>
-                          <span class="product-sub-text">
-                            <%= variant.color %>, <%= variant.storage %>
-                          </span>
-                        </div>
-                      </div>
-                      </td>
-                      <!-- <td><span class="sku-text">
+                            <tr data-product-id="<%= product._id %>"
+                              data-category="<%= product.categoryId ? (product.categoryId.categoryName || product.categoryId) : 'Smartphones' %>"
+                              data-status="<%= variant.stock === 0 ? 'Out of Stock' : (variant.stock < 10 ? 'Low Stock' : 'In Stock') %>">
+                              <td>
+                                <div class="product-cell">
+                                  <div class="product-thumb-box">
+                                    <img src="<%= variant.imgUrls[0] %>" alt="<%= product.name %>"
+                                      class="product-thumb-img">
+                                  </div>
+                                  <div>
+                                    <span class="product-title-text">
+                                      <%= product.name %>
+                                    </span>
+                                    <span class="product-sub-text">
+                                      <%= variant.color %>, <%= variant.storage %>
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <!-- <td><span class="sku-text">
                           <%= product.description %>
                         </span></td> -->
-                      <td><span class="category-pill">
-                          <%= product.categoryId.categoryName %>
-                        </span></td>
-                      <td>
-                        <div class="stock-cell">
-                          <span class="stock-text">
-                            <%= variant.stock %>
-                          </span>
-                        </div>
-                      </td>
-                      <td><span class="price-text">₹<%= variant.price.toLocaleString('en-IN') %></span></td>
-                      <td>
-                        <span class="status-dot"></span>
-                        <% if (variant.stock===0) { %>
-                          <span class="status-badge-pill out-of-stock">
-                            <span class="status-dot"></span>
-                            <%= 'Out of Stock' %>
-                          </span>
-                          <% } else if (variant.stock < 10) { %>
-                            <span class="status-badge-pill low-stock">
-                              <span class="status-dot"></span>
-                              <%= 'Low Stock' %>
-                            </span>
-                            <% } else { %>
-                              <span class="status-badge-pill in-stock">
+                              <td><span class="category-pill">
+                                  <%= product.categoryId.categoryName %>
+                                </span></td>
+                              <td>
+                                <div class="stock-cell">
+                                  <span class="stock-text">
+                                    <%= variant.stock %>
+                                  </span>
+                                </div>
+                              </td>
+                              <td><span class="price-text">₹<%= variant.price.toLocaleString('en-IN') %></span></td>
+                              <td>
                                 <span class="status-dot"></span>
-                                <%= 'In Stock' %>
-                              </span>
-                              <% } %>
-                      </td>
-                      <td>
-                        <label class="toggle-switch">
-                          <input type="checkbox" <%=product.isActive ? 'checked' : '' %>
-                          onchange="handleVisibilityToggleProduct(this, '<%= product._id %>', '<%= product.name %>')">
-                              <span class="slider"></span>
-                        </label>
-                      </td>
-                      <td class="text-right">
-                        <div class="actions-cell">
-                          <button type="button" class="action-icon-btn edit" title="Edit Product"
-                            data-product-id="<%= product._id %>" data-variant-id="<%= variant._id %>"
-                            onclick="openEditProductModal(this)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
+                                <% if (variant.stock===0) { %>
+                                  <span class="status-badge-pill out-of-stock">
+                                    <span class="status-dot"></span>
+                                    <%= 'Out of Stock' %>
+                                  </span>
+                                  <% } else if (variant.stock < 10) { %>
+                                    <span class="status-badge-pill low-stock">
+                                      <span class="status-dot"></span>
+                                      <%= 'Low Stock' %>
+                                    </span>
+                                    <% } else { %>
+                                      <span class="status-badge-pill in-stock">
+                                        <span class="status-dot"></span>
+                                        <%= 'In Stock' %>
+                                      </span>
+                                      <% } %>
+                              </td>
+                              <td>
+                                <label class="toggle-switch">
+                                  <input type="checkbox" <%=product.isActive ? 'checked' : '' %>
+                                  onchange="handleVisibilityToggleProduct(this, '<%= product._id %>', '<%= product.name
+                                      %>')">
+                                      <span class="slider"></span>
+                                </label>
+                              </td>
+                              <td class="text-right">
+                                <div class="actions-cell">
+                                  <button type="button" class="action-icon-btn edit" title="Edit Product"
+                                    data-product-id="<%= product._id %>" data-variant-id="<%= variant._id %>"
+                                    onclick="openEditProductModal(this)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                      stroke-width="2">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                  </button>
+                                  <button type="button" class="action-icon-btn delete" title="Delete Product"
+                                    onclick="deleteProductRow(this, '<%= product._id %>')">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                      stroke-width="2">
+                                      <polyline points="3 6 5 6 21 6"></polyline>
+                                      <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                      </path>
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+
+                            <% }) %>
+
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Pagination Bar -->
+                  <div class="pagination-bar">
+                    <span class="pagination-text">
+                      Page <%= currentPage %> of <%= totalPages %>
+                    </span>
+                    <div class="pagination-controls">
+                      <!-- Previous -->
+                      <button type="button" class="page-btn" <%=currentPage===1 ? 'disabled' : '' %>
+                        <% if (currentPage> 1) { %>
+                          onclick="window.location.href='/admin/products?page=<%= currentPage - 1 %>'"
+                            <% } %>
+                              >
+                              &lt;
+                      </button>
+                      <!-- Page Numbers -->
+                      <% for (let i=1; i <=totalPages; i++) { %>
+                        <button type="button" class="page-btn <%= currentPage === i ? 'active' : '' %>"
+                          onclick="window.location.href='/admin/products?page=<%= i %>'">
+                          <%= i %>
+                        </button>
+                        <% } %>
+                          <!-- Next -->
+                          <button type="button" class="page-btn" <%=currentPage===totalPages ? 'disabled' : '' %>
+                            onclick="window.location.href='/admin/products?page=<%= currentPage + 1 %>'"
+                              >
+                              &gt;
                           </button>
-                          <button type="button" class="action-icon-btn delete" title="Delete Product"
-                            onclick="deleteProductRow(this, '<%= product._id %>')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <polyline points="3 6 5 6 21 6"></polyline>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                              </path>
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    </div>
+                  </div>
 
-                    <% }) %>
+                </div>
 
-              </tbody>
-            </table>
-          </div>
+              </main>
 
-          <!-- Pagination Bar -->
-          <div class="pagination-bar">
-            <span class="pagination-text">
-              Page <%= currentPage %> of <%= totalPages %>
-            </span>
-            <div class="pagination-controls">
-              <!-- Previous -->
-              <button type="button" class="page-btn" <%=currentPage===1 ? 'disabled' : '' %>
-                <% if (currentPage> 1) { %>
-                  onclick="window.location.href='/admin/products?page=<%= currentPage - 1 %>'"
-                    <% } %>
-                      >
-                      &lt;
-              </button>
-              <!-- Page Numbers -->
-              <% for (let i=1; i <=totalPages; i++) { %>
-                <button type="button" class="page-btn <%= currentPage === i ? 'active' : '' %>"
-                  onclick="window.location.href='/admin/products?page=<%= i %>'">
-                  <%= i %>
-                </button>
-                <% } %>
-                  <!-- Next -->
-                  <button type="button" class="page-btn" <%=currentPage===totalPages ? 'disabled' : '' %>
-                    onclick="window.location.href='/admin/products?page=<%= currentPage + 1 %>'"
-                      >
-                      &gt;
-                  </button>
-            </div>
-          </div>
-
-        </div>
-
-      </main>
-
-      <!-- ADMIN FOOTER -->
-      <footer class="admin-footer">
-        <div>© <%= new Date().getFullYear() %> Voltiq Global Electronics Admin. All rights reserved.</div>
-      </footer>
+              <!-- ADMIN FOOTER -->
+              <footer class="admin-footer">
+                <div>© <%= new Date().getFullYear() %> Voltiq Global Electronics Admin. All rights reserved.</div>
+              </footer>
 
     </div>
   </div>
@@ -851,6 +845,149 @@
               backdrop.classList.remove('hidden');
               document.body.style.overflow = 'hidden';
             }
+
+            function restoreAddProductModal() {
+
+              if (!formData || formType !== "add") {
+                return;
+              }
+
+              // -------------------------
+              // Basic information
+              // -------------------------
+
+              document.getElementById("productName").value =
+                formData.name || "";
+
+              document.getElementById("productDescription").value =
+                formData.description || "";
+
+              document.getElementById("productCategoryId").value =
+                formData.categoryId || "";
+
+              document.getElementById("productBrandId").value =
+                formData.brandId || "";
+
+
+              // -------------------------
+              // Visibility
+              // -------------------------
+
+              const visibilityCheckbox =
+                document.getElementById("productIsActive");
+
+              visibilityCheckbox.checked =
+                formData.isActive === "on";
+
+              toggleProductVisibilityLabel(visibilityCheckbox);
+
+
+              // -------------------------
+              // Highlights
+              // -------------------------
+
+              const highlightsContainer =
+                document.getElementById("highlightsContainer");
+
+              highlightsContainer.innerHTML = "";
+
+              const highlights = Array.isArray(formData.highlights)
+                ? formData.highlights
+                : formData.highlights
+                  ? [formData.highlights]
+                  : [];
+
+              highlights.forEach((highlight) => {
+
+                const row = document.createElement("div");
+
+                row.className = "highlight-row-input";
+
+                row.innerHTML = `
+            <span class="highlight-bullet">•</span>
+
+            <input
+                type="text"
+                name="highlights[]"
+                class="field-input"
+                value="${highlight}"
+                placeholder="e.g. All-day battery life with fast charging support"
+            >
+
+            <button
+                type="button"
+                class="btn-remove-highlight"
+                onclick="removeHighlightRow(this)"
+            >
+                ✕
+            </button>
+        `;
+
+                highlightsContainer.appendChild(row);
+              });
+
+
+              // -------------------------
+              // Variants
+              // -------------------------
+
+              const variantsContainer =
+                document.getElementById("variantsContainer");
+
+              variantsContainer.innerHTML = "";
+
+              variantCardCount = 0;
+
+              if (Array.isArray(formData.variants)) {
+
+                formData.variants.forEach((variant, index) => {
+
+                  addVariantRow();
+
+                  document.querySelector(
+                    `input[name="variants[${index}][color]"]`
+                  ).value = variant.color || "";
+
+                  document.querySelector(
+                    `input[name="variants[${index}][storage]"]`
+                  ).value = variant.storage || "";
+
+                  document.querySelector(
+                    `input[name="variants[${index}][stock]"]`
+                  ).value = variant.stock || "";
+
+                  document.querySelector(
+                    `input[name="variants[${index}][price]"]`
+                  ).value = variant.price || "";
+                });
+              }
+
+
+              // -------------------------
+              // Open modal
+              // -------------------------
+
+              const backdrop =
+                document.getElementById("productModalBackdrop");
+
+              backdrop.classList.remove("hidden");
+
+              document.body.style.overflow = "hidden";
+            }
+
+
+            document.addEventListener("DOMContentLoaded", () => {
+
+              if (formData && formType === "add") {
+                restoreAddProductModal();
+              }
+
+              if (formData && formType === "edit") {
+                restoreEditProductModal();
+              }
+
+            });
+
 
             function closeProductModal() {
               const backdrop = document.getElementById('productModalBackdrop');
@@ -1432,6 +1569,142 @@
             }
 
 
+            function restoreEditProductModal() {
+
+              if (!formData || formType !== "edit") {
+                return;
+              }
+
+              // -------------------------
+              // Basic information
+              // -------------------------
+
+              document.getElementById("editProductId").value =
+                formData.productId || "";
+
+              document.getElementById("editProductName").value =
+                formData.name || "";
+
+              document.getElementById("editProductDescription").value =
+                formData.description || "";
+
+
+              // -------------------------
+              // Category
+              // -------------------------
+
+              document.getElementById("editProductCategoryId").value =
+                formData.categoryId || "";
+
+
+              // -------------------------
+              // Brand
+              // -------------------------
+
+              document.getElementById("editProductBrandId").value =
+                formData.brandId || "";
+
+
+              // -------------------------
+              // Visibility
+              // -------------------------
+
+              const visibilityCheckbox =
+                document.getElementById("editProductIsActive");
+
+              visibilityCheckbox.checked =
+                formData.isActive === "on";
+
+              toggleEditProductVisibilityLabel(visibilityCheckbox);
+
+
+              // -------------------------
+              // Highlights
+              // -------------------------
+
+              const highlightsContainer =
+                document.getElementById("editHighlightsContainer");
+
+              highlightsContainer.innerHTML = "";
+
+              const highlights = Array.isArray(formData.highlights)
+                ? formData.highlights
+                : formData.highlights
+                  ? [formData.highlights]
+                  : [];
+
+              highlights.forEach((highlight) => {
+
+                const row = document.createElement("div");
+
+                row.className = "highlight-row-input";
+
+                row.innerHTML = `
+            <span class="highlight-bullet">•</span>
+
+            <input
+                type="text"
+                name="highlights[]"
+                class="field-input"
+                placeholder="e.g. High quality build"
+            >
+
+            <button
+                type="button"
+                class="btn-remove-highlight"
+                onclick="removeEditHighlightRow(this)"
+            >
+                ✕
+            </button>
+        `;
+
+                row.querySelector("input").value = highlight;
+
+                highlightsContainer.appendChild(row);
+              });
+
+
+              // -------------------------
+              // Variants
+              // -------------------------
+
+              const variantsContainer =
+                document.getElementById("editVariantsContainer");
+
+              variantsContainer.innerHTML = "";
+
+              editVariantCardCount = 0;
+
+              if (Array.isArray(formData.variants)) {
+
+                formData.variants.forEach((variant) => {
+
+                  addEditVariantRow({
+                    _id: variant.variantId || "",
+                    color: variant.color || "",
+                    storage: variant.storage || "",
+                    stock: variant.stock ?? "",
+                    price: variant.price ?? "",
+                    imgUrls: []
+                  });
+
+                });
+              }
+
+
+              // -------------------------
+              // Open modal
+              // -------------------------
+
+              const backdrop =
+                document.getElementById("editProductModalBackdrop");
+
+              backdrop.classList.remove("hidden");
+
+              document.body.style.overflow = "hidden";
+            }
+
+
             function removeExistingVariantImage(button, imageUrl, variantId) {
 
               // Remove the preview from the screen
@@ -1583,11 +1856,11 @@
                   </div>
                   <div class="form-field-group">
                     <label class="field-label-sm">Stock Quantity</label>
-                    <input type="number" name="variants[${vIdx}][stock]" class="field-input-sm stock-input" value="${stock}" placeholder="50" min="0">
+                    <input type="number" name="variants[${vIdx}][stock]" class="field-input-sm stock-input" value="${stock}" placeholder="50">
                   </div>
                   <div class="form-field-group">
                     <label class="field-label-sm">Price (₹)</label>
-                    <input type="number" name="variants[${vIdx}][price]" class="field-input-sm" value="${price}" placeholder="0.00" step="0.01">
+                    <input type="number" name="variants[${vIdx}][price]" class="field-input-sm" value="${price}" placeholder="0.00" step="1">
                   </div>
                   <button type="button" class="btn-remove-variant" title="Remove Variant" onclick="removeEditVariantCard(${vIdx})">✕</button>
                 </div>
@@ -1771,6 +2044,11 @@
               }
             }
 
+          </script>
+
+          <script>
+            const formData = <%- JSON.stringify(formData || null) %>;
+            const formType = <%- JSON.stringify(formType || null) %>;
           </script>
 
           <!-- Cropper.js Script CDN -->

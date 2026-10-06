@@ -46,12 +46,46 @@ body {
     margin-bottom: 20px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 form label {
     display: block;
     margin-bottom: 8px;
     font-family: hanken grotesk;
     font-size: 15px;
     color:#444;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 42px;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #949191;
+    transition: color 0.2s;
+    outline: none;
+}
+
+.toggle-password-btn:hover {
+    color: #694CAC;
 }
 
 form input {

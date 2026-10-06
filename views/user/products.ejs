@@ -78,12 +78,29 @@
           <p>Browse High-End Gear</p>
         </div>
 
+      <%
+        const filterParams = new URLSearchParams();
+
+        if (search) filterParams.set('search', search);
+        if (sort) filterParams.set('sort', sort);
+        if (maxPrice) filterParams.set('maxPrice', maxPrice);
+
+        selectedBrands.forEach(brandId => {
+        filterParams.append('brands', brandId);
+        });
+      %>
+
         <!-- Category Nav Links -->
         <nav class="category-nav">
 
           <% categories.forEach((category, index)=> { %>
 
-            <a href="/products/<%= category._id %>" class="category-nav-item <%= index >= 5 ? 'extra-category' : '' %> <%= selectedCategoryId === category._id.toString() ? 'active' : '' %>">
+            <%
+              const categoryParams = new URLSearchParams(filterParams);
+              categoryParams.delete('page');
+            %>
+
+            <a href="/products/<%= category._id %><%= categoryParams.toString() ? '?' + categoryParams.toString() : '' %>" class="category-nav-item <%= index >= 5 ? 'extra-category' : '' %> <%= selectedCategoryId === category._id.toString() ? 'active' : '' %>">
 
               <span class="cat-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -178,7 +195,7 @@
               <% const displayVariant=product.displayVariant; %>
 
                 <!-- Card 1: iPhone 17 Pro Max -->
-                <a href="/products/<%= product._id %>" class="product-card">
+                <a href="/products/details/<%= product._id %>" class="product-card">
                   <div class="product-image-box">
                     <!-- <span class="product-badge bestseller">Best Seller</span> -->
                     <img src="<%= displayVariant.imgUrls[0] %>" alt="<%= product.name %>" class="product-image">

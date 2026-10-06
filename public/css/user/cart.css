@@ -306,6 +306,33 @@ body {
   color: #1F2937;
 }
 
+.toast {
+    position: fixed;
+    left: 370px;
+    bottom: 250px;
+    padding: 14px 20px;
+    min-width: 220px;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-btn);
+    border-left: 4px solid var(--primary-purple);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(101, 59, 182, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
 .btn-remove-item {
   background: none;
   border: none;
@@ -321,6 +348,92 @@ body {
 
 .btn-remove-item:hover {
   color: #EF4444;
+}
+
+.remove-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.remove-modal.show {
+    display: flex;
+}
+
+.remove-modal-content {
+    background: var(--bg-card);
+    color: var(--text-main);
+    width: 380px;
+    padding: 28px;
+    border: 1px solid var(--border-btn);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.remove-modal-content h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.remove-modal-content p {
+    margin: 0 0 24px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.remove-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.remove-modal-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+/* Cancel */
+.remove-modal-actions button:first-child {
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-btn);
+}
+
+.remove-modal-actions button:first-child:hover {
+    background: var(--purple-light);
+    border-color: var(--primary-purple);
+}
+
+.remove-modal-actions button:first-child:active {
+    transform: scale(0.96);
+}
+
+/* Remove */
+.remove-modal-actions button:last-child {
+    background: var(--primary-purple);
+    color: white;
+    border: 1px solid var(--primary-purple);
+}
+
+.remove-modal-actions button:last-child:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.remove-modal-actions button:last-child:active {
+    transform: scale(0.96);
 }
 
 /* RIGHT COLUMN (SUMMARY + ASSISTANCE) */

@@ -152,7 +152,7 @@ exports.getCategories = async (page, limit) => {
 
     const totalCategories = await Category.countDocuments();
 
-    const activeCategories = await Category.countDocuments({ isActive: true});
+    const activeCategories = await Category.countDocuments({ isActive: true });
     const inactiveCategories = await Category.countDocuments({ isActive: false });
 
     for (category of categories) {
@@ -203,7 +203,7 @@ exports.AddCategory = async (body, file) => {
         }
     }
 
-    const alreadyExists = await Category.findOne({ categoryName: name });
+    const alreadyExists = await Category.findOne({ categoryName: { $regex: `^${name}$`, $options: 'i' } });
 
     if (alreadyExists) {
         return {
@@ -230,6 +230,15 @@ exports.editCategory = async (body, file) => {
 
     if (file) {
         await Category.updateOne({ _id: id }, { imgUrl: `/uploads/${file.filename}` });
+    }
+
+    const alreadyExists = await Category.findOne({ categoryName: { $regex: `^${name}$`, $options: 'i' }, _id: { $ne: id } });
+
+    if (alreadyExists) {
+        return {
+            success: false,
+            message: "A category with the same name already exists."
+        }
     }
 
     await Category.updateOne({ _id: id }, { $set: { categoryName: name, description: description, isActive: isVisible === "on" } });
@@ -365,10 +374,10 @@ exports.AddProducts = async (body, files) => {
         }
     }
 
-    if (!highlights || highlights.length === 0) {
+    if (!highlights || highlights.length < 3) {
         return {
             success: false,
-            message: "Please enter the product highlight(s)."
+            message: "Please enter atleast 3 product highlights."
         }
     }
 
@@ -408,8 +417,8 @@ exports.AddProducts = async (body, files) => {
             }
         }
 
-        for (let idx = 0; idx < variants.length; idx++) {
-            if (variant.color === variants[idx].color && variant.storage === variants[idx].storage) {
+        for (let j = 0; j < idx; j++) {
+            if (variant.color === variants[j].color && variant.storage === variants[j].storage) {
                 return {
                     success: false,
                     message: "Variant with the same color and storage already exists."
@@ -457,16 +466,11 @@ exports.AddProducts = async (body, files) => {
             }
         }
 
-        files.map(file => ({
-            fieldname: file.fieldname,
-            filename: file.filename
-        }));
-
         const variantImages = files.filter(file => file.fieldname === `variantImages_${idx}[]`);
-        if (variantImages.length === 0) {
+        if (variantImages.length < 4) {
             return {
                 success: false,
-                message: `Please upload at least one image for variant ${idx + 1}.`
+                message: `Please upload at least four images for variant ${idx + 1}.`
             }
         }
         variantImages.map(file => file.filename);
@@ -484,7 +488,7 @@ exports.AddProducts = async (body, files) => {
     if (formattedVariants.length === 0) {
         return {
             success: false,
-            messgae: "Please add at least one product variant."
+            message: "Please add at least one product variant."
         }
     }
 
@@ -542,6 +546,41 @@ exports.editProduct = async (body, files) => {
         }
     }
 
+    if (!name) {
+        return {
+            success: false,
+            message: "Please enter a product name."
+        }
+    }
+
+    if (!description) {
+        return {
+            success: false,
+            message: "Please enter a product description."
+        }
+    }
+
+    if (!highlights || highlights.length < 0) {
+        return {
+            success: false,
+            message: "Please enter atleast 3 product highlights."
+        };
+    }
+
+    if (!categoryId) {
+        return {
+            success: false,
+            message: "Please select a category."
+        }
+    }
+
+    if (!brandId) {
+        return {
+            success: false,
+            message: "Please select a brand."
+        }
+    }
+
     product.name = name;
     product.description = description;
     product.highlights = Array.isArray(highlights)
@@ -553,13 +592,53 @@ exports.editProduct = async (body, files) => {
 
     const variants = body.variants || [];
 
-    variants.forEach((variantData) => {
+    for (const variantData of variants) {
+
+        for (const otherVariant of variants) {
+
+            if (otherVariant.variantId === variantData.variantId) {
+                continue;
+            }
+
+            if (variantData.color === otherVariant.color && variantData.storage === otherVariant.storage) {
+                return {
+                    success: false,
+                    message: "A variant with the same color & storage already exists."
+                };
+            }
+        }
 
         if (variantData.variantId) {
 
             const variant = product.variants.id(variantData.variantId);
 
-            if (!variant) return;
+            if (!variant) {
+                return {
+                    success: false,
+                    message: "Variant not found."
+                }
+            }
+
+            if (!variantData.color) {
+                return {
+                    success: false,
+                    message: "Please enter a color for the variant."
+                };
+            }
+
+            if (!variantData.storage) {
+                return {
+                    success: false,
+                    message: "Please enter storage for the variant."
+                };
+            }
+
+            if (variantData.stock === undefined || variantData.stock === "") {
+                return {
+                    success: false,
+                    message: "Please enter stock for the variant."
+                };
+            }
 
             if (variantData.stock < 0) {
                 return {
@@ -568,19 +647,17 @@ exports.editProduct = async (body, files) => {
                 }
             }
 
+            if (variantData.price === undefined || variantData.price === "") {
+                return {
+                    success: false,
+                    message: "Please enter a price for the variant."
+                };
+            }
+
             if (variantData.price < 0) {
                 return {
                     success: false,
                     message: "The price entered for the variant is a negative number."
-                }
-            }
-
-            for (let idx = 0; idx < variants.length; idx++) {
-                if (variantData.color === variants[idx].color && variantData.storage === variants[idx].storage) {
-                    return {
-                        success: false,
-                        message: "A variant with the same color & storage already exists."
-                    }
                 }
             }
 
@@ -603,7 +680,7 @@ exports.editProduct = async (body, files) => {
             product.variants.push(newVariant);
             variantData.variantId = newVariant._id.toString();
         }
-    });
+    };
 
     if (files && files.length > 0) {
 

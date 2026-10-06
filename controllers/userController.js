@@ -663,6 +663,9 @@ exports.getProducts = async (req, res) => {
 
         const expanded = req.query.expanded === 'true';
 
+        const error = req.session.error || null;
+        req.session.error = null;
+
         return res.render('user/products', {
             categories,
             brands,
@@ -674,7 +677,8 @@ exports.getProducts = async (req, res) => {
             selectedBrands,
             currentPage: result.currentPage,
             totalPages: result.totalPages,
-            expanded
+            expanded,
+            error
         });
     }
     catch (err) {
@@ -683,9 +687,27 @@ exports.getProducts = async (req, res) => {
     }
 }
 
-exports.getProductDetails = (req, res) => {
+exports.getProductDetails = async (req, res) => {
 
-    res.render('user/product-details');
+    try {
+        const productId = req.params.productId;
+
+        const result = await userService.getProductDetails(productId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/products');
+        }
+
+        const product = result.product;
+
+        res.render('user/product-details', { product });
+    }
+    catch (err){
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/products');
+    }
 }
 
 
@@ -696,9 +718,65 @@ exports.getWishlist = (req, res) => {
 }
 
 
-exports.getCart = (req, res) => {
+exports.getCart = async (req, res) => {
 
-    res.render('user/cart');
+    try {
+        const result = await userService.getCart(req.session.user.id);
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        const cartItems = result.cartItems;
+
+        return res.render('user/cart', { cartItems, error });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again.";
+        return res.redirect('/home');
+    }
+}
+
+
+exports.addToCart = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId } = req.body;
+
+        const result = await userService.addToCart(userId, variantId);
+
+        return res.json(result);
+    }
+    catch (err) {}
+}
+
+
+exports.updateCart = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId, quantity } = req.body;
+
+        const result = await userService.updateCart(userId, variantId, quantity);
+
+        return res.json(result);
+    }
+    catch (err) {}
+}
+
+
+exports.removeCartItem = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId } = req.body;
+
+        const result = await userService.removeCartItem(userId, variantId);
+
+        return res.json(result);
+    }
+    catch (err) {}
 }
 
 

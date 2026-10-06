@@ -139,6 +139,11 @@ exports.editCategory = async (req, res) => {
 
         const result = await adminService.editCategory(req.body, req.file);
 
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/admin/categories');
+        }
+
         req.session.message = result.message;
         return res.redirect('/admin/categories');
     }
@@ -224,8 +229,14 @@ exports.getProducts = async (req, res) => {
         const message = req.session.message || null;
         req.session.message = null;
 
+        const formData = req.session.data || null;
+        req.session.data = null;
+
+        const formType = req.session.formType || null;
+        req.session.formType = null;
+
         return res.render('admin/inventory', {
-            ...result, categories, brands, search, categoryFilter, statusFilter, lowStockCount, outOfStockCount, error, message
+            ...result, categories, brands, search, categoryFilter, statusFilter, lowStockCount, outOfStockCount, error, message, formData, formType
         });
     }
     catch (err) {
@@ -241,8 +252,10 @@ exports.postProducts = async (req, res) => {
         const result = await adminService.AddProducts(req.body, req.files);
 
         if (!result.success) {
-            console.log(result.message);
             req.session.error = result.message;
+            req.session.data = req.body;
+            req.session.formType = "add";
+
             return res.redirect('/admin/products');
         }
 
@@ -291,19 +304,13 @@ exports.toggleProductStatus = async (req, res) => {
 exports.editProduct = async (req, res) => {
 
     try {
-        console.log("EDIT CONTROLLER REACHED");
-
-        console.log("BODY:", req.body);
-
-        console.log("FILES:", req.files);
-
-
         const result = await adminService.editProduct(req.body, req.files);
-
-        console.log("SERVICE RESULT:", result);
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = req.body;
+            req.session.formType = "edit";
+
             return res.redirect('/admin/products');
         }
 

@@ -1,6 +1,7 @@
 const User = require('../src/models/User');
 const Address = require('../src/models/Address');
 const Product = require('../src/models/Product');
+const Cart = require('../src/models/Cart');
 
 const addressService = require('./addressService');
 
@@ -579,5 +580,214 @@ exports.getProducts = async (categoryId, search, sort, maxPrice, selectedBrands,
         currentPage,
         totalPages,
         totalProducts
+    };
+}
+
+
+exports.getProductDetails = async (productId) => {
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+        return {
+            success: false,
+            message: "Product not found."
+        }
+    }
+
+    return {
+        success: true,
+        product
+    }
+}
+
+
+
+exports.getCart = async (userId) => {
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: true,
+            cartItems: []
+        }
+    }
+
+    const items = cart.items;
+
+    const cartItems = [];
+
+    for (let item of items) {
+        const variantId = item.variantId;
+
+        const product = await Product.findOne({ "variants._id": variantId });
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === variantId.toString();
+        })
+
+        cartItems.push({
+            product,
+            variant,
+            quantity: item.quantity
+        })
+    }
+
+    return {
+        success: true,
+        cartItems
+    };
+}
+
+
+exports.addToCart = async (userId, variantId) => {
+
+    const product = await Product.findOne({ "variants._id": variantId });
+
+    if (!product) {
+        return {
+            success: false,
+            message: "Variant not found."
+        }
+    }
+
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString() === variantId;
+    });
+
+    if (variant.stock === 0) {
+        return {
+            success: false,
+            message: "The product is out of stock."
+        }
+    }
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        await Cart.create({
+            userId,
+            items: [
+                {
+                    variantId: variant._id,
+                    quantity: 1
+                }
+            ]
+        })
+
+        return {
+            success: true,
+            message: "Product added to cart successfully."
+        }
+    }
+    else {
+        const item = cart.items.find((item) => {
+            return item.variantId.toString() === variantId;
+        });
+
+        if (!item) {
+            cart.items.push({
+                variantId: variant._id,
+                quantity: 1
+            });
+
+            await cart.save();
+        }
+        else {
+            if (item.quantity >= variant.stock) {
+                return {
+                    success: false,
+                    message: "The required quantity exceeds the stock."
+                }
+            }
+
+            item.quantity += 1;
+
+            await cart.save();
+        }
+    }
+
+    return {
+        success: true,
+        message: "Product added to cart successfully."
+    }
+}
+
+
+exports.updateCart = async (userId, variantId, quantity) => {
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "Cart not found."
+        }
+    }
+
+    const item = cart.items.find((item) => {
+        return item.variantId.toString() === variantId;
+    });
+
+    if (!item) {
+        return {
+            success: false,
+            message: "Item not found in cart."
+        }
+    }
+
+    const product = await Product.findOne({ "variants._id": variantId });
+
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString() === variantId;
+    });
+
+    if (quantity > variant.stock) {
+        return {
+            success: false,
+            message: "The required quantity exceeds the stock."
+        }
+    }
+
+    item.quantity = quantity;
+    await cart.save();
+
+    return {
+        success: true,
+        message: "Updated quantity successfully."
+    };
+}
+
+
+exports.removeCartItem = async (userId, variantId) => {
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "Cart not found."
+        }
+    }
+
+    const index = cart.items.findIndex((item) => {
+        return item.variantId.toString() === variantId;
+    });
+
+    if (index === -1) {
+        return {
+            success: false,
+            message: "Product variant not found."
+        }
+    }
+
+    cart.items.splice(index, 1);
+
+    await cart.save();
+
+    return {
+        success: true,
+        message: "Item removed from cart successfully."
     };
 }

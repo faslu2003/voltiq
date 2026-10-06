@@ -32,7 +32,7 @@ router.post('/resend-otp', userController.resendOtp);
 
 
 
-router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/cart', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
 
 
@@ -73,12 +73,16 @@ router.post('/address/delete/:id', userController.deleteAddress);
 
 router.get('/products', userController.getProducts);
 router.get('/products/:categoryId', userController.getProducts);
-router.get('/products/details', userController.getProductDetails);
+router.get('/products/details/:productId', userController.getProductDetails);
 
 
 router.get('/wishlist', userController.getWishlist);
 
+
 router.get('/cart', userController.getCart);
+router.post('/cart/add', userController.addToCart);
+router.patch('/cart/update', userController.updateCart);
+router.delete('/cart/remove', userController.removeCartItem);
 
 
 router.post('/logout', userController.logout);

@@ -461,6 +461,41 @@ body {
   transform: translateY(-1px);
 }
 
+/* ================= TOAST NOTIFICATION ================= */
+.toast {
+  position: fixed;
+  right: 250px;
+  bottom: 250px;
+
+  padding: 14px 20px;
+  min-width: 220px;
+
+  background-color: var(--bg-card);
+  color: var(--text-main);
+
+  border: 1px solid var(--purple-border);
+  border-left: 4px solid var(--primary-purple);
+  border-radius: 12px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  box-shadow: 0 10px 30px rgba(101, 59, 182, 0.12);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px);
+
+  transition: all 0.3s ease;
+
+  z-index: 1000;
+}
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .btn-add-to-wishlist {
   height: 48px;
   width: 100%;
