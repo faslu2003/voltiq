@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
+const methodOverride = require('method-override');
+
 const nocache = require('nocache');
 app.use(nocache());
 
@@ -25,6 +27,9 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false, httpOnly: true, rolling: true }
 }));
+
+
+app.use(methodOverride('_method'));
 
 
 const adminRoutes = require('../routes/adminRoutes');

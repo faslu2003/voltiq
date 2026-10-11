@@ -216,6 +216,7 @@ body {
   align-items: center;
   justify-content: center;
   aspect-ratio: 1 / 1;
+  position: relative;
 }
 
 .main-image-card img {
@@ -494,6 +495,38 @@ body {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+.unavailable-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #dc5252;
+  padding: 6px 10px;
+  background: #ece9e9;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.unavailable-message {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+    background: #f7f7f7;
+    color: #dc5252;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-add-to-cart:disabled,
+.btn-add-to-wishlist:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .btn-add-to-wishlist {

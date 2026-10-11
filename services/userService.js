@@ -2,6 +2,7 @@ const User = require('../src/models/User');
 const Address = require('../src/models/Address');
 const Product = require('../src/models/Product');
 const Cart = require('../src/models/Cart');
+const Wishlist = require('../src/models/Wishlist');
 
 const addressService = require('./addressService');
 
@@ -603,6 +604,119 @@ exports.getProductDetails = async (productId) => {
 
 
 
+exports.getWishlist = async (userId) => {
+
+    const wishlist = await Wishlist.findOne({ userId });
+
+    if (!wishlist) {
+        return {
+            success: true,
+            wishlistItems: []
+        }
+    }
+
+    const variantIds = wishlist.variants;
+
+    const wishlistItems = [];
+
+    for (let variantId of variantIds) {
+
+        const product = await Product.findOne({ "variants._id": variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === variantId.toString();
+        });
+
+        wishlistItems.push({
+            product,
+            variant,
+            isActive: product.isActive
+        });
+    }
+
+    return {
+        success: true,
+        wishlistItems
+    };
+}
+
+
+exports.addToWishlist = async (userId, variantId) => {
+
+    const product = await Product.findOne({ "variants._id": variantId });
+
+    if (!product) {
+        return {
+            success: false,
+            message: "Product not found."
+        }
+    }
+
+    if (!product.isActive) {
+        return {
+            success: false,
+            message: "This product is unavailable."
+        }
+    }
+
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString() === variantId;
+    });
+
+    if (!variant) {
+        return {
+            success: false,
+            message: "Variant not found."
+        };
+    }
+
+    if (variant.stock === 0) {
+        return {
+            success: false,
+            message: "This product is out of stock."
+        }
+    }
+
+    const wishlist = await Wishlist.findOne({ userId });
+
+    if (!wishlist) {
+        await Wishlist.create({
+            userId,
+            variants: [variant._id]
+        });
+
+        return {
+            success: true,
+            message: "Added to wishlist."
+        }
+    }
+    else {
+        const alreadyExists = wishlist.variants.some((id) => {
+            return id.toString() === variantId;
+        });
+
+        if (alreadyExists) {
+            return {
+                success: false,
+                message: "This item is already in your wishlist."
+            }
+        }
+        else {
+            wishlist.variants.push(variant._id);
+            await wishlist.save();
+        }
+    }
+
+    return {
+        success: true,
+        "message": "Added to wishlist."
+    }
+}
+
+
+
 exports.getCart = async (userId) => {
 
     const cart = await Cart.findOne({ userId });
@@ -623,15 +737,18 @@ exports.getCart = async (userId) => {
 
         const product = await Product.findOne({ "variants._id": variantId });
 
+        if (!product) continue;
+
         const variant = product.variants.find((variant) => {
             return variant._id.toString() === variantId.toString();
-        })
+        });
 
         cartItems.push({
             product,
             variant,
-            quantity: item.quantity
-        })
+            quantity: item.quantity,
+            isActive: product.isActive
+        });
     }
 
     return {
@@ -649,6 +766,13 @@ exports.addToCart = async (userId, variantId) => {
         return {
             success: false,
             message: "Variant not found."
+        }
+    }
+
+    if (!product.isActive) {
+        return {
+            success: false,
+            message: "The product is unavaiable."
         }
     }
 
@@ -674,7 +798,7 @@ exports.addToCart = async (userId, variantId) => {
                     quantity: 1
                 }
             ]
-        })
+        });
 
         return {
             success: true,

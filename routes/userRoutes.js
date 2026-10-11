@@ -41,7 +41,7 @@ router.get('/home', userController.getHome);
 
 router.get('/profile', userController.getProfile);
 router.get('/profile/edit', userController.getEditProfile);
-router.post('/profile/edit', upload.single("avatar"), userController.postEditProfile);
+router.patch('/profile/edit', upload.single("avatar"), userController.patchEditProfile);
 
 
 router.get('/email/verify-current', userController.getVerifyCurrentEmail);
@@ -57,7 +57,7 @@ router.post('/email/verify-otp-1', userController.postVerifyOtp1);
 router.post('/email/verify-otp-2', userController.postVerifyOtp2);
 
 router.get('/change-password', userController.getChangePassword);
-router.post('/change-password', userController.postChangePassword);
+router.patch('/change-password', userController.patchChangePassword);
 
 
 router.get('/address', userController.getAddress);
@@ -66,9 +66,9 @@ router.get('/address/add', userController.getAddAddress);
 router.post('/address/add', userController.postAddAddress);
 
 router.get('/address/edit/:id', userController.getEditAddress);
-router.post('/address/edit/:id', userController.postEditAddress);
+router.patch('/address/edit/:id', userController.patchEditAddress);
 
-router.post('/address/delete/:id', userController.deleteAddress);
+router.delete('/address/delete/:id', userController.deleteAddress);
 
 
 router.get('/products', userController.getProducts);
@@ -77,6 +77,7 @@ router.get('/products/details/:productId', userController.getProductDetails);
 
 
 router.get('/wishlist', userController.getWishlist);
+router.post('/wishlist/add', userController.addToWishlist);
 
 
 router.get('/cart', userController.getCart);

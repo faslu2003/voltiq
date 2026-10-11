@@ -66,8 +66,9 @@
   <!-- MAIN CONTAINER -->
   <main class="main-container">
 
+
     <!-- PAGE HEADING -->
-    <h1 class="page-title-heading">Your Bag</h1>
+    <h1 class="page-title-heading">Your Bag - <%= cartLength %></h1>
 
     <!-- 2-COLUMN CART LAYOUT -->
     <div class="cart-layout-grid">
@@ -77,7 +78,7 @@
 
         <% cartItems.forEach((item)=> { %>
 
-          <div class="cart-item-card" data-price="<%= item.variant.price %>" data-variant-id="<%= item.variant._id %>">
+          <div class="cart-item-card <%= !item.isActive ? 'unavailable' : '' %>" data-price="<%= item.variant.price %>" data-variant-id="<%= item.variant._id %>" data-active="<%= item.isActive %>">
             <div class="item-thumb-box">
               <img src="<%= item.variant.imgUrls[0] %>" alt="<%= item.product.name %>">
             </div>
@@ -92,16 +93,21 @@
                     <%= `${item.variant.color}, ${item.variant.storage}` %>
                   </p>
                 </div>
-                <span class="item-price">₹<%= item.variant.price.toLocaleString('en-IN') %></span>
+
+                <% if (item.isActive) { %>
+                  <span class="item-price">₹<%= item.variant.price.toLocaleString('en-IN') %></span>
+                <% } else { %>
+                  <span class="item-unavailable">Unavailable</span>
+                <% } %>
               </div>
 
               <div class="item-controls-row">
                 <div class="qty-pill">
-                  <button type="button" class="qty-btn" onclick="updateQty(this, -1)">-</button>
+                  <button type="button" class="qty-btn" <%= !item.isActive ? 'disabled' : '' %> onclick="updateQty(this, -1)">-</button>
                   <span class="qty-val">
                     <%= item.quantity %>
                   </span>
-                  <button type="button" class="qty-btn" onclick="updateQty(this, 1)">+</button>
+                  <button type="button" class="qty-btn" <%= !item.isActive ? 'disabled' : '' %> onclick="updateQty(this, 1)">+</button>
                 </div>
 
                 <button type="button" class="btn-remove-item" onclick="removeCartItem(this)">
@@ -133,16 +139,20 @@
 
               <% cartItems.forEach((item)=> { %>
 
-                <div class="summary-line-item" data-variant-id="<%= item.variant._id %>">
-                  <span>
+                <% if (item.isActive) { %>
+
+                  <div class="summary-line-item" data-variant-id="<%= item.variant._id %>">
+                    <span>
                     <%= `${item.product.name} (x${item.quantity})` %>
-                  </span>
-                  <span class="amount">₹<%= (item.variant.price * item.quantity).toLocaleString('en-IN') %></span>
-                </div>
+                    </span>
+                    <span class="amount">₹<%= (item.variant.price * item.quantity).toLocaleString('en-IN') %></span>
+                  </div>
 
-                <% totalPrice +=item.variant.price * item.quantity %>
+                  <% totalPrice +=item.variant.price * item.quantity %>
 
-                  <% }) %>
+                <% } %>
+
+            <% }) %>
 
             </div>
 
@@ -399,6 +409,7 @@
       const cards = document.querySelectorAll('.cart-item-card');
       let total = 0;
       cards.forEach(card => {
+        if (card.dataset.active === "false") return;
         const price = parseInt(card.getAttribute('data-price'));
         const qty = parseInt(card.querySelector('.qty-val').textContent);
         total += (price * qty);

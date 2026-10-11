@@ -158,6 +158,7 @@ const error = locals.error || null;
             <% } %>
 
               <form action="/profile/edit" method="post" enctype="multipart/form-data" class="edit-form" novalidate>
+                <input type="hidden" name="_method" value="PATCH">
 
                 <div class="form-grid">
 

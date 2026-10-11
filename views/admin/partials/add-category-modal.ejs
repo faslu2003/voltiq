@@ -11,6 +11,12 @@
       <button type="button" class="category-modal-close" onclick="closeCategoryModal()" aria-label="Close modal">✕</button>
     </div>
 
+    <% if (error) { %>
+          <div class="alert alert-error">
+            <%= error %>
+          </div>
+    <% } %>
+
     <!-- Form Body -->
     <form action="/admin/categories" method="POST" enctype="multipart/form-data" class="category-modal-form" id="categoryForm">
       
@@ -20,7 +26,7 @@
       <!-- Category Name Input -->
       <div class="form-field-group">
         <label for="categoryName" class="field-label">Category Name</label>
-        <input type="text" id="categoryName" name="name" class="field-input" placeholder="e.g. Premium Audio" required autocomplete="off">
+        <input type="text" id="categoryName" name="name" class="field-input" placeholder="e.g. Premium Audio" value="<%= data.name || '' %>" autocomplete="off">
       </div>
 
       <!-- Description Input -->

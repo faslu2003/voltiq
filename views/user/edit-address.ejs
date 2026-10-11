@@ -187,6 +187,7 @@
       <!-- MODAL FORM PRE-FILLED WITH ADDRESS DATA -->
       <form action="/address/edit/<%= address._id %>" method="POST"
         class="modal-form">
+        <input type="hidden" name="_method" value="PATCH">
 
         <!-- ROW 1: FULL NAME & MOBILE NUMBER -->
         <div class="form-row-2">

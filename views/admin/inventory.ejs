@@ -745,7 +745,7 @@
 
               try {
                 const response = await fetch('/admin/products/toggle-status', {
-                  method: 'POST',
+                  method: 'PATCH',
                   headers: {
                     'Content-Type': 'application/json'
                   },
@@ -791,7 +791,7 @@
 
               try {
                 const response = await fetch('/admin/products/toggle-status', {
-                  method: 'POST',
+                  method: 'PATCH',
                   headers: {
                     'Content-Type': 'application/json'
                   },
@@ -942,7 +942,16 @@
 
                 formData.variants.forEach((variant, index) => {
 
-                  addVariantRow();
+                  const variantErrors = {
+                    color: errors[`variant_${index}_color`],
+                    storage: errors[`variant_${index}_storage`],
+                    stock: errors[`variant_${index}_stock`],
+                    price: errors[`variant_${index}_price`],
+                    image: errors[`variant_${index}_image`],
+                    duplicate: errors[`variant_${index}_duplicate`]
+                  }
+
+                  addVariantRow(variant, variantErrors);
 
                   document.querySelector(
                     `input[name="variants[${index}][color]"]`
@@ -1236,7 +1245,7 @@
 
             // ================= MULTI-VARIANT & VARIANT IMAGE / STOCK CONTROLLER =================
 
-            function addVariantRow() {
+            function addVariantRow(variant = {}, errors = {}) {
               const vIdx = variantCardCount;
               variantCardCount++;
               const container = document.getElementById('variantsContainer');
@@ -1246,20 +1255,25 @@
               card.innerHTML = `
         <!-- 5-Column Inputs Grid (Name, Color, Storage, Stock, Price, Remove) -->
         <div class="variant-inputs-grid">
+          ${errors.duplicate ? `<div class="alert alert-error">${errors.duplicate}</div>` : ''}
           <div class="form-field-group">
             <label class="field-label-sm">Color</label>
+            ${errors.color ? `<div class="alert alert-error">${errors.color}</div>` : ''}
             <input type="text" name="variants[${vIdx}][color]" class="field-input-sm" placeholder="Lilac">
           </div>
           <div class="form-field-group">
             <label class="field-label-sm">Storage</label>
+            ${errors.storage ? `<div class="alert alert-error">${errors.storage}</div>` : ''}
             <input type="text" name="variants[${vIdx}][storage]" class="field-input-sm" placeholder="256GB">
           </div>
           <div class="form-field-group">
             <label class="field-label-sm">Stock Quantity</label>
+            ${errors.stock ? `<div class="alert alert-error">${errors.stock}</div>` : ''}
             <input type="number" name="variants[${vIdx}][stock]" class="field-input-sm stock-input" placeholder="50">
           </div>
           <div class="form-field-group">
             <label class="field-label-sm">Price (₹)</label>
+            ${errors.price ? `<div class="alert alert-error">${errors.price}</div>` : ''}
             <input type="number" name="variants[${vIdx}][price]" class="field-input-sm" placeholder="0.00" step="1">
           </div>
           <button type="button" class="btn-remove-variant" title="Remove Variant" onclick="removeVariantCard(${vIdx})">✕</button>
@@ -1277,6 +1291,7 @@
             </label>
             <input type="file" id="variantFileInput_${vIdx}" name="variantImages_${vIdx}[]" accept="image/*" multiple class="hidden-file-input" onchange="handleVariantFilesSelect(this, ${vIdx})">
           </div>
+          ${errors.image ? `<div class="alert alert-error">${errors.image}</div>` : ''}
           <div class="variant-preview-grid hidden" id="variantPreviewGrid_${vIdx}"></div>
         </div>
       `;
@@ -2049,6 +2064,7 @@
           <script>
             const formData = <%- JSON.stringify(formData || null) %>;
             const formType = <%- JSON.stringify(formType || null) %>;
+            const errors = <%- JSON.stringify(errors || {}) %>;
           </script>
 
           <!-- Cropper.js Script CDN -->

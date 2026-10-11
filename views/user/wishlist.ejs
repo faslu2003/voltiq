@@ -63,17 +63,19 @@
 
     <!-- WISHLIST ITEMS GRID (4 COLUMNS) -->
     <section class="wishlist-grid" id="wishlistGrid">
-      
-      <!-- Card 1: iPhone 17 -->
+
+      <% wishlistItems.forEach((item) => { %>
+
+      <!-- Card -->
       <div class="wishlist-card">
         <div class="card-image-box">
-          <span class="stock-badge">In Stock</span>
-          <img src="/images/avatar.jpg" alt="iPhone 17" class="card-image">
+          <span class="stock-badge"><%= item.variant.stock === 0 ? 'Out of Stock' : 'In Stock' %></span>
+          <img src="<%= item.variant.imgUrls[0] %>" alt="<%= item.product.name %>" class="card-image">
         </div>
         <div class="card-body">
-          <h3 class="card-title">iPhone 17</h3>
-          <span class="card-subtitle">256GB, LILAC</span>
-          <span class="card-price">₹79,900</span>
+          <h3 class="card-title"><%= item.product.name %></h3>
+          <span class="card-subtitle"><%= `${item.variant.storage}, ${item.variant.color}` %></span>
+          <span class="card-price">₹<%= item.variant.price %></span>
         </div>
         <div class="card-actions-row">
           <button type="button" class="btn-add-cart" onclick="moveToCart(this, 'iPhone 17')">
@@ -93,92 +95,7 @@
         </div>
       </div>
 
-      <!-- Card 2: iPad Pro M4 -->
-      <div class="wishlist-card">
-        <div class="card-image-box">
-          <span class="stock-badge">In Stock</span>
-          <img src="/images/avatar.jpg" alt="iPad Pro M4" class="card-image">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">iPad Pro M4</h3>
-          <span class="card-subtitle">512GB, SILVER</span>
-          <span class="card-price">₹99,900</span>
-        </div>
-        <div class="card-actions-row">
-          <button type="button" class="btn-add-cart" onclick="moveToCart(this, 'iPad Pro M4')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            Add to Cart
-          </button>
-          <button type="button" class="btn-remove-item" title="Remove from Wishlist" onclick="removeFromWishlist(this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 3: MacBook Air M5 -->
-      <div class="wishlist-card">
-        <div class="card-image-box">
-          <span class="stock-badge">In Stock</span>
-          <img src="/images/avatar.jpg" alt="MacBook Air M5" class="card-image">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">MacBook Air M5</h3>
-          <span class="card-subtitle">16GB UNIFIED MEMORY</span>
-          <span class="card-price">₹1,14,900</span>
-        </div>
-        <div class="card-actions-row">
-          <button type="button" class="btn-add-cart" onclick="moveToCart(this, 'MacBook Air M5')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            Add to Cart
-          </button>
-          <button type="button" class="btn-remove-item" title="Remove from Wishlist" onclick="removeFromWishlist(this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 4: Watch Ultra 2 -->
-      <div class="wishlist-card">
-        <div class="card-image-box">
-          <span class="stock-badge">In Stock</span>
-          <img src="/images/avatar.jpg" alt="Watch Ultra 2" class="card-image">
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">Watch Ultra 2</h3>
-          <span class="card-subtitle">TITANIUM, PURPLE BAND</span>
-          <span class="card-price">₹89,900</span>
-        </div>
-        <div class="card-actions-row">
-          <button type="button" class="btn-add-cart" onclick="moveToCart(this, 'Watch Ultra 2')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            Add to Cart
-          </button>
-          <button type="button" class="btn-remove-item" title="Remove from Wishlist" onclick="removeFromWishlist(this)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
+      <% }) %>
 
     </section>
 

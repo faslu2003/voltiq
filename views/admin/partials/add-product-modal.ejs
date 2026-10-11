@@ -43,6 +43,11 @@
                 <!-- Product Name (productName) -->
                 <div class="form-field-group">
                   <label for="productName" class="field-label">Product Name</label>
+                  <% if (errors.name) { %>
+                    <div class="alert alert-error">
+                      <%= errors.name %>
+                    </div>
+                  <% } %>
                   <input type="text" id="productName" name="name" class="field-input"
                     placeholder="e.g. Voltiq Ultra Pro Headphones" autocomplete="off">
                 </div>
@@ -51,6 +56,11 @@
                 <div class="field-grid-2">
                   <div class="form-field-group">
                     <label for="productCategoryId" class="field-label">Category</label>
+                    <% if (errors.categoryId) { %>
+                    <div class="alert alert-error">
+                      <%= errors.categoryId %>
+                    </div>
+                  <% } %>
                     <div class="select-wrapper">
                       <select id="productCategoryId" name="categoryId" class="field-select">
                         <option value="" disabled selected>Select Category</option>
@@ -71,6 +81,11 @@
 
                   <div class="form-field-group">
                     <label for="productBrandId" class="field-label">Brand</label>
+                    <% if (errors.brandId) { %>
+                    <div class="alert alert-error">
+                      <%= errors.brandId %>
+                    </div>
+                  <% } %>
                     <div class="select-wrapper">
                       <select id="productBrandId" name="brandId" class="field-select">
                         <option value="" disabled selected>Select Brand</option>
@@ -94,6 +109,11 @@
                 <!-- Description (description) -->
                 <div class="form-field-group">
                   <label for="productDescription" class="field-label">Description</label>
+                  <% if (errors.description) { %>
+                    <div class="alert alert-error">
+                      <%= errors.description %>
+                    </div>
+                  <% } %>
                   <textarea id="productDescription" name="description" class="field-textarea"
                     placeholder="Describe key product features, specs, and details..."></textarea>
                 </div>
@@ -111,6 +131,11 @@
                     <polyline points="2 12 12 17 22 12"></polyline>
                   </svg>
                   VARIANTS
+                  <% if (errors.variant) { %>
+                    <div class="alert alert-error">
+                      <%= errors.variant %>
+                    </div>
+                  <% } %>
                 </div>
 
                 <div class="variants-container" id="variantsContainer">
@@ -139,6 +164,11 @@
                     <polyline points="10 9 9 9 8 9"></polyline>
                   </svg>
                   PRODUCT HIGHLIGHTS
+                  <% if (errors.highlights) { %>
+                    <div class="alert alert-error">
+                      <%= errors.highlights %>
+                    </div>
+                  <% } %>
                 </div>
 
                 <div class="highlights-container" id="highlightsContainer">

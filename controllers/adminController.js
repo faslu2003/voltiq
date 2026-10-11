@@ -68,7 +68,7 @@ exports.getCustomers = async (req, res) => {
 }
 
 
-exports.upddateCustomerStatus = async (req, res) => {
+exports.updateCustomerStatus = async (req, res) => {
 
     try {
 
@@ -101,8 +101,10 @@ exports.getCategories = async (req, res) => {
         const message = req.session.message || null;
         req.session.message = null;
 
+        const data = req.session.data || {};
+        req.session.data = null;
 
-        return res.render('admin/categories', { ...result, error, message });
+        return res.render('admin/categories', { ...result, error, message, data });
     }
     catch (err) {
         console.log(err);
@@ -119,6 +121,7 @@ exports.postCategory = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = req.body;
             return res.redirect('/admin/categories');
         }
 
@@ -141,6 +144,7 @@ exports.editCategory = async (req, res) => {
 
         if (!result.success) {
             req.session.error = result.message;
+            req.session.data = req.body;
             return res.redirect('/admin/categories');
         }
 
@@ -167,7 +171,7 @@ exports.toggleCategoryStatus = async (req, res) => {
         console.log(err);
 
         return res.json({
-            sucess: false,
+            success: false,
             message: "Something went wrong."
         });
     }
@@ -226,6 +230,9 @@ exports.getProducts = async (req, res) => {
         const error = req.session.error || null;
         req.session.error = null;
 
+        const errors = req.session.errors || {};
+        req.session.errors = {};
+
         const message = req.session.message || null;
         req.session.message = null;
 
@@ -236,7 +243,7 @@ exports.getProducts = async (req, res) => {
         req.session.formType = null;
 
         return res.render('admin/inventory', {
-            ...result, categories, brands, search, categoryFilter, statusFilter, lowStockCount, outOfStockCount, error, message, formData, formType
+            ...result, categories, brands, search, categoryFilter, statusFilter, lowStockCount, outOfStockCount, error, errors, message, formData, formType
         });
     }
     catch (err) {
@@ -252,7 +259,7 @@ exports.postProducts = async (req, res) => {
         const result = await adminService.AddProducts(req.body, req.files);
 
         if (!result.success) {
-            req.session.error = result.message;
+            req.session.errors = result.errors;
             req.session.data = req.body;
             req.session.formType = "add";
 

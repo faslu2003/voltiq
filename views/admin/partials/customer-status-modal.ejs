@@ -138,7 +138,7 @@
 
       try {
         const res = await fetch('/admin/customers/status/' + encodeURIComponent(activeCustomer.id), {
-          method: 'POST',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ isBlocked: activeAction === 'block' })
         });
@@ -148,7 +148,7 @@
           throw new Error(data.message || 'Something went wrong. Please try again.');
         }
 
-        window.location.reload();
+        // window.location.reload();
 
         activeSelect.value = activeAction === 'block' ? 'true' : 'false';
         activeSelect.classList.remove('blocked', 'unblocked');

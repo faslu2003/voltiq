@@ -175,6 +175,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 }
 
 /* TOP BAR HEADER */
@@ -483,7 +484,7 @@ body {
 
 .categories-table th {
   background-color: #FAF8FC;
-  padding: 16px 28px;
+  padding: 16px 20px;
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
@@ -510,7 +511,7 @@ body {
 }
 
 .categories-table td {
-  padding: 18px 28px;
+  padding: 18px 20px;
   vertical-align: middle;
   font-size: 14px;
 }

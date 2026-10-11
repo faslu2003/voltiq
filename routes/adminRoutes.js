@@ -17,21 +17,19 @@ router.use(authMiddleware.authenticateAdmin);
 
 
 router.get('/customers', adminController.getCustomers);
-router.post('/customers/status/:id', adminController.upddateCustomerStatus);
+router.patch('/customers/status/:id', adminController.updateCustomerStatus);
 
 
 router.get('/categories', adminController.getCategories);
 router.post('/categories', upload.single("image"), adminController.postCategory);
 router.post('/categories/edit', upload.single("image"), adminController.editCategory);
-router.post('/categories/toggle-status', adminController.toggleCategoryStatus);
-router.post('/categories/delete', adminController.deleteCategory);
+router.patch('/categories/toggle-status', adminController.toggleCategoryStatus);
 
 
 router.get('/products', adminController.getProducts);
 router.post('/products', upload.any(), adminController.postProducts);
-router.post('/products/toggle-status', adminController.toggleProductStatus);
-router.post('/products/edit', upload.any(), adminController.editProduct);
-router.post('/products/delete', adminController.deleteProduct);
+router.patch('/products/toggle-status', adminController.toggleProductStatus);
+router.patch('/products/edit', upload.any(), adminController.editProduct);
 
 
 router.get('/brands', adminController.getBrands);

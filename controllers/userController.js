@@ -304,7 +304,7 @@ exports.getEditProfile = async (req, res) => {
     res.render('user/edit-profile', { user, error, data });
 }
 
-exports.postEditProfile = async (req, res) => {
+exports.patchEditProfile = async (req, res) => {
 
     try {
 
@@ -501,7 +501,7 @@ exports.getChangePassword = (req, res) => {
     res.render('user/change-password', { error });
 }
 
-exports.postChangePassword = async (req, res) => {
+exports.patchChangePassword = async (req, res) => {
 
     try {
 
@@ -586,7 +586,7 @@ exports.getEditAddress = async (req, res) => {
     res.render('user/edit-address', { address, error, data });
 }
 
-exports.postEditAddress = async (req, res) => {
+exports.patchEditAddress = async (req, res) => {
 
     try {
 
@@ -701,7 +701,7 @@ exports.getProductDetails = async (req, res) => {
 
         const product = result.product;
 
-        res.render('user/product-details', { product });
+        return res.render('user/product-details', { product });
     }
     catch (err){
         console.log(err);
@@ -712,10 +712,47 @@ exports.getProductDetails = async (req, res) => {
 
 
 
-exports.getWishlist = (req, res) => {
+exports.getWishlist = async (req, res) => {
 
-    res.render('user/wishlist');
+    try {
+        const userId = req.session?.user?.id;
+
+        const result = await userService.getWishlist(userId);
+
+        const wishlistItems = result.wishlistItems;
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        return res.render('user/wishlist', { wishlistItems, error });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/home');
+    }
 }
+
+
+exports.addToWishlist = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId } = req.body;
+
+        const result = await userService.addToWishlist(userId, variantId);
+
+        return res.json(result);
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong. Please try again."
+        });
+    }
+}
+
 
 
 exports.getCart = async (req, res) => {
@@ -728,7 +765,13 @@ exports.getCart = async (req, res) => {
 
         const cartItems = result.cartItems;
 
-        return res.render('user/cart', { cartItems, error });
+        let cartLength = 0;
+
+        cartItems.forEach((item) => {
+            cartLength += item.quantity;
+        });
+
+        return res.render('user/cart', { cartItems, cartLength, error });
     }
     catch (err) {
         console.log(err);
@@ -778,6 +821,8 @@ exports.removeCartItem = async (req, res) => {
     }
     catch (err) {}
 }
+
+
 
 
 

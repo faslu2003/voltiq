@@ -228,6 +228,42 @@ exports.editCategory = async (body, file) => {
 
     const { id, name, description, isVisible } = body;
 
+    if (!name && !description) {
+        return {
+            success: false,
+            message: "Please fill in all the fields."
+        }
+    }
+
+    if (!name) {
+        return {
+            success: false,
+            message: "Please enter a category name."
+        }
+    }
+
+    if (!description) {
+        return {
+            success: false,
+            message: "Please enter the category description."
+        }
+    }
+
+    const category = await Category.findById(id);
+    if (!category) {
+        return {
+            success: false,
+            message: "Category not found."
+        }
+    }
+
+    if (!category.imgUrl && !file) {
+        return {
+            success: false,
+            message: "Please upload the category image."
+        }
+    }
+
     if (file) {
         await Category.updateOne({ _id: id }, { imgUrl: `/uploads/${file.filename}` });
     }
@@ -360,46 +396,26 @@ exports.AddProducts = async (body, files) => {
 
     const { name, description, highlights, categoryId, brandId, isActive } = body;
 
+    const errors = {};
+
     if (!name) {
-        return {
-            success: false,
-            message: "Please enter a product name."
-        }
+        errors.name = "Please enter a product name.";
     }
 
     if (!description) {
-        return {
-            success: false,
-            message: "Please enter a product description."
-        }
+        errors.description = "Please enter a product description.";
     }
 
     if (!highlights || highlights.length < 3) {
-        return {
-            success: false,
-            message: "Please enter atleast 3 product highlights."
-        }
+        errors.highlights = "Please enter atleast 3 product highlights.";
     }
 
     if (!categoryId) {
-        return {
-            success: false,
-            message: "Please select a category."
-        }
+        errors.categoryId = "Please select a category.";
     }
 
     if (!brandId) {
-        return {
-            success: false,
-            message: "Please select a brand."
-        }
-    }
-
-    if (!files || files.length === 0) {
-        return {
-            success: false,
-            message: "Please upload at least one product image."
-        }
+        errors.brandId = "Please select a brand.";
     }
 
     const variants = body.variants || [];
@@ -411,18 +427,12 @@ exports.AddProducts = async (body, files) => {
         if (!variant) continue;
 
         if (!variant.color) {
-            return {
-                success: false,
-                message: `Please enter a color for variant ${idx + 1}.`
-            }
+            errors[`variant_${idx}_color`] = `Please enter a color for variant ${idx + 1}.`;
         }
 
         for (let j = 0; j < idx; j++) {
             if (variant.color === variants[j].color && variant.storage === variants[j].storage) {
-                return {
-                    success: false,
-                    message: "Variant with the same color and storage already exists."
-                }
+                errors[`variant_${idx}_duplicate`] = "Variant with the same color and storage already exists.";
             }
         }
 
@@ -434,62 +444,52 @@ exports.AddProducts = async (body, files) => {
         // }
 
         if (!variant.storage) {
-            return {
-                success: false,
-                message: `Please enter storage for variant ${idx + 1}.`
-            }
+            errors[`variant_${idx}_storage`] = `Please enter storage for variant ${idx + 1}.`;
         }
 
         if (variant.stock === undefined || variant.stock === "") {
-            return {
-                success: false,
-                message: `Please enter stock for variant ${idx + 1}.`
-            }
+            errors[`variant_${idx}_stock`] = `Please enter stock for variant ${idx + 1}.`;
         }
         if (variant.stock < 0) {
-            return {
-                success: false,
-                message: `The stock quantity entered for variant ${idx + 1} is negative.`
-            }
+            errors[`variant_${idx}_stock`] = `The stock quantity entered for variant ${idx + 1} is negative.`;
         }
 
         if (!variant.price) {
-            return {
-                success: false,
-                message: `Please enter a price for variant ${idx + 1}.`
-            }
+            errors[`variant_${idx}_price`] = `Please enter a price for variant ${idx + 1}.`;
         }
         if (variant.price < 0) {
-            return {
-                success: false,
-                message: `The price entered for variant ${idx + 1} is negative.`
-            }
+            errors[`variant_${idx}_price`] = `The price entered for variant ${idx + 1} is negative.`;
         }
 
         const variantImages = files.filter(file => file.fieldname === `variantImages_${idx}[]`);
         if (variantImages.length < 4) {
-            return {
-                success: false,
-                message: `Please upload at least four images for variant ${idx + 1}.`
-            }
+            errors[`variant_${idx}_image`] = `Please upload at least four images for variant ${idx + 1}.`;
         }
         variantImages.map(file => file.filename);
 
-        formattedVariants.push({
-            color: variant.color,
-            colorCode: variant.colorCode,
-            storage: variant.storage,
-            stock: variant.stock,
-            price: Number(variant.price),
-            imgUrls: variantImages.map(file => `/uploads/${file.filename}`)
-        });
+        const hasVariantData = variant.color || variant.storage || variant.stock || variant.price || variantImages.length > 0;
+
+        if (hasVariantData) {
+            formattedVariants.push({
+                color: variant.color,
+                // colorCode: variant.colorCode,
+                storage: variant.storage,
+                stock: variant.stock,
+                price: Number(variant.price),
+                imgUrls: variantImages.map(file => `/uploads/${file.filename}`)
+            });
+        }
     }
 
     if (formattedVariants.length === 0) {
+        errors.variant = "Please add at least one product variant.";
+    }
+
+    if (Object.keys(errors).length > 0) {
         return {
             success: false,
-            message: "Please add at least one product variant."
-        }
+            errors
+        };
     }
 
     await Product.create({
@@ -560,7 +560,7 @@ exports.editProduct = async (body, files) => {
         }
     }
 
-    if (!highlights || highlights.length < 0) {
+    if (!highlights || highlights.length < 3) {
         return {
             success: false,
             message: "Please enter atleast 3 product highlights."
