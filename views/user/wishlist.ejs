@@ -13,7 +13,7 @@
     <div class="header-left">
       <a href="/" class="brand-logo">voltiq</a>
       <nav class="main-nav">
-        <a href="/" class="nav-link">Home</a>
+        <a href="/home" class="nav-link">Home</a>
         <a href="/new-arrivals" class="nav-link">New Arrivals</a>
         <a href="/support" class="nav-link">Support</a>
       </nav>
@@ -28,7 +28,7 @@
     </div>
 
     <div class="header-actions">
-      <a href="/account" class="icon-btn" aria-label="User Account">
+      <a href="/profile" class="icon-btn" aria-label="User Account">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
@@ -78,7 +78,7 @@
           <span class="card-price">₹<%= item.variant.price %></span>
         </div>
         <div class="card-actions-row">
-          <button type="button" class="btn-add-cart" onclick="moveToCart(this, 'iPhone 17')">
+          <button type="button" class="btn-add-cart" data-variant-id="<%= item.variant._id %>" onclick="moveToCart(this)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
@@ -223,8 +223,39 @@
 
   <!-- CLIENT INTERACTION JAVASCRIPT -->
   <script>
-    function removeFromWishlist(btn) {
-      if (confirm('Remove this item from your wishlist?')) {
+
+    async function moveToCart(btn) {
+      const variantId = btn.dataset.variantId ;
+
+      const data = await fetch('/wishlist/move-to-cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          variantId
+        })
+      });
+
+      const result = await data.json();
+
+      const toast = document.getElementById('toast');
+
+      if (!result.success) {
+        toast.textContent = result.message;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+      else {
+        toast.textContent = "Product added to cart."
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+
         const card = btn.closest('.wishlist-card');
         card.style.opacity = '0';
         card.style.transform = 'scale(0.9)';
@@ -234,14 +265,12 @@
       }
     }
 
-    function moveToCart(btn, itemName) {
-      alert(`${itemName} has been added to your shopping cart!`);
-    }
-
     function quickAdd(itemName) {
       alert(`${itemName} added to your cart!`);
     }
   </script>
+
+  <div id="toast" class="toast"></div>
 
 </body>
 </html>

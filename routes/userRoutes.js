@@ -32,7 +32,7 @@ router.post('/resend-otp', userController.resendOtp);
 
 
 
-router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/cart', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/wishlist', '/cart', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
 
 
@@ -78,6 +78,7 @@ router.get('/products/details/:productId', userController.getProductDetails);
 
 router.get('/wishlist', userController.getWishlist);
 router.post('/wishlist/add', userController.addToWishlist);
+router.post('/wishlist/move-to-cart', userController.moveToCart);
 
 
 router.get('/cart', userController.getCart);

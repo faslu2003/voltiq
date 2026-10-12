@@ -754,6 +754,34 @@ exports.addToWishlist = async (req, res) => {
 }
 
 
+exports.moveToCart = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId } = req.body;
+
+        const firstResult = await userService.addToCart(userId, variantId);
+
+        if (firstResult.success) {
+
+            const secondResult = await userService.removeFromWishlist(userId, variantId);
+
+            return res.json(secondResult);
+        }
+        else {
+            return res.json(firstResult);
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong. Please try again."
+        });
+    }
+}
+
+
 
 exports.getCart = async (req, res) => {
 

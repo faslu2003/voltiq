@@ -716,6 +716,36 @@ exports.addToWishlist = async (userId, variantId) => {
 }
 
 
+exports.removeFromWishlist = async (userId, variantId) => {
+
+    const product = await Product.findOne({ "variants._id": variantId });
+
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString() === variantId;
+    });
+
+    const wishlist = await Wishlist.findOne({ userId });
+
+    if (!wishlist) {
+        return {
+            success: true,
+            wishlistItems: []
+        }
+    }
+
+    await Wishlist.updateOne({ userId }, {
+        $pull: {
+            variants: variant._id
+        }
+    });
+
+    return {
+        success: true,
+        message: "Product variant removed from wishlist."
+    };
+}
+
+
 
 exports.getCart = async (userId) => {
 
