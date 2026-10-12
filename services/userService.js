@@ -504,7 +504,7 @@ exports.deleteAddress = async (addressId, session) => {
 
 
 
-exports.getProducts = async (categoryId, search, sort, maxPrice, selectedBrands, page, limit) => {
+exports.getProducts = async (categoryId, search, sort, maxPrice, selectedBrands, page, limit, userId) => {
 
     const query = {
         categoryId,
@@ -576,11 +576,23 @@ exports.getProducts = async (categoryId, search, sort, maxPrice, selectedBrands,
         }
     });
 
+    const wishlist = await Wishlist.findOne({ userId });
+
+    let wishlistVariantIds;
+
+    if (!wishlist) {
+        wishlistVariantIds = [];
+    }
+    else {
+        wishlistVariantIds = wishlist.variants;
+    }
+
     return {
         products,
         currentPage,
         totalPages,
-        totalProducts
+        totalProducts,
+        wishlistVariantIds
     };
 }
 
@@ -718,12 +730,6 @@ exports.addToWishlist = async (userId, variantId) => {
 
 exports.removeFromWishlist = async (userId, variantId) => {
 
-    const product = await Product.findOne({ "variants._id": variantId });
-
-    const variant = product.variants.find((variant) => {
-        return variant._id.toString() === variantId;
-    });
-
     const wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
@@ -733,9 +739,20 @@ exports.removeFromWishlist = async (userId, variantId) => {
         }
     }
 
+    const varId = wishlist.variants.find((variant) => {
+        return variant.toString() === variantId
+    });
+
+    if (!varId) {
+        return {
+            success: false,
+            message: "Variant not found in wishlist."
+        }
+    }
+
     await Wishlist.updateOne({ userId }, {
         $pull: {
-            variants: variant._id
+            variants: varId
         }
     });
 

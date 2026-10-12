@@ -78,96 +78,89 @@
           <p>Browse High-End Gear</p>
         </div>
 
-      <%
-        const filterParams = new URLSearchParams();
+        <% const filterParams=new URLSearchParams(); if (search) filterParams.set('search', search); if (sort)
+          filterParams.set('sort', sort); if (maxPrice) filterParams.set('maxPrice', maxPrice);
+          selectedBrands.forEach(brandId=> {
+          filterParams.append('brands', brandId);
+          });
+          %>
 
-        if (search) filterParams.set('search', search);
-        if (sort) filterParams.set('sort', sort);
-        if (maxPrice) filterParams.set('maxPrice', maxPrice);
+          <!-- Category Nav Links -->
+          <nav class="category-nav">
 
-        selectedBrands.forEach(brandId => {
-        filterParams.append('brands', brandId);
-        });
-      %>
+            <% categories.forEach((category, index)=> { %>
 
-        <!-- Category Nav Links -->
-        <nav class="category-nav">
+              <% const categoryParams=new URLSearchParams(filterParams); categoryParams.delete('page'); %>
 
-          <% categories.forEach((category, index)=> { %>
+                <a href="/products/<%= category._id %><%= categoryParams.toString() ? '?' + categoryParams.toString() : '' %>"
+                  class="category-nav-item <%= index >= 5 ? 'extra-category' : '' %> <%= selectedCategoryId === category._id.toString() ? 'active' : '' %>">
 
-            <%
-              const categoryParams = new URLSearchParams(filterParams);
-              categoryParams.delete('page');
-            %>
+                  <span class="cat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                  </span>
 
-            <a href="/products/<%= category._id %><%= categoryParams.toString() ? '?' + categoryParams.toString() : '' %>" class="category-nav-item <%= index >= 5 ? 'extra-category' : '' %> <%= selectedCategoryId === category._id.toString() ? 'active' : '' %>">
-
-              <span class="cat-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                </svg>
-              </span>
-
-              <%= category.categoryName %>
-
-            </a>
-
-            <% }) %>
-
-
-              <% if (categories.length> 5) { %>
-
-                <a href="javascript:void(0)" class="see-more-link" id="seeMoreBtn">
-
-                  <span>See More</span>
+                  <%= category.categoryName %>
 
                 </a>
 
-                <% } %>
+                <% }) %>
 
-        </nav>
 
-        <!-- Price Range Filter -->
-        <div class="filter-section">
-          <span class="filter-title">PRICE RANGE</span>
-          <div class="price-slider-box">
-            <input type="range" class="range-slider" id="priceSlider" min="10000" max="500000" step="10000"
-              value="<%= maxPrice || 500000 %>">
-            <div class="price-range-labels">
-              <span>₹10k</span>
-              <span id="maxPriceLabel">₹<%= Number(maxPrice || 500000).toLocaleString('en-IN') %></span>
+                  <% if (categories.length> 5) { %>
+
+                    <a href="javascript:void(0)" class="see-more-link" id="seeMoreBtn">
+
+                      <span>See More</span>
+
+                    </a>
+
+                    <% } %>
+
+          </nav>
+
+          <!-- Price Range Filter -->
+          <div class="filter-section">
+            <span class="filter-title">PRICE RANGE</span>
+            <div class="price-slider-box">
+              <input type="range" class="range-slider" id="priceSlider" min="10000" max="500000" step="10000"
+                value="<%= maxPrice || 500000 %>">
+              <div class="price-range-labels">
+                <span>₹10k</span>
+                <span id="maxPriceLabel">₹<%= Number(maxPrice || 500000).toLocaleString('en-IN') %></span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Brand Checkboxes Filter -->
-        <div class="filter-section">
-          <span class="filter-title">BRAND</span>
-          <div class="checkbox-list">
-            <% brands.forEach(brand=> { %>
-              <label class="checkbox-label">
-                <input type="checkbox" class="brand-checkbox" value="<%= brand._id %>" <%=selectedBrands &&
-                  selectedBrands.includes(brand._id.toString()) ? 'checked' : '' %>>
-                <span class="custom-checkbox"></span>
-                <%= brand.name %>
-              </label>
-              <% }) %>
+          <!-- Brand Checkboxes Filter -->
+          <div class="filter-section">
+            <span class="filter-title">BRAND</span>
+            <div class="checkbox-list">
+              <% brands.forEach(brand=> { %>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="brand-checkbox" value="<%= brand._id %>" <%=selectedBrands &&
+                    selectedBrands.includes(brand._id.toString()) ? 'checked' : '' %>>
+                  <span class="custom-checkbox"></span>
+                  <%= brand.name %>
+                </label>
+                <% }) %>
+            </div>
           </div>
-        </div>
 
-        <!-- Sort By Dropdown Filter -->
-        <div class="filter-section">
-          <span class="filter-title">SORT BY</span>
-          <select class="sort-select" id="sortSelect">
-            <option value="newest" <%=sort==='newest' ? 'selected' : '' %>>Newest Arrivals</option>
-            <option value="price-low" <%=sort==='price-low' ? 'selected' : '' %>>Price: Low to High</option>
-            <option value="price-high" <%=sort==='price-high' ? 'selected' : '' %>>Price: High to Low</option>
-            <option value="a-z" <%=sort==='a-z' ? 'selected' : '' %>>A - Z</option>
-            <option value="z-a" <%=sort==='z-a' ? 'selected' : '' %>>Z - A</option>
-          </select>
-        </div>
+          <!-- Sort By Dropdown Filter -->
+          <div class="filter-section">
+            <span class="filter-title">SORT BY</span>
+            <select class="sort-select" id="sortSelect">
+              <option value="newest" <%=sort==='newest' ? 'selected' : '' %>>Newest Arrivals</option>
+              <option value="price-low" <%=sort==='price-low' ? 'selected' : '' %>>Price: Low to High</option>
+              <option value="price-high" <%=sort==='price-high' ? 'selected' : '' %>>Price: High to Low</option>
+              <option value="a-z" <%=sort==='a-z' ? 'selected' : '' %>>A - Z</option>
+              <option value="z-a" <%=sort==='z-a' ? 'selected' : '' %>>Z - A</option>
+            </select>
+          </div>
 
       </aside>
 
@@ -190,44 +183,57 @@
           <!-- Products Grid (3 Columns) -->
           <div class="products-grid">
 
-            <% products.forEach((product)=> { %>
+            <% wishlistVariantIds %>
 
-              <% const displayVariant=product.displayVariant; %>
+              <% products.forEach((product)=> { %>
 
-                <!-- Card 1: iPhone 17 Pro Max -->
-                <a href="/products/details/<%= product._id %>" class="product-card">
-                  <div class="product-image-box">
-                    <!-- <span class="product-badge bestseller">Best Seller</span> -->
-                    <img src="<%= displayVariant.imgUrls[0] %>" alt="<%= product.name %>" class="product-image">
-                  </div>
-                  <div class="product-details">
-                    <h3 class="product-title">
-                      <%= product.name %>
-                    </h3>
-                    <div class="product-footer">
-                      <span class="product-price">₹<%= displayVariant.price.toLocaleString('en-IN') %></span>
-                      <div class="color-swatches">
+                <% const displayVariant=product.displayVariant; %>
 
-                        <% const displayedColors=new Set(); product.variants.forEach((variant)=> {
+                  <!-- Card 1: iPhone 17 Pro Max -->
+                  <a href="/products/details/<%= product._id %>" class="product-card">
+                    <div class="product-image-box">
+                      <!-- <span class="product-badge bestseller">Best Seller</span> -->
+                      <button type="button"
+                        class="wishlist-btn <%= wishlistVariantIds.includes(displayVariant._id.toString()) ? 'active' : '' %>"
+                        aria-label="Add to wishlist" data-variant-id="<%= displayVariant._id %>"
+                        onclick="toggleWishlist(event, this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                          </path>
+                        </svg>
+                      </button>
+                      <img src="<%= displayVariant.imgUrls[0] %>" alt="<%= product.name %>" class="product-image">
+                    </div>
+                    <div class="product-details">
+                      <h3 class="product-title">
+                        <%= product.name %>
+                      </h3>
+                      <div class="product-footer">
+                        <span class="product-price">₹<%= displayVariant.price.toLocaleString('en-IN') %></span>
+                        <div class="color-swatches">
 
-                          const colorName = variant.color.trim().toLowerCase();
+                          <% const displayedColors=new Set(); product.variants.forEach((variant)=> {
 
-                          if (displayedColors.has(colorName)) return;
-                          displayedColors.add(colorName);
+                            const colorName = variant.color.trim().toLowerCase();
 
-                          const colorValue = colorMap[colorName] || '#CBD5E1';
-                          %>
+                            if (displayedColors.has(colorName)) return;
+                            displayedColors.add(colorName);
 
-                          <span class="swatch-dot" style="background-color: <%= colorValue %>;"
-                            title="<%= variant.color %>"></span>
+                            const colorValue = colorMap[colorName] || '#CBD5E1';
+                            %>
 
-                          <% }) %>
+                            <span class="swatch-dot" style="background-color: <%= colorValue %>;"
+                              title="<%= variant.color %>"></span>
 
+                            <% }) %>
+
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </a>
-                <% }) %>
+                  </a>
+                  <% }) %>
           </div>
 
 
@@ -439,7 +445,84 @@
       });
 
     });
+
+    async function toggleWishlist(event, btn) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const variantId = btn.dataset.variantId;
+      if (!variantId) return;
+
+      const toast = document.getElementById('toast');
+
+      try {
+        let action;
+        let response;
+
+        if (!btn.classList.contains('active')) {
+          action = "add";
+          response = await fetch('/wishlist/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ variantId })
+          });
+        }
+        else {
+          action = "remove";
+          response = await fetch('/wishlist/remove', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ variantId })
+          });
+        }
+
+        if (response.redirected) {
+          window.location.href = response.url;
+          return;
+        }
+
+        const data = await response.json();
+
+        if (action === "add") {
+          if (data.success || (data.message && data.message.includes('already in your wishlist'))) {
+            btn.classList.add('active');
+          }
+          else {
+            toast.textContent = data.message;
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 3000);
+          }
+        }
+        else if (action === "remove") {
+          if (data.success) {
+            btn.classList.remove('active');
+          }
+          else {
+            toast.textContent = data.message;
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 3000);
+          }
+        }
+      } catch (err) {
+        console.error("Wishlist error:", err);
+        toast.textContent = "Something went wrong. Please try again.";
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    }
   </script>
+
+  <div id="toast" class="toast"></div>
 
 </body>
 

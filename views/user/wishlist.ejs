@@ -86,7 +86,7 @@
             </svg>
             Add to Cart
           </button>
-          <button type="button" class="btn-remove-item" title="Remove from Wishlist" onclick="removeFromWishlist(this)">
+          <button type="button" class="btn-remove-item" data-variant-id="<%= item.variant._id %>" title="Remove from Wishlist" onclick="removeFromWishlist(this)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -223,6 +223,29 @@
 
   <!-- CLIENT INTERACTION JAVASCRIPT -->
   <script>
+
+    async function removeFromWishlist(btn) {
+      const variantId = btn.dataset.variantId;
+
+      const data = await fetch('/wishlist/remove', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ variantId })
+      });
+
+      const result = await data.json();
+
+      if (result.success) {
+        const card = btn.closest('.wishlist-card');
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          card.remove();
+        }, 200);
+      }
+    }
 
     async function moveToCart(btn) {
       const variantId = btn.dataset.variantId ;

@@ -79,6 +79,7 @@ router.get('/products/details/:productId', userController.getProductDetails);
 router.get('/wishlist', userController.getWishlist);
 router.post('/wishlist/add', userController.addToWishlist);
 router.post('/wishlist/move-to-cart', userController.moveToCart);
+router.delete('/wishlist/remove', userController.removeWishlistItem);
 
 
 router.get('/cart', userController.getCart);

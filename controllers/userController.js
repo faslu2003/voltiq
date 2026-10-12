@@ -659,12 +659,18 @@ exports.getProducts = async (req, res) => {
         const page = Math.max(1, Number(req.query.page) || 1);
         const limit = 6;
 
-        const result = await userService.getProducts(selectedCategoryId, search, sort, maxPrice, selectedBrands, page, limit);
+        const userId = req.session.user.id;
+
+        const result = await userService.getProducts(selectedCategoryId, search, sort, maxPrice, selectedBrands, page, limit, userId);
 
         const expanded = req.query.expanded === 'true';
 
         const error = req.session.error || null;
         req.session.error = null;
+
+        const wishlistVariantIds = result.wishlistVariantIds.map((variantId) => {
+            return variantId.toString();
+        });
 
         return res.render('user/products', {
             categories,
@@ -678,7 +684,8 @@ exports.getProducts = async (req, res) => {
             currentPage: result.currentPage,
             totalPages: result.totalPages,
             expanded,
-            error
+            error,
+            wishlistVariantIds
         });
     }
     catch (err) {
@@ -771,6 +778,26 @@ exports.moveToCart = async (req, res) => {
         else {
             return res.json(firstResult);
         }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong. Please try again."
+        });
+    }
+}
+
+
+exports.removeWishlistItem = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { variantId } = req.body;
+
+        const result = await userService.removeFromWishlist(userId, variantId);
+
+        return res.json(result);
     }
     catch (err) {
         console.log(err);
