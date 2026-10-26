@@ -1,0 +1,316 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      Order Details
+    </title>
+    <link rel="stylesheet" href="/css/user/order-item-details.css">
+  </head>
+
+  <body>
+
+    <!-- ============ TOP NAV ============ -->
+    <header class="topnav">
+      <div class="topnav-inner">
+        <a href="/" class="brand">voltiq</a>
+        <nav class="main-links">
+          <a href="/">Home</a>
+          <a href="/shop">Shop</a>
+          <a href="/support">Support</a>
+        </nav>
+        <div class="search">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <span>Search devices...</span>
+        </div>
+        <div class="topnav-icons">
+          <a href="/profile" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <a href="/wishlist" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
+          </a>
+          <a href="/cart" class="icon-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="19" cy="21" r="1" />
+              <path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-wrap">
+
+      <!-- ============ BREADCRUMB ============ -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/orders">Orders</a>
+        <svg class="icon crumb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+        <a href="/orders/details/<%= order.orderId %>">#<%= order.orderId %></a>
+      </nav>
+
+      <div>
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          <%= order.orderStatus %>
+        </span>
+        <span class="ordered-date">Ordered on <%= order.createdAt.toLocaleDateString('en-IN', { day: 'numeric' ,
+            month: 'short' , year: 'numeric' }) %></span>
+      </div>
+
+      <div class="order-detail-grid">
+
+        <!-- ============ LEFT COLUMN ============ -->
+        <div class="left-col">
+
+          <!-- Item Card -->
+
+          <% order.orderItems.forEach((item)=> { %>
+            <section class="panel item-panel">
+              <div class="item-image-wrap">
+                <img src="<%= item.imgUrl %>" alt="<%= order.itemName %>">
+              </div>
+
+              <div class="item-info">
+                <div class="item-info-head">
+                  <div>
+                    <h1 class="item-name">
+                      <%= item.productName %>
+                    </h1>
+                    <p class="item-variant">
+                      <%= `${item.color} · ${item.storage ? item.storage : '' }` %>
+                    </p>
+                    <p class="item-quantity">
+                      Qty: <%= item.quantity %>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="item-actions">
+                  <% if (order.orderStatus === "Delivered") { %>
+                    <form action="/account/orders/<%= order.orderId %>/return" method="POST">
+                      <button type="submit" class="btn-return">Return Item</button>
+                    </form>
+                    <% } else { %>
+                      <button type="button" class="btn-return" disabled>Return Item</button>
+                      <% } %>
+
+                        <% if (order.orderStatus !== "Delivered") { %>
+                          <form action="/account/orders/<%= order.orderId %>/cancel" method="POST">
+                            <button type="submit" class="btn-cancel-item">Cancel Item</button>
+                          </form>
+                          <% } else { %>
+                            <button type="button" class="btn-cancel-item" disabled>Cancel Item</button>
+                            <% } %>
+                </div>
+              </div>
+            </section>
+            <% }) %>
+
+
+<%
+const stages = [
+    { label: 'Ordered', icon: 'check' },
+    { label: 'Processed', icon: 'package' },
+    { label: 'Shipped', icon: 'truck' },
+    { label: 'Delivered', icon: 'home' }
+];
+
+const statusProgress = {
+    'Processing': 2,
+    'Shipped': 3,
+    'Out for Delivery': 3,
+    'Delivered': 4
+};
+
+const progress = statusProgress[order.orderStatus] ?? 0;
+
+const timeline = stages.map((stage, index) => ({
+    ...stage,
+    complete: index < progress
+}));
+%>
+
+
+
+              <!-- Shipment Progress -->
+              <section class="panel">
+                <h2 class="panel-title">Shipment Progress</h2>
+
+                <div class="timeline">
+
+                    <% timeline.forEach(function(step, i) { %>
+                      <div class="timeline-step <%= step.complete ? 'complete' : '' %>">
+                        <div class="timeline-node">
+                          <% if (step.icon==='check' ) { %>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <% } else if (step.icon==='package' ) { %>
+                              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+                                <path d="M3 8v8l9 5 9-5V8" />
+                                <path d="M12 13v8" />
+                              </svg>
+                              <% } else if (step.icon==='truck' ) { %>
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                                  <rect x="1" y="6" width="14" height="11" rx="1" />
+                                  <path d="M15 10h4l3 3v4h-7z" />
+                                  <circle cx="6" cy="19" r="2" />
+                                  <circle cx="17.5" cy="19" r="2" />
+                                </svg>
+                                <% } else if (step.icon==='home' ) { %>
+                                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 11 12 4l9 7" />
+                                    <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+                                  </svg>
+                                  <% } %>
+                        </div>
+
+                        <span class="timeline-label">
+                          <%= step.label %>
+                        </span>
+                      </div>
+
+                      <% if (i < timeline.length - 1) { %>
+                        <div
+                          class="timeline-connector <%= (step.complete && timeline[i + 1].complete) ? 'complete' : '' %>">
+                        </div>
+                      <% } %>
+                    <% }); %>
+                </div>
+              </section>
+
+
+        </div>
+
+        <!-- ============ RIGHT COLUMN ============ -->
+        <div class="right-col">
+
+          <!-- Item Summary -->
+          <section class="panel summary-panel">
+            <h3 class="summary-eyebrow">ITEM SUMMARY</h3>
+
+            <% order.orderItems.forEach((item)=> { %>
+
+              <div class="summary-row">
+                <span>
+                  <%= `${item.productName} (x${item.quantity})` %>
+                </span>
+                <span class="summary-value">₹<%= (item.orderedPrice * item.quantity).toLocaleString('en-IN') %></span>
+              </div>
+
+              <% }) %>
+
+                <div class="summary-row">
+                  <span>Discount</span>
+                  <span class="summary-value">
+                    - ₹<%= order.discountAmount.toLocaleString('en-IN') %>
+                  </span>
+                </div>
+                <div class="summary-row">
+                  <span>Shipping</span>
+                  <span class="summary-value">
+                    ₹<%= order.shippingCharge.toLocaleString('en-IN') %>
+                  </span>
+                </div>
+                <div class="summary-row">
+                  <span>Other Charges</span>
+                  <span class="summary-value">
+                    ₹<%= order.otherCharges.toLocaleString('en-IN') %>
+                  </span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-row summary-total">
+                  <span>Total</span>
+                  <span class="summary-value">₹<%= order.totalPrice %></span>
+                </div>
+
+          </section>
+
+          <!-- Important Policies -->
+          <section class="policy-panel">
+            <h3 class="policy-title">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              Important Policies
+            </h3>
+
+            <ul class="policy-list">
+              <li>Return Window: This item is eligible for return until <a href="#" class="policy-link">
+                  <%= order.returnDeadline %>
+                </a>. Please ensure all original packaging is intact.</li>
+              <li>Cancellation: Since this item has been delivered, regular cancellation is no longer available. Please
+                use the 'Return' flow for refunds.</li>
+            </ul>
+          </section>
+
+          <!-- Need Help -->
+          <a href="/support" class="help-row">
+            <span class="help-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 5" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </span>
+            <span class="help-text">Need help with this item?</span>
+            <svg class="icon help-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <a href="/" class="footer-brand">voltiq</a>
+        <div class="footer-links">
+          <a href="/support">Support</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/sustainability">Sustainability</a>
+        </div>
+        <span class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision.</span>
+      </div>
+    </footer>
+
+  </body>
+
+  </html>

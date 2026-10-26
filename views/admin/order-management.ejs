@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Order Management · Voltiq Admin Portal' %></title>
+  <link rel="stylesheet" href="/css/admin/orders.css">
+</head>
+
+<body>
+
+  <div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+      <a href="/admin/dashboard" class="brand-wrapper">
+        <svg class="brand-bolt-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+        </svg>
+        <div class="brand-text-block">
+          <span class="brand-title">voltiq</span>
+          <span class="brand-subtitle">ADMIN PORTAL</span>
+        </div>
+      </a>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard (Expandable) -->
+        <div class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            <span>Dashboard</span>
+          </div>
+          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+
+        <!-- Dashboard Sub-nav -->
+        <div class="sub-nav">
+          <a href="/admin/overview" class="sub-nav-item">
+            <span class="nav-icon" style="margin-right: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            Overview
+          </a>
+          <a href="/admin/sales" class="sub-nav-item">
+            <span class="nav-icon" style="margin-right: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <rect x="7" y="12" width="3" height="6"></rect>
+                <rect x="12.5" y="8" width="3" height="10"></rect>
+                <rect x="18" y="5" width="3" height="13"></rect>
+              </svg>
+            </span>
+            Sales Performance
+          </a>
+        </div>
+
+        <!-- Inventory -->
+        <a href="/admin/products" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </span>
+            <span>Inventory</span>
+          </div>
+        </a>
+
+        <!-- Categories -->
+        <a href="/admin/categories" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </span>
+            <span>Categories</span>
+          </div>
+        </a>
+
+        <!-- Orders (ACTIVE) -->
+        <div class="nav-item active">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </span>
+            <span>Orders</span>
+          </div>
+        </div>
+
+        <!-- Orders Sub-nav (Expanded) -->
+        <div class="sub-nav">
+          <a href="/admin/orders" class="sub-nav-item active">
+            <span>Order Management</span>
+          </a>
+          <a href="/admin/returns" class="sub-nav-item">
+            <span class="nav-icon" style="margin-right: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            </span>
+            <span>Return Requests</span>
+          </a>
+        </div>
+
+        <!-- Customers -->
+        <a href="/admin/customers" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            <span>Customers</span>
+          </div>
+        </a>
+
+        <!-- Promotions -->
+        <div class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            <span>Promotions</span>
+          </div>
+          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+
+        <!-- Brand Management -->
+        <a href="/admin/brands" class="nav-item">
+          <div class="nav-item-content">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </span>
+            <span>Brand Management</span>
+          </div>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+
+      <!-- TOP HEADER BAR -->
+      <header class="top-header-bar">
+        <div class="header-search-wrapper">
+          <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="header-search-input" placeholder="Search orders, customers, or SKUs..." aria-label="Search orders">
+        </div>
+
+        <div class="header-right-actions">
+          <button class="header-icon-btn" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge-dot"></span>
+          </button>
+
+          <button class="header-icon-btn" aria-label="Help & Support">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
+
+          <div class="user-profile-pill">
+            <div class="user-avatar-circle">A</div>
+            <svg class="user-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT WRAPPER -->
+      <main class="page-content-wrapper">
+
+        <!-- TITLE & EXPORT HEADER -->
+        <div class="order-management-header">
+          <div class="header-text-group">
+            <h1 class="page-main-heading">Order Management</h1>
+            <p class="page-subheading-text">
+              Manage your customer transactions.
+              <span class="total-orders-highlight">Total Orders: <%= totalOrders.toLocaleString() %></span>
+            </p>
+          </div>
+
+          <a href="#" class="btn-export-orders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export Orders</span>
+          </a>
+        </div>
+
+        <!-- 4 METRIC STAT CARDS -->
+        <div class="metric-cards-grid">
+          <!-- Card 1: New Orders -->
+          <div class="metric-card">
+            <div class="metric-top-row">
+              <div class="metric-icon-box icon-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <!-- <span class="metric-trend-badge trend-positive">↗ 12%</span> -->
+            </div>
+            <span class="metric-label-text">New Orders</span>
+            <span class="metric-value-text"><%= cardData.confirmedOrders.toLocaleString() %></span>
+          </div>
+
+          <!-- Card 2: Processing -->
+          <div class="metric-card">
+            <div class="metric-top-row">
+              <div class="metric-icon-box icon-amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+              </div>
+            </div>
+            <span class="metric-label-text">Processing</span>
+            <span class="metric-value-text"><%= cardData.processingOrders.toLocaleString() %></span>
+          </div>
+
+          <!-- Card 3: Out for Delivery -->
+          <div class="metric-card">
+            <div class="metric-top-row">
+              <div class="metric-icon-box icon-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+              </div>
+            </div>
+            <!-- <span class="metric-label-text">Out for Delivery</span> -->
+             <span class="metric-label-text">Delivered</span>
+            <span class="metric-value-text"><%= cardData.deliveredOrders.toLocaleString() %></span>
+          </div>
+
+          <!-- Card 4: Returns/Refunds -->
+          <div class="metric-card">
+            <div class="metric-top-row">
+              <div class="metric-icon-box icon-rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </div>
+            </div>
+            <span class="metric-label-text">Returns</span>
+            <span class="metric-value-text"><%= cardData.returnedOrders.toLocaleString() %></span>
+          </div>
+        </div>
+
+        <!-- FILTERS & SEARCH ROW -->
+        <div class="table-filters-container">
+          <div class="filters-left-group">
+            <div class="order-search-box">
+              <svg class="order-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" class="order-search-input" placeholder="Search Order ID..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+            </div>
+
+            <select class="status-dropdown-select" aria-label="Filter by order status">
+              <option value="all" <%= typeof status !== 'undefined' && status === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="Processing" <%= typeof status !== 'undefined' && status === 'Processing' ? 'selected' : '' %>>Processing</option>
+              <option value="Shipped" <%= typeof status !== 'undefined' && status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+              <option value="Delivered" <%= typeof status !== 'undefined' && status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+              <option value="Pending" <%= typeof status !== 'undefined' && status === 'Pending' ? 'selected' : '' %>>Pending</option>
+              <option value="Cancelled" <%= typeof status !== 'undefined' && status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+            </select>
+          </div>
+
+          <div class="filters-right-group">
+            <button class="date-range-picker-btn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Date Range: Oct 20 - Oct 27</span>
+            </button>
+
+            <button class="filter-sliders-btn" type="button" aria-label="Advanced Filters">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ORDERS DATA TABLE -->
+        <div class="orders-table-card">
+          <div class="table-responsive-wrapper">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total Amount</th>
+                  <th>Payment Status</th>
+                  <th>Fulfillment</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                  <% orders.forEach(function(order) { %>
+                    <tr>
+                      <td class="order-id-cell">#<%= order.orderId %></td>
+                      <td>
+                        <div class="customer-info-cell">
+                          <span class="customer-name"><%= order.shippingAddress.fullName %></span>
+                          <span class="customer-id">ID: <%= order.user ? (order.user._id ? order.user._id.toString().slice(-6).toUpperCase() : '') : '' %></span>
+                        </div>
+                      </td>
+                      <td class="order-date-cell"><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></td>
+                      <td class="order-amount-cell">₹<%= order.totalPrice.toLocaleString('en-IN') %></td>
+                      <td>
+                        <span class="status-pill-text <%= order.payment && order.payment.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending' %>">
+                          <%= order.payment.paymentStatus %>
+                        </span>
+                      </td>
+                      <td>
+                        <span class="fulfillment-pill fulfillment-<%= (order.orderStatus || 'processing').toLowerCase() %>">
+                          <%= order.orderStatus %>
+                        </span>
+                      </td>
+                      <td class="action-cell">
+                        <a href="/admin/orders/<%= order.orderId %>" class="btn-view-order" aria-label="View Order Details">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TABLE FOOTER / PAGINATION -->
+          <div class="table-pagination-footer">
+            <span class="pagination-info-text">
+              Showing <%= typeof pagination !== 'undefined' ? `${pagination.from}-${pagination.to} of ${pagination.total.toLocaleString()}` : '1-10 of 42,650' %> orders
+            </span>
+
+            <div class="pagination-controls-row">
+              <button class="pagination-btn disabled" disabled aria-label="Previous page">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <span class="pagination-ellipsis">...</span>
+              <button class="pagination-btn">428</button>
+
+              <button class="pagination-btn" aria-label="Next page">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>

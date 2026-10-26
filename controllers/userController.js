@@ -3,6 +3,8 @@ const Address = require('../src/models/Address');
 const Category = require('../src/models/Category');
 const Product = require('../src/models/Product');
 const Brand = require('../src/models/Brand');
+const Order = require('../src/models/Order');
+const Cart = require('../src/models/Cart');
 
 const authService = require('../services/authService');
 const userService = require('../services/userService');
@@ -547,7 +549,9 @@ exports.getAddAddress = async (req, res) => {
     const data = req.session.data || {};
     req.session.data = null;
 
-    res.render('user/add-address', { error, user, data });
+    const redirect = req.query.redirect || '';
+
+    res.render('user/add-address', { error, user, data, redirect });
 }
 
 exports.postAddAddress = async (req, res) => {
@@ -558,17 +562,24 @@ exports.postAddAddress = async (req, res) => {
         if (!result.success) {
             req.session.error = result.message;
             req.session.data = req.body;
-            return res.redirect('/address/add');
+            const redirect = req.body.redirect === "checkout" ? '?redirect=checkout' : '';
+            return res.redirect(`/address/add${redirect}`);
         }
 
         if (result.success) {
-            return res.redirect('/address');
+            if (req.body.redirect === "checkout") {
+                return res.redirect('/checkout');
+            }
+            else {
+                return res.redirect('/address');
+            }
         }
     }
     catch (err) {
         console.error(err);
         req.session.error = "Something went wrong. Please try again";
-        return res.redirect('/address/add');
+        const redirect = req.body.redirect === "checkout" ? '?redirect=checkout' : '';
+        return res.redirect(`/address/add${redirect}`);
     }
 }
 
@@ -583,7 +594,9 @@ exports.getEditAddress = async (req, res) => {
     const data = req.session.data || {};
     req.session.data = null;
 
-    res.render('user/edit-address', { address, error, data });
+    const redirect = req.query.redirect || '';
+
+    res.render('user/edit-address', { address, error, data, redirect });
 }
 
 exports.patchEditAddress = async (req, res) => {
@@ -595,17 +608,24 @@ exports.patchEditAddress = async (req, res) => {
         if (!result.success) {
             req.session.error = result.message;
             req.session.data = req.body;
-            return res.redirect(`/address/edit/${req.params.id}`);
+            const redirect = req.body.redirect === "checkout" ? '?redirect=checkout' : '';
+            return res.redirect(`/address/edit/${req.params.id}${redirect}`);
         }
 
         if (result.success) {
-            return res.redirect('/address');
+            if (req.body.redirect === "checkout") {
+                return res.redirect('/checkout');
+            }
+            else {
+                return res.redirect('/address');
+            }
         }
     }
     catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again";
-        res.redirect(`/address/edit/${req.params.id}`);
+        const redirect = req.body.redirect === "checkout" ? '?redirect=checkout' : '';
+        res.redirect(`/address/edit/${req.params.id}${redirect}`);
     }
 }
 
@@ -707,10 +727,14 @@ exports.getProductDetails = async (req, res) => {
         }
 
         const product = result.product;
+        const ecosystemProducts = result.ecosystemProducts;
 
-        return res.render('user/product-details', { product });
+        const categoryId = result.categoryId;
+        const categoryName = result.categoryName;
+
+        return res.render('user/product-details', { product, ecosystemProducts, categoryId, categoryName });
     }
-    catch (err){
+    catch (err) {
         console.log(err);
         req.session.error = "Something went wrong. Please try again."
         return res.redirect('/products');
@@ -820,13 +844,7 @@ exports.getCart = async (req, res) => {
 
         const cartItems = result.cartItems;
 
-        let cartLength = 0;
-
-        cartItems.forEach((item) => {
-            cartLength += item.quantity;
-        });
-
-        return res.render('user/cart', { cartItems, cartLength, error });
+        return res.render('user/cart', { cartItems, error });
     }
     catch (err) {
         console.log(err);
@@ -846,7 +864,7 @@ exports.addToCart = async (req, res) => {
 
         return res.json(result);
     }
-    catch (err) {}
+    catch (err) { }
 }
 
 
@@ -860,7 +878,7 @@ exports.updateCart = async (req, res) => {
 
         return res.json(result);
     }
-    catch (err) {}
+    catch (err) { }
 }
 
 
@@ -874,7 +892,297 @@ exports.removeCartItem = async (req, res) => {
 
         return res.json(result);
     }
-    catch (err) {}
+    catch (err) { }
+}
+
+
+
+exports.getCheckout = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+
+        const result = await userService.getCheckout(userId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/cart');
+        }
+
+        const addresses = result.addresses;
+        const cartItems = result.cartItems;
+
+        const coupons = result.coupons;
+        const offers = result.offers;
+
+        let discountAmount = null;
+        let couponCode = null;
+
+        let appliedCouponId = req.session.appliedCouponId;
+
+        if (appliedCouponId) {
+            const validationResult = await userService.validateCoupon(appliedCouponId);
+
+            if (!validationResult.success) {
+                req.session.appliedCouponId = null;
+                appliedCouponId = null;
+            }
+            else {
+                const coupon = validationResult.coupon;
+
+                const result = await userService.applyCoupon(coupon, userId);
+
+                if (!result.success) {
+                    req.session.appliedCouponId = null;
+                    appliedCouponId = null;
+                }
+                else {
+                    discountAmount = result.discountAmount;
+                    couponCode = result.couponCode;
+                }
+            }
+        }
+
+        res.render('user/checkout', { addresses, cartItems, coupons, offers, appliedCouponId, couponCode, discountAmount });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/cart');
+    }
+}
+
+
+exports.applyCoupon = async (req, res) => {
+
+    try {
+        const { couponId } = req.body;
+
+        const validationResult = await userService.validateCoupon(couponId);
+
+        if (!validationResult.success) {
+            return res.json(validationResult);
+        }
+
+        const coupon = validationResult.coupon;
+
+        const userId = req.session.user.id;
+
+        const result = await userService.applyCoupon(coupon, userId);
+
+        if (!result.success) {
+            return res.json(result);
+        }
+
+        req.session.appliedCouponId = couponId;
+        return res.json(result);
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong. Please try again."
+        });
+    }
+}
+
+
+exports.removeCoupon = async (req, res) => {
+
+    try {
+        req.session.appliedCouponId = null;
+
+        return res.json({
+            success: true
+        });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong. Please try again."
+        });
+    }
+}
+
+
+exports.postCheckout = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+
+        const { addressId, shippingMethod, paymentMethod } = req.body;
+
+        const addressResult = await userService.validateAddress(addressId, userId);
+
+        const shippingAddress = addressResult.address;
+
+        if (!addressResult.success) {
+            req.session.error = addressResult.message;
+            return res.redirect('/checkout');
+        }
+
+        const cartResult = await userService.validateCartItems(userId);
+
+        if (!cartResult.success) {
+            req.session.error = cartResult.message;
+            return res.redirect('/checkout');
+        }
+
+        const { orderItems, subtotal } = cartResult;
+
+        const shippingCharge = shippingMethod === "express" ? 200 : 0;
+
+        let otherCharges;
+
+        otherCharges = paymentMethod === "COD" ? 50 : 0;
+
+        let discountAmount = 0;
+        const couponId = req.session.appliedCouponId;
+
+        if (couponId) {
+            const couponResult = await userService.validateCoupon(couponId);
+
+            if (!couponResult.success) {
+                req.session.appliedCouponId = null;
+                req.session.error = couponResult.message;
+                return res.redirect('/checkout');
+            }
+
+            const coupon = couponResult.coupon;
+
+            let discountResult = await userService.applyCoupon(coupon, userId);
+
+            if (!discountResult.success) {
+                req.session.error = discountResult.message;
+                return res.redirect('/checkout');
+            }
+
+            discountAmount = discountResult.discountAmount;
+        }
+
+        const totalPrice = subtotal - discountAmount + shippingCharge + otherCharges;
+
+        if (paymentMethod !== "COD") {
+            req.session.error = "Online payment is not currently available.";
+            return res.redirect('/checkout');
+        }
+
+        const order = await Order.create({
+            orderId: userService.generateOrderId(),
+            userId,
+            orderItems,
+            subtotal,
+            shippingCharge,
+            otherCharges,
+            discountAmount,
+            totalPrice,
+            shippingAddress,
+            payment: {
+                paymentMethod: "COD",
+                paymentStatus: "Pending"
+            }
+        });
+
+        await Cart.deleteOne({ userId });
+
+        req.session.appliedCouponId = null;
+
+        return res.status(201).json({
+            success: true,
+            redirectUrl: `order-success/${order.orderId}`
+        });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "Unable to place your order."
+        });
+    }
+}
+
+
+exports.getOrderSuccess = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({ orderId, userId });
+
+        if (!order) {
+            return res.redirect('/orders');
+        }
+
+        return res.render('user/order-success', { order });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Something went wrong.");
+    }
+}
+
+
+
+exports.getOrders = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+
+        const currentPage = Math.max(1, parseInt(req.query.page, 10) || 1);
+
+        const limit = 5;
+
+        const totalOrders = await userService.totalOrders(userId);
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        const page = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+
+        const skip = (page - 1) * limit;
+
+        const orders = await userService.getOrders(userId, skip, limit);
+
+        return res.render('user/order-history', {
+            orders,
+            pagination: {
+                currentPage: page,
+                totalPages
+            }
+        });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong."
+        return;
+    }
+}
+
+
+exports.getOrderDetails = async (req, res) => {
+
+    try {
+        const userId = req.session.user.id;
+
+        const { orderId } = req.params;
+
+        const result = await userService.getOrder(orderId, userId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/orders');
+        }
+
+        const order = result.order;
+
+        return res.render('user/order-item-details', { order });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/orders');
+    }
 }
 
 
@@ -889,3 +1197,9 @@ exports.logout = (req, res) => {
         res.redirect('/signin');
     })
 }
+
+
+
+
+
+

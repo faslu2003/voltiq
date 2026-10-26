@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order History · Voltiq</title>
+  <link rel="stylesheet" href="/css/user/order-history.css">
+</head>
+
+<body>
+
+  <!-- ============ TOP NAV ============ -->
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="/" class="brand">voltiq</a>
+      <nav class="main-links">
+        <a href="/">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/support">Support</a>
+      </nav>
+      <div class="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <span>Search premium electronics...</span>
+      </div>
+      <div class="topnav-icons">
+        <a href="/account" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </a>
+        <a href="/wishlist" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+          </svg>
+        </a>
+        <a href="/cart" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="19" cy="21" r="1" />
+            <path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <nav class="account-nav">
+        <a href="/account" class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Account Overview
+        </a>
+        <a href="/profile" class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          Personal Info
+        </a>
+        <a href="/account/orders" class="account-nav-item active">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 3" />
+          </svg>
+          Order History
+        </a>
+        <a href="/address" class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          Saved Addresses
+        </a>
+        <a href="/account/wallet" class="account-nav-item">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+            <path d="M17 15h.01" />
+          </svg>
+          Wallet
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main">
+
+      <h1 class="page-title">Order History</h1>
+      <p class="page-sub">Manage your recent orders and track their delivery status.</p>
+
+      <!-- ============ ORDER SEARCH ============ -->
+      <form class="order-search" id="orderSearchForm" method="GET" role="search" autocomplete="off">
+        <div class="order-search-field">
+          <svg class="icon order-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="text"
+            id="orderSearchInput"
+            name="q"
+            class="order-search-input"
+            placeholder="Search by order ID, product name..."
+            value="<%= locals.q || '' %>"
+            aria-label="Search your orders">
+          <button type="button" class="order-search-clear hidden" id="orderSearchClear" aria-label="Clear search">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <button type="submit" class="btn-order-search">Search</button>
+      </form>
+      <%
+        // "Out for Delivery" -> "out-for-delivery" (used for CSS classes and filter matching)
+        const toSlug = function (value) {
+          return String(value || '').toLowerCase().trim().replace(/[\s_]+/g, '-');
+        };
+        // Must mirror the orderStatus enum in src/models/Order.js
+        const statusFilters = ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'];
+      %>
+
+      <!-- ============ ORDER FILTERS ============ -->
+      <div class="order-filters">
+        <div class="filter-chips" role="group" aria-label="Filter orders by status">
+          <button type="button" class="filter-chip active" data-status="all" aria-pressed="true">All</button>
+          <% statusFilters.forEach(function(status){ %>
+            <button type="button" class="filter-chip" data-status="<%= toSlug(status) %>" aria-pressed="false"><%= status %></button>
+          <% }); %>
+        </div>
+
+        <div class="filter-period">
+          <svg class="icon filter-period-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <select id="orderPeriodFilter" name="period" aria-label="Filter orders by time period">
+            <option value="all">All time</option>
+            <option value="30d">Last 30 days</option>
+            <option value="3m">Last 3 months</option>
+            <option value="6m">Last 6 months</option>
+            <option value="year">This year</option>
+          </select>
+          <svg class="icon filter-period-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="order-search-meta hidden" id="orderSearchMeta" aria-live="polite">
+        <span id="orderSearchMetaText"></span>
+        <button type="button" class="link-clear" id="orderFiltersReset">Clear all</button>
+      </div>
+
+      <div class="orders-grid" id="ordersGrid">
+        <% orders.forEach(function(order){
+          const statusSlug = toSlug(order.orderStatus);
+          const searchText = [
+            order.orderId,
+            order.orderStatus,
+            order.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            ...order.orderItems.map(function(item){ return item.productName; })
+          ].join(' ').toLowerCase();
+        %>
+          <div class="order-card" data-search="<%= searchText %>" data-status="<%= statusSlug %>" data-date="<%= order.createdAt.toISOString() %>">
+            <img class="order-card-thumb" src="<%= order.orderItems[0].imgUrl %>" alt="<%= order.orderItems[0].productName %>">
+
+            <div class="order-card-body">
+              <div class="order-card-meta">
+                <span class="status-pill <%= statusSlug %>">
+                  <% if (statusSlug === 'delivered') { %>
+                    <svg class="icon status-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="m9 12 2 2 4-4" />
+                    </svg>
+                  <% } %>
+                  <%= order.orderStatus %>
+                </span>
+                <span class="order-card-id">ID: #<%= order.orderId %></span>
+              </div>
+
+              <h2 class="order-card-name"><%= order.orderItems[0].productName %></h2>
+              <span>
+                <% if (order.orderItems.length > 1) { %>
+                  + <%= `${order.orderItems.length - 1} more item(s)` %>
+                <% } %>
+              </span>
+              <p class="order-card-date">Ordered on <%= order.createdAt.toLocaleDateString('en-IN', { day: 'numeric' , month: 'short' , year: 'numeric' }) %></p>
+            </div>
+
+            <div class="order-card-actions">
+              <span class="order-card-price">₹<%= order.totalPrice %></span>
+              <a href="/orders/details/<%= order.orderId %>" class="btn-view-details">View Details</a>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+      <!-- ============ NO SEARCH RESULTS ============ -->
+      <div class="orders-empty hidden" id="ordersNoMatch">
+        <div class="orders-empty-icon">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </div>
+        <h3>No matching orders</h3>
+        <p id="ordersNoMatchText"></p>
+        <button type="button" class="btn-view-details" id="ordersNoMatchReset">Clear search &amp; filters</button>
+      </div>
+
+      <!-- ============ PAGINATION ============ -->
+      <%
+        // Placeholder: 5 pages on page 1. Real values passed from the controller as `pagination` take priority.
+        const pagination = Object.assign({ currentPage: 1, totalPages: 5 }, locals.pagination || {});
+      %>
+      <% if (pagination.totalPages > 1) { %>
+        <div class="pagination">
+          <a href="?page=<%= Math.max(1, pagination.currentPage - 1) %>" class="page-btn page-arrow" aria-label="Previous page">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </a>
+          <% for (let p = 1; p <= pagination.totalPages; p++) { %>
+            <a href="?page=<%= p %>" class="page-btn <%= p === pagination.currentPage ? 'active' : '' %>"><%= p %></a>
+          <% } %>
+          <a href="?page=<%= Math.min(pagination.totalPages, pagination.currentPage + 1) %>" class="page-btn page-arrow" aria-label="Next page">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </a>
+        </div>
+      <% } %>
+
+    </main>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">voltiq</div>
+        <p class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision in electronics.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/privacy">privacy</a>
+        <a href="/terms">terms</a>
+        <a href="/shipping">shipping</a>
+        <a href="/returns">returns</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ---- In-page order search + filters: narrows the order cards already rendered on this page ----
+    (function () {
+      var form = document.getElementById('orderSearchForm');
+      var input = document.getElementById('orderSearchInput');
+      var clearBtn = document.getElementById('orderSearchClear');
+      var chips = Array.prototype.slice.call(document.querySelectorAll('.filter-chip'));
+      var periodSelect = document.getElementById('orderPeriodFilter');
+      var meta = document.getElementById('orderSearchMeta');
+      var metaText = document.getElementById('orderSearchMetaText');
+      var resetAllBtn = document.getElementById('orderFiltersReset');
+      var noMatch = document.getElementById('ordersNoMatch');
+      var noMatchText = document.getElementById('ordersNoMatchText');
+      var noMatchReset = document.getElementById('ordersNoMatchReset');
+      var cards = Array.prototype.slice.call(document.querySelectorAll('#ordersGrid .order-card'));
+      var activeStatus = 'all';
+
+      // Lowercase, drop "#", and treat "-" / "_" as spaces so "in transit" matches "in-transit"
+      function normalize(str) {
+        return (str || '').toLowerCase().replace(/#/g, '').replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
+      // Earliest order date allowed by the selected time period (null = no limit)
+      function periodStart(period) {
+        var d = new Date();
+        if (period === '30d') { d.setDate(d.getDate() - 30); return d; }
+        if (period === '3m') { d.setMonth(d.getMonth() - 3); return d; }
+        if (period === '6m') { d.setMonth(d.getMonth() - 6); return d; }
+        if (period === 'year') { return new Date(d.getFullYear(), 0, 1); }
+        return null;
+      }
+
+      function applyFilters() {
+        var raw = input.value;
+        var query = normalize(raw);
+        var terms = query ? query.split(' ') : [];
+        var since = periodStart(periodSelect.value);
+        var visible = 0;
+
+        cards.forEach(function (card) {
+          var haystack = normalize(card.getAttribute('data-search'));
+          // Every word typed must appear somewhere in the order's searchable text
+          var matchesText = terms.every(function (term) { return haystack.indexOf(term) !== -1; });
+          var matchesStatus = activeStatus === 'all' || card.getAttribute('data-status') === activeStatus;
+          var matchesPeriod = true;
+          if (since) {
+            var ordered = new Date(card.getAttribute('data-date'));
+            matchesPeriod = isNaN(ordered.getTime()) || ordered >= since;
+          }
+
+          var isMatch = matchesText && matchesStatus && matchesPeriod;
+          card.classList.toggle('hidden', !isMatch);
+          if (isMatch) visible++;
+        });
+
+        var hasSearch = terms.length > 0;
+        var hasFilters = activeStatus !== 'all' || periodSelect.value !== 'all';
+        var isNarrowed = (hasSearch || hasFilters) && cards.length > 0;
+
+        clearBtn.classList.toggle('hidden', !raw);
+        meta.classList.toggle('hidden', !isNarrowed);
+        if (isNarrowed) {
+          metaText.textContent = 'Showing ' + visible + ' of ' + cards.length + ' orders on this page';
+        }
+
+        var showEmpty = isNarrowed && visible === 0;
+        noMatch.classList.toggle('hidden', !showEmpty);
+        if (showEmpty) {
+          noMatchText.textContent = hasSearch
+            ? 'No orders on this page match "' + raw.trim() + '"' + (hasFilters ? ' with the selected filters' : '') + '. Try a different search or adjust your filters.'
+            : 'No orders on this page match the selected filters. Try a different status or time period.';
+        }
+      }
+
+      function setStatus(status) {
+        activeStatus = status;
+        chips.forEach(function (chip) {
+          var isActive = chip.getAttribute('data-status') === status;
+          chip.classList.toggle('active', isActive);
+          chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+      }
+
+      // Clears only the search text
+      function resetSearch() {
+        input.value = '';
+        applyFilters();
+        input.focus();
+      }
+
+      // Clears search text, status chip and time period
+      function resetAll() {
+        input.value = '';
+        periodSelect.value = 'all';
+        setStatus('all');
+        applyFilters();
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          setStatus(chip.getAttribute('data-status'));
+          applyFilters();
+        });
+      });
+      periodSelect.addEventListener('change', applyFilters);
+      input.addEventListener('input', applyFilters);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') resetSearch();
+      });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        applyFilters();
+      });
+      clearBtn.addEventListener('click', resetSearch);
+      resetAllBtn.addEventListener('click', resetAll);
+      noMatchReset.addEventListener('click', resetAll);
+
+      applyFilters();
+    })();
+  </script>
+
+</body>
+
+</html>

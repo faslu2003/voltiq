@@ -35,6 +35,12 @@ router.patch('/products/edit', upload.any(), adminController.editProduct);
 router.get('/brands', adminController.getBrands);
 
 
+router.get('/orders', adminController.getOrders);
+router.get('/orders/details/:orderId', adminController.getOrderDetails);
+
+router.get('/returns', adminController.getReturns);
+
+
 router.post('/logout', adminController.logout);
 
 

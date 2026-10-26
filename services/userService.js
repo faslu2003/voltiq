@@ -3,11 +3,19 @@ const Address = require('../src/models/Address');
 const Product = require('../src/models/Product');
 const Cart = require('../src/models/Cart');
 const Wishlist = require('../src/models/Wishlist');
+const Category = require('../src/models/Category');
+const Offer = require('../src/models/Offer');
+const Coupon = require('../src/models/Coupon');
+const CouponUsage = require('../src/models/CouponUsage');
+const Order = require('../src/models/Order');
 
 const addressService = require('./addressService');
 
 const bcrypt = require('bcrypt');
 const mailer = require('../utils/mailer');
+
+const crypto = require('crypto');
+const { userInfo } = require('os');
 
 
 
@@ -608,10 +616,23 @@ exports.getProductDetails = async (productId) => {
         }
     }
 
+    const brandId = product.brandId;
+
+    const categoryId = product.categoryId;
+    const category = await Category.findOne({ _id: categoryId });
+
+    let categoryName = '';
+    if (category) categoryName = category.categoryName;
+
+    const ecosystemProducts = await Product.find({ brandId, _id: { $ne: productId } });
+
     return {
         success: true,
-        product
-    }
+        product,
+        ecosystemProducts,
+        categoryId,
+        categoryName
+    };
 }
 
 
@@ -960,5 +981,286 @@ exports.removeCartItem = async (userId, variantId) => {
     return {
         success: true,
         message: "Item removed from cart successfully."
+    };
+}
+
+
+
+exports.getCheckout = async (userId) => {
+
+    const addresses = await Address.find({ userId }).sort({ isDefault: -1 });
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "There are no items in your cart."
+        }
+    }
+
+    const items = cart.items;
+
+    let validCartItems = [];
+
+    for (let item of items) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        if (product.isActive && variant.stock >= item.quantity) {
+            validCartItems.push(item);
+        }
+    }
+
+    if (validCartItems.length === 0) {
+        return {
+            success: false,
+            message: "The item(s) in your cart is currently unavailable."
+        }
+    }
+
+    const cartItems = [];
+
+    for (let item of validCartItems) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        cartItems.push({
+            product,
+            variant,
+            quantity: item.quantity
+        });
+    }
+
+    const coupons = await Coupon.find({ isActive: true });
+    const offers = await Offer.find({ isActive: true });
+
+    return {
+        success: true,
+        addresses,
+        cartItems,
+        coupons,
+        offers
+    };
+}
+
+
+exports.validateCoupon = async (couponId) => {
+
+    const coupon = await Coupon.findById(couponId);
+
+    if (!coupon) {
+        return {
+            success: false,
+            message: "The coupon is invalid or has expired."
+        }
+    }
+
+    if (!coupon.isActive) {
+        return {
+            success: false,
+            message: "The coupon is invalid or has expired."
+        }
+    }
+
+    const currentDate = Date.now();
+
+    if (coupon.expiryDate) {
+        if (currentDate >= coupon.expiryDate.getTime()) {
+            return {
+                success: false,
+                message: "The coupon has expired."
+            }
+        }
+    }
+
+    return {
+        success: true,
+        coupon
+    }
+}
+
+
+exports.applyCoupon = async (coupon, userId) => {
+
+    const couponCode = coupon.couponCode;
+
+    let discountAmount = 0;
+
+    let subtotal = 0;
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "Cart not found."
+        }
+    }
+
+    const cartItems = cart.items;
+
+    for (let item of cartItems) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        subtotal += item.quantity * variant.price;
+    }
+
+    if (subtotal < coupon.minimumPurchase) {
+        let remainingPurchase = coupon.minimumPurchase - subtotal;
+        return {
+            success: false,
+            message: `Purchase for ₹${remainingPurchase.toLocaleString('en-IN')} more to avail the coupon.`
+        }
+    }
+
+    if (coupon.discountType === "percentage") {
+        discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+
+        if (coupon.maximumDiscount && discountAmount > coupon.maximumDiscount) discountAmount = coupon.maximumDiscount;
+    }
+    else {
+        discountAmount = coupon.discountValue;
+    }
+
+
+    return {
+        success: true,
+        couponCode,
+        discountAmount
+    };
+}
+
+
+exports.generateOrderId = () => {
+
+    return`VTQ-${crypto.randomUUID()
+        .replace(/-/g, '')
+        .slice(0, 12)
+        .toUpperCase()}`;
+}
+
+
+exports.validateAddress = async (addressId, userId) => {
+
+    const address = await Address.findOne({ _id: addressId, userId });
+
+    if (!address) {
+        return {
+            success: false,
+            message: "Please select a valid address."
+        }
+    }
+
+    return {
+        success: true,
+        address
+    }
+}
+
+
+exports.validateCartItems = async (userId) => {
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "There are no items in your cart."
+        }
+    }
+
+    let orderItems = [];
+    let subtotal = 0;
+
+    for (let item of cart.items) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        if (!product.isActive || variant.stock < item.quantity) {
+            continue;
+        }
+
+        orderItems.push({
+            productId: product._id,
+            variantId: variant._id,
+            productName: product.name,
+            color: variant.color,
+            storage: variant.storage,
+            quantity: item.quantity,
+            imgUrl: variant.imgUrls[0],
+            orderedPrice: variant.price
+        });
+
+        subtotal += variant.price * item.quantity;
+    }
+
+    if (orderItems.length === 0) {
+        return {
+            success: false,
+            message: "The items in your cart are currently unavailable."
+        }
+    }
+
+    return {
+        success: true,
+        orderItems,
+        subtotal
+    };
+}
+
+
+exports.totalOrders = async (userId) => {
+
+    return await Order.countDocuments({ userId });
+}
+
+
+exports.getOrders = async (userId, skip, limit) => {
+
+    return await Order.find({ userId }).skip(skip).limit(limit);
+}
+
+
+exports.getOrder = async (orderId, userId) => {
+
+    const order = await Order.findOne({ orderId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    return {
+        success: true,
+        order
     };
 }

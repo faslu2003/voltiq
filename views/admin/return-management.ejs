@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Return Management · Voltiq Admin' %></title>
+  <link rel="stylesheet" href="/css/admin/returns.css">
+</head>
+
+<body>
+
+  <div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-top-section">
+        <a href="/admin/dashboard" class="brand-wrapper">
+          <svg class="brand-bolt-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+          </svg>
+          <div class="brand-text-block">
+            <span class="brand-title">voltiq</span>
+            <span class="brand-subtitle">Management Suite</span>
+          </div>
+        </a>
+
+        <nav class="sidebar-nav">
+          <!-- Dashboard -->
+          <a href="/admin/dashboard" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- Inventory -->
+          <a href="/admin/products" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+            </span>
+            <span>Inventory</span>
+          </a>
+
+          <!-- Categories -->
+          <a href="/admin/categories" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </span>
+            <span>Categories</span>
+          </a>
+
+          <!-- Brands -->
+          <a href="/admin/brands" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </span>
+            <span>Brands</span>
+          </a>
+
+          <!-- Orders (Active Menu) -->
+          <div class="nav-item active">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </span>
+            <span>Orders</span>
+          </div>
+
+          <!-- Orders Sub-nav (Return Requests Active) -->
+          <div class="sub-nav">
+            <a href="/admin/orders" class="sub-nav-item">
+              <span>Order Management</span>
+            </a>
+            <a href="/admin/returns" class="sub-nav-item active">
+              <span>Return Requests</span>
+            </a>
+          </div>
+
+          <!-- Promotions -->
+          <a href="/admin/promotions" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </span>
+            <span>Promotions</span>
+          </a>
+
+          <!-- Customers -->
+          <a href="/admin/customers" class="nav-item">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </span>
+            <span>Customers</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Sidebar Bottom Profile / Support -->
+      <div class="sidebar-bottom-section">
+        <a href="/admin/support" class="sidebar-help-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Support</span>
+        </a>
+
+        <div class="admin-profile-card">
+          <div class="profile-left-info">
+            <div class="profile-avatar-badge">VA</div>
+            <div class="profile-text-names">
+              <span class="admin-name">Admin User</span>
+              <span class="signout-label">Sign out</span>
+            </div>
+          </div>
+
+          <form action="/admin/logout" method="POST" style="margin: 0;">
+            <button type="submit" class="signout-icon-btn" aria-label="Sign out">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="admin-main">
+
+      <!-- TOP HEADER BAR -->
+      <header class="top-header-bar">
+        <div class="header-search-wrapper">
+          <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="header-search-input" placeholder="Search return ID, order ID, or customer..." aria-label="Search returns">
+        </div>
+
+        <div class="header-right-actions">
+          <button class="header-icon-btn" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="header-badge-dot"></span>
+          </button>
+
+          <div class="user-avatar-pill">A</div>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT WRAPPER -->
+      <main class="page-content-wrapper">
+
+        <!-- TITLE BAR & ACTIONS -->
+        <div class="returns-header-row">
+          <div class="header-headings-group">
+            <h1 class="page-title">Return Management</h1>
+            <p class="page-subtitle">
+              Review, approve, or reject customer return requests.
+              <span class="highlight-count">Total Requests: <%= typeof totalReturns !== 'undefined' ? totalReturns.toLocaleString() : '148' %></span>
+            </p>
+          </div>
+
+          <a href="#" class="btn-export-returns">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export Returns</span>
+          </a>
+        </div>
+
+        <!-- 4 STAT METRIC CARDS -->
+        <div class="stat-cards-grid">
+          <!-- Card 1: Total Requests -->
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon-wrapper icon-box-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </div>
+            </div>
+            <span class="stat-card-label">Total Return Requests</span>
+            <span class="stat-card-value"><%= typeof stats !== 'undefined' && stats.total ? stats.total.toLocaleString() : '148' %></span>
+          </div>
+
+          <!-- Card 2: Pending Approval -->
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon-wrapper icon-box-amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <span class="stat-badge-pill">Action Required</span>
+            </div>
+            <span class="stat-card-label">Pending Approval</span>
+            <span class="stat-card-value"><%= typeof stats !== 'undefined' && stats.pending ? stats.pending.toLocaleString() : '24' %></span>
+          </div>
+
+          <!-- Card 3: In Progress / Picked Up -->
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon-wrapper icon-box-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+              </div>
+            </div>
+            <span class="stat-card-label">In Progress / Picked Up</span>
+            <span class="stat-card-value"><%= typeof stats !== 'undefined' && stats.inProgress ? stats.inProgress.toLocaleString() : '86' %></span>
+          </div>
+
+          <!-- Card 4: Refunded & Closed -->
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div class="stat-icon-wrapper icon-box-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+            </div>
+            <span class="stat-card-label">Refunded & Closed</span>
+            <span class="stat-card-value"><%= typeof stats !== 'undefined' && stats.refunded ? stats.refunded.toLocaleString() : '38' %></span>
+          </div>
+        </div>
+
+        <!-- SEARCH & FILTERS ROW -->
+        <div class="filters-toolbar-row">
+          <div class="filters-left-group">
+            <div class="table-search-box">
+              <svg class="table-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" class="table-search-input" placeholder="Search Return ID, Order ID..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+            </div>
+
+            <select class="filter-select" aria-label="Filter by return status">
+              <option value="all" <%= typeof status !== 'undefined' && status === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="Pending" <%= typeof status !== 'undefined' && status === 'Pending' ? 'selected' : '' %>>Pending Approval</option>
+              <option value="Approved" <%= typeof status !== 'undefined' && status === 'Approved' ? 'selected' : '' %>>Approved</option>
+              <option value="Transit" <%= typeof status !== 'undefined' && status === 'Transit' ? 'selected' : '' %>>In Transit</option>
+              <option value="Rejected" <%= typeof status !== 'undefined' && status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+              <option value="Refunded" <%= typeof status !== 'undefined' && status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+            </select>
+
+            <select class="filter-select" aria-label="Filter by return reason">
+              <option value="all">All Reasons</option>
+              <option value="defective">Defective product</option>
+              <option value="wrong">Wrong item received</option>
+              <option value="performance">Performance issue</option>
+              <option value="mind">Customer changed mind</option>
+            </select>
+          </div>
+
+          <div class="filters-right-group">
+            <button class="date-range-badge-btn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Date Range: Oct 18 - Oct 25</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RETURNS DATA TABLE -->
+        <div class="returns-table-card">
+          <div class="table-responsive-container">
+            <table class="returns-data-table">
+              <thead>
+                <tr>
+                  <th>Return ID</th>
+                  <th>Customer</th>
+                  <th>Product Returned</th>
+                  <th>Reason</th>
+                  <th>Refund Amount</th>
+                  <th>Requested Date</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (typeof returns !== 'undefined' && returns.length > 0) { %>
+                  <% returns.forEach(function(ret) { %>
+                    <tr>
+                      <td>
+                        <div class="return-id-cell">
+                          <span class="return-id-code">#<%= ret.returnId %></span>
+                          <a href="/admin/orders/<%= ret.orderId %>" class="related-order-link">Order #<%= ret.orderId %></a>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="customer-cell-block">
+                          <span class="customer-full-name"><%= ret.customerName || (ret.user ? ret.user.name : 'Customer') %></span>
+                          <span class="customer-member-id">ID: <%= ret.customerId || (ret.user && ret.user._id ? ret.user._id.toString().slice(-6) : '') %></span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="product-item-cell">
+                          <div class="product-cell-thumb">
+                            <img src="<%= ret.productImage || '/images/admin/return-item-iphone.png' %>" alt="<%= ret.productName %>">
+                          </div>
+                          <div class="product-cell-meta">
+                            <span class="product-name-txt"><%= ret.productName %></span>
+                            <span class="product-specs-txt"><%= ret.productSpecs || '' %></span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="reason-cell-block">
+                          <span class="reason-tag"><%= ret.reasonTag || 'Defective' %></span>
+                          <span class="reason-snippet" title="<%= ret.reasonText %>"><%= ret.reasonText %></span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="refund-amount-cell">
+                          <span class="refund-val-bold">₹<%= (ret.refundAmount || 0).toLocaleString('en-IN') %></span>
+                          <span class="refund-method-sub"><%= ret.payoutMethod || 'UPI' %></span>
+                        </div>
+                      </td>
+                      <td class="return-date-cell">
+                        <%= new Date(ret.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                      </td>
+                      <td>
+                        <span class="return-status-badge badge-<%= (ret.status || 'pending').toLowerCase() %>">
+                          <span class="status-dot-indicator"></span>
+                          <span><%= ret.status || 'Pending Approval' %></span>
+                        </span>
+                      </td>
+                      <td class="action-cell">
+                        <a href="/admin/returns/<%= ret.returnId %>" class="btn-review-return">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                          <span>Review</span>
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
+                  <!-- Mock Data matching Voltiq Returns Flow -->
+                  <!-- Row 1: The exact return request from the Return Request Approval page -->
+                  <tr>
+                    <td>
+                      <div class="return-id-cell">
+                        <span class="return-id-code">#RET-10492</span>
+                        <a href="/admin/orders/VQ-90214" class="related-order-link">Order #VQ-90214</a>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="customer-cell-block">
+                        <span class="customer-full-name">Rohan Agarwal</span>
+                        <span class="customer-member-id">ID: 882041</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="product-item-cell">
+                        <div class="product-cell-thumb">
+                          <img src="/images/admin/return-item-iphone.png" alt="iPhone 17 Pro Max">
+                        </div>
+                        <div class="product-cell-meta">
+                          <span class="product-name-txt">iPhone 17 Pro Max</span>
+                          <span class="product-specs-txt">Titanium Black, 256GB</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="reason-cell-block">
+                        <span class="reason-tag">Defective product</span>
+                        <span class="reason-snippet" title="Small hairline scratch on top edge of titanium frame">Small hairline scratch on top edge of titanium frame</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="refund-amount-cell">
+                        <span class="refund-val-bold">₹1,88,682</span>
+                        <span class="refund-method-sub">UPI: voltiq@axis</span>
+                      </div>
+                    </td>
+                    <td class="return-date-cell">Oct 24, 2024</td>
+                    <td>
+                      <span class="return-status-badge badge-pending">
+                        <span class="status-dot-indicator"></span>
+                        <span>Pending Approval</span>
+                      </span>
+                    </td>
+                    <td class="action-cell">
+                      <a href="/admin/return-request" class="btn-review-return">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Review</span>
+                      </a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 2 -->
+                  <tr>
+                    <td>
+                      <div class="return-id-cell">
+                        <span class="return-id-code">#RET-10491</span>
+                        <a href="/admin/orders/VQ-90213" class="related-order-link">Order #VQ-90213</a>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="customer-cell-block">
+                        <span class="customer-full-name">Sanya Malhotra</span>
+                        <span class="customer-member-id">ID: 110925</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="product-item-cell">
+                        <div class="product-cell-thumb">
+                          <img src="/images/admin/airpods-max.png" alt="AirPods Max">
+                        </div>
+                        <div class="product-cell-meta">
+                          <span class="product-name-txt">AirPods Max</span>
+                          <span class="product-specs-txt">Space Grey</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="reason-cell-block">
+                        <span class="reason-tag">Wrong item</span>
+                        <span class="reason-snippet" title="Received Space Grey instead of Silver color">Received Space Grey instead of Silver</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="refund-amount-cell">
+                        <span class="refund-val-bold">₹59,900</span>
+                        <span class="refund-method-sub">Original Card</span>
+                      </div>
+                    </td>
+                    <td class="return-date-cell">Oct 23, 2024</td>
+                    <td>
+                      <span class="return-status-badge badge-approved">
+                        <span class="status-dot-indicator"></span>
+                        <span>Approved</span>
+                      </span>
+                    </td>
+                    <td class="action-cell">
+                      <a href="/admin/return-request" class="btn-review-return">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Review</span>
+                      </a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 3 -->
+                  <tr>
+                    <td>
+                      <div class="return-id-cell">
+                        <span class="return-id-code">#RET-10490</span>
+                        <a href="/admin/orders/VQ-90208" class="related-order-link">Order #VQ-90208</a>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="customer-cell-block">
+                        <span class="customer-full-name">Vikram Khanna</span>
+                        <span class="customer-member-id">ID: 440212</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="product-item-cell">
+                        <div class="product-cell-thumb">
+                          <img src="/images/order-item-ipad.png" alt="iPad Pro M4">
+                        </div>
+                        <div class="product-cell-meta">
+                          <span class="product-name-txt">iPad Pro M4</span>
+                          <span class="product-specs-txt">Space Grey, 11-inch</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="reason-cell-block">
+                        <span class="reason-tag">Performance issue</span>
+                        <span class="reason-snippet" title="Screen flicker noticed on low brightness levels">Screen flicker on low brightness</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="refund-amount-cell">
+                        <span class="refund-val-bold">₹89,900</span>
+                        <span class="refund-method-sub">Net Banking</span>
+                      </div>
+                    </td>
+                    <td class="return-date-cell">Oct 22, 2024</td>
+                    <td>
+                      <span class="return-status-badge badge-transit">
+                        <span class="status-dot-indicator"></span>
+                        <span>In Transit</span>
+                      </span>
+                    </td>
+                    <td class="action-cell">
+                      <a href="/admin/return-request" class="btn-review-return">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Review</span>
+                      </a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 4 -->
+                  <tr>
+                    <td>
+                      <div class="return-id-cell">
+                        <span class="return-id-code">#RET-10489</span>
+                        <a href="/admin/orders/VQ-90201" class="related-order-link">Order #VQ-90201</a>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="customer-cell-block">
+                        <span class="customer-full-name">Priya Kapur</span>
+                        <span class="customer-member-id">ID: 191941</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="product-item-cell">
+                        <div class="product-cell-thumb">
+                          <img src="/images/order-item-iphone.png" alt="iPhone 17">
+                        </div>
+                        <div class="product-cell-meta">
+                          <span class="product-name-txt">iPhone 17</span>
+                          <span class="product-specs-txt">Deep Lavender, 256GB</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="reason-cell-block">
+                        <span class="reason-tag">Customer mind</span>
+                        <span class="reason-snippet" title="Seal broken, request initiated beyond 7-day policy">Seal broken, returned after 18 days</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="refund-amount-cell">
+                        <span class="refund-val-bold">₹1,24,900</span>
+                        <span class="refund-method-sub">UPI</span>
+                      </div>
+                    </td>
+                    <td class="return-date-cell">Oct 21, 2024</td>
+                    <td>
+                      <span class="return-status-badge badge-rejected">
+                        <span class="status-dot-indicator"></span>
+                        <span>Rejected</span>
+                      </span>
+                    </td>
+                    <td class="action-cell">
+                      <a href="/admin/return-request" class="btn-review-return">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Review</span>
+                      </a>
+                    </td>
+                  </tr>
+
+                  <!-- Row 5 -->
+                  <tr>
+                    <td>
+                      <div class="return-id-cell">
+                        <span class="return-id-code">#RET-10488</span>
+                        <a href="/admin/orders/VQ-90195" class="related-order-link">Order #VQ-90195</a>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="customer-cell-block">
+                        <span class="customer-full-name">Rahul Varma</span>
+                        <span class="customer-member-id">ID: 322199</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="product-item-cell">
+                        <div class="product-cell-thumb">
+                          <img src="/images/admin/iphone-17-pro-max.png" alt="MacBook Pro">
+                        </div>
+                        <div class="product-cell-meta">
+                          <span class="product-name-txt">MacBook Pro M3</span>
+                          <span class="product-specs-txt">Space Black, 512GB</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="reason-cell-block">
+                        <span class="reason-tag">Dead on arrival</span>
+                        <span class="reason-snippet" title="Device not powering on out of the box">Device not powering on</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="refund-amount-cell">
+                        <span class="refund-val-bold">₹1,99,900</span>
+                        <span class="refund-method-sub">Original Card</span>
+                      </div>
+                    </td>
+                    <td class="return-date-cell">Oct 20, 2024</td>
+                    <td>
+                      <span class="return-status-badge badge-refunded">
+                        <span class="status-dot-indicator"></span>
+                        <span>Refunded</span>
+                      </span>
+                    </td>
+                    <td class="action-cell">
+                      <a href="/admin/return-request" class="btn-review-return">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>Review</span>
+                      </a>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TABLE FOOTER & PAGINATION -->
+          <div class="table-pagination-footer">
+            <span class="pagination-info-text">
+              Showing <%= typeof pagination !== 'undefined' ? `${pagination.from}-${pagination.to} of ${pagination.total.toLocaleString()}` : '1-5 of 148' %> return requests
+            </span>
+
+            <div class="pagination-controls-row">
+              <button class="pagination-btn disabled" disabled aria-label="Previous page">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <span class="pagination-ellipsis">...</span>
+              <button class="pagination-btn">15</button>
+
+              <button class="pagination-btn" aria-label="Next page">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>

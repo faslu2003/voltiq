@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= typeof title !=='undefined' ? title : 'Order Placed Successfully · Voltiq' %>
+  </title>
+  <link rel="stylesheet" href="/css/user/order-success.css">
+</head>
+
+<body>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="/home" class="brand-logo">voltiq</a>
+
+    <nav class="main-nav">
+      <a href="/home" class="nav-link">Home</a>
+      <a href="/products" class="nav-link">Products</a>
+      <a href="/products" class="nav-link">Collections</a>
+      <a href="/support" class="nav-link">Sustainability</a>
+    </nav>
+
+    <div class="header-actions">
+      <a href="/profile" class="icon-btn" aria-label="User Account">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+
+      <a href="/wishlist" class="icon-btn" aria-label="Wishlist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+          </path>
+        </svg>
+      </a>
+
+      <a href="/cart" class="icon-btn" aria-label="Shopping Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="order-page-main">
+
+    <!-- HERO SUCCESS BADGE & TITLE -->
+    <section class="order-hero-section">
+      <div class="success-badge-circle">
+        <svg class="success-check-icon" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h1 class="order-hero-title">Order Placed Successfully!</h1>
+      <p class="order-hero-subtitle">Thank you for your purchase. Your atmospheric tech is on its way.</p>
+    </section>
+
+    <!-- TWO-COLUMN CONTENT GRID -->
+    <div class="order-content-container">
+
+      <!-- LEFT COLUMN: ORDER DETAILS & ITEMS -->
+      <div class="order-left-column">
+
+        <div class="order-items-card">
+          <!-- Order ID & Delivery Date -->
+          <div class="order-meta-header">
+            <div class="meta-group">
+              <span class="meta-label">ORDER ID</span>
+              <span class="order-id-value">
+                <%= order.orderId %>
+              </span>
+            </div>
+
+            <% if (order.estimatedDelivery) { %>
+              <div class="meta-group text-right">
+                <span class="meta-label">ESTIMATED DELIVERY</span>
+                <span class="delivery-date-value">
+                  <%= order.estimatedDelivery %>
+                </span>
+              </div>
+            <% } %>
+
+          </div>
+
+          <hr class="order-card-divider">
+
+          <h3 class="items-section-title">ITEMS ORDERED</h3>
+
+          <!-- Items List -->
+          <div class="items-list">
+            <% order.orderItems.forEach(function(item) { %>
+              <div class="order-product-row">
+                <div class="product-thumb-container">
+                  <img src="<%= item.imgUrl %>" alt="<%= item.productName %>" class="product-thumb-image">
+                </div>
+                <div class="product-info-container">
+                  <h4 class="product-name-heading">
+                    <%= item.productName %>
+                  </h4>
+                  <p class="product-variant-details">
+                    <%= `${item.color}, ${item.storage}` %>
+                  </p>
+                </div>
+                <div class="product-price-container">
+                  <span class="product-price-text">₹<%= item.orderedPrice.toLocaleString('en-IN') %></span>
+                </div>
+              </div>
+              <% }); %>
+
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="order-actions-row">
+          <a href="/orders" class="btn-pill btn-track-order">Track Order</a>
+          <a href="/home" class="btn-pill btn-continue-shopping">Continue Shopping</a>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: SHIPPING ADDRESS & ORDER SUMMARY -->
+      <div class="order-right-column">
+
+        <!-- 1. SHIPPING ADDRESS CARD -->
+        <div class="shipping-address-card">
+          <div class="shipping-header-row">
+            <svg class="shipping-truck-icon" viewBox="0 0 24 24">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span class="shipping-header-title">SHIPPING ADDRESS</span>
+          </div>
+
+          <h4 class="recipient-full-name">
+            <%= order.shippingAddress.fullName %>
+          </h4>
+          <p class="address-line-text">
+            <%= order.shippingAddress.houseName %>
+          </p>
+          <p class="address-line-text">
+            <%= order.shippingAddress.locality %>
+          </p>
+          <p class="address-line-text">
+            <%= `${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}` %>
+          </p>
+          <p class="address-phone-number">
+            <%= order.shippingAddress.phoneNumber %>
+          </p>
+        </div>
+
+        <!-- 2. ORDER SUMMARY CARD -->
+        <div class="order-summary-card">
+          <h3 class="summary-card-header">ORDER SUMMARY</h3>
+
+          <div class="summary-rows-group">
+            <!-- Subtotal -->
+            <div class="summary-calc-row">
+              <span class="calc-label">Subtotal</span>
+              <span class="calc-value">₹<%= order.subtotal.toLocaleString('en-IN') %></span>
+            </div>
+
+            <!-- Shipping -->
+            <div class="summary-calc-row">
+              <span class="calc-label">Shipping</span>
+              <span class="calc-value free-shipping">
+                <%= order.shippingCharge> 0 ? '₹' + order.shippingCharge.toLocaleString('en-IN') : 'FREE' %>
+              </span>
+            </div>
+
+            <!-- Other Charges -->
+            <% if (order.otherCharges) { %>
+              <div class="summary-calc-row">
+                <span class="calc-label">Other Charges</span>
+                <span class="calc-value">₹<%= order.otherCharges ? order.otherCharges.toLocaleString('en-IN') : '' %>
+                    </span>
+              </div>
+              <% } %>
+
+                <!-- Discount (if applicable) -->
+                <% if (order.discountAmount && order.discountAmount> 0) { %>
+                  <div class="summary-calc-row">
+                    <span class="calc-label">Discount</span>
+                    <span class="calc-value discount-val">-₹<%= order.discountAmount.toLocaleString('en-IN') %></span>
+                  </div>
+                  <% } %>
+          </div>
+
+          <hr class="summary-card-divider">
+
+          <!-- Total Row -->
+          <div class="summary-total-row">
+            <span class="total-title">Total</span>
+            <span class="total-amount-display">₹<%= order.totalPrice.toLocaleString('en-IN') %></span>
+          </div>
+        </div>
+
+        <!-- 3. NEED HELP BANNER -->
+        <div class="order-help-banner">
+          <svg class="help-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <p class="help-text-content">
+            Need help with your order? <a href="/support" class="help-support-link">Contact Support</a>
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-left">
+      <a href="/home" class="footer-logo">voltiq</a>
+    </div>
+
+    <nav class="footer-nav">
+      <a href="/support" class="footer-link">Support</a>
+      <a href="/privacy" class="footer-link">Privacy Policy</a>
+      <a href="/terms" class="footer-link">Terms of Service</a>
+      <a href="/shipping" class="footer-link">Shipping</a>
+      <a href="/returns" class="footer-link">Returns</a>
+    </nav>
+
+    <div class="footer-right">
+      <p class="footer-copyright">© 2024 voltiq. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

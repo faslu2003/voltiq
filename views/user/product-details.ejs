@@ -66,9 +66,9 @@
 
       <!-- BREADCRUMBS BAR (INCLUDED AS REQUESTED) -->
       <nav class="breadcrumb-nav" aria-label="Breadcrumb">
-        <a href="/" class="breadcrumb-link">Home</a>
+        <a href="/home" class="breadcrumb-link">Home</a>
         <span class="breadcrumb-separator">/</span>
-        <a href="/shop/smartphones" class="breadcrumb-link">Smartphones</a>
+        <a href="/products/<%= categoryId %>" class="breadcrumb-link"><%= categoryName %></a>
         <span class="breadcrumb-separator">/</span>
         <span class="breadcrumb-current">
           <%= product.name %>
@@ -88,15 +88,7 @@
           </div>
 
           <div class="thumbnails-row">
-            <div class="thumb-card active" onclick="switchMainImage('/images/avatar.jpg', this)">
-              <img src="<%= product.variants[0].imgUrls[1] %>" alt="iPhone 17 Front & Back">
-            </div>
-            <div class="thumb-card" onclick="switchMainImage('/images/avatar.jpg', this)">
-              <img src="<%= product.variants[0].imgUrls[2] %>" alt="iPhone 17 Camera Lens Close-up">
-            </div>
-            <div class="thumb-card" onclick="switchMainImage('/images/avatar.jpg', this)">
-              <img src="<%= product.variants[0].imgUrls[3] %>" alt="iPhone 17 Camera Lens Close-up">
-            </div>
+            <!-- renderGallery() in JS handles this -->
           </div>
         </div>
 
@@ -306,29 +298,22 @@
         <h2 class="section-heading-title">Complete Your Ecosystem</h2>
 
         <div class="ecosystem-grid">
-          <!-- iPad Pro M4 -->
-          <a href="/product/ipad-pro-m4" class="ecosystem-card">
-            <div class="ecosystem-thumb-box">
-              <img src="/images/avatar.jpg" alt="iPad Pro M4">
-            </div>
-            <div class="ecosystem-info">
-              <h3 class="ecosystem-title">iPad Pro M4</h3>
-              <span class="ecosystem-price">From ₹99,900</span>
-              <span class="ecosystem-link-text">Explore →</span>
-            </div>
-          </a>
 
-          <!-- Apple Watch Ultra 2 -->
-          <a href="/product/apple-watch-ultra-2" class="ecosystem-card">
-            <div class="ecosystem-thumb-box">
-              <img src="/images/avatar.jpg" alt="Apple Watch Ultra 2">
-            </div>
-            <div class="ecosystem-info">
-              <h3 class="ecosystem-title">Apple Watch Ultra 2</h3>
-              <span class="ecosystem-price">From ₹89,900</span>
-              <span class="ecosystem-link-text">Explore →</span>
-            </div>
-          </a>
+          <% ecosystemProducts.forEach((product)=> { %>
+
+            <a href="/products/details/<%= product._id %>" class="ecosystem-card">
+              <div class="ecosystem-thumb-box">
+                <img src="<%= product.variants[0].imgUrls[0] %>" alt="<%= product.name %>">
+              </div>
+              <div class="ecosystem-info">
+                <h3 class="ecosystem-title"><%= product.name %></h3>
+                <span class="ecosystem-price">₹<%= product.variants[0].price.toLocaleString('en-IN') %></span>
+                <span class="ecosystem-link-text">Explore →</span>
+              </div>
+            </a>
+
+          <% }) %>
+
         </div>
       </section>
 
@@ -362,6 +347,35 @@
     let selectedColor;
     let selectedStorage;
 
+    function renderGallery(variants) {
+      const mainCardImg = document.getElementById('mainProductImg');
+      mainCardImg.src = variants[0].imgUrls[0];
+
+      const thumbnailsRow = document.querySelector('.thumbnails-row');
+      thumbnailsRow.innerHTML = '';
+
+      variants[0].imgUrls.forEach((imgUrl, index) => {
+        const thumbnailCard = document.createElement('div');
+        thumbnailsRow.appendChild(thumbnailCard);
+        thumbnailCard.classList.add('thumb-card');
+
+        if (index === 0) {
+          thumbnailCard.classList.add('active');
+        }
+
+        const thumbnailImg = document.createElement('img');
+        thumbnailImg.src = imgUrl;
+
+        thumbnailImg.addEventListener('click', () => {
+          switchMainImage(imgUrl, thumbnailCard);
+        });
+
+        thumbnailCard.appendChild(thumbnailImg);
+      });
+    }
+
+    renderGallery(variants);
+
     function selectColor(btn) {
       selectedColor = btn.dataset.color;
       document.querySelectorAll('.color-swatch-btn').forEach(el => el.classList.remove('active'));
@@ -372,6 +386,8 @@
         return variant.color.trim().toLowerCase() === selectedColor;
       })
       console.log(selectedVariants);
+
+      renderGallery(selectedVariants);
 
       const storages = new Set();
       selectedVariants.forEach((variant) => {
@@ -386,7 +402,7 @@
         const storageButton = document.createElement('button');
 
         storageButton.classList.add('storage-btn');
-        storageButton.textContent = storage;
+        storageButton.textContent = storage.toUpperCase();
 
         if (storage === selectedStorage) {
           storageButton.classList.add('active');
@@ -454,10 +470,12 @@
 
       if (!selectedColor || !selectedStorage) {
         toast.textContent = "Please select a color and storage."
+        toast.classList.add('toast-error');
         toast.classList.add('show');
 
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-error');
         }, 3000);
 
         return;
@@ -482,16 +500,20 @@
         toast.textContent = "Added to cart";
 
         toast.classList.add('show');
+        toast.classList.add('toast-message');
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-message');
         }, 3000);
       }
       else {
         toast.textContent = data.message;
 
         toast.classList.add('show');
+        toast.classList.add('toast-error');
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-error');
         }, 3000);
       }
     }
@@ -504,10 +526,12 @@
 
       if (!selectedColor || !selectedStorage) {
         toast.textContent = "Please select a color and storage."
+        toast.classList.add('toast-error');
         toast.classList.add('show');
 
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-error');
         }, 3000);
 
         return;
@@ -527,18 +551,22 @@
 
       if (result.success) {
         toast.textContent = result.message;
+        toast.classList.add('toast-message');
         toast.classList.add('show');
 
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-message');
         }, 3000);
       }
       else {
         toast.textContent = result.message;
+        toast.classList.add('toast-error');
         toast.classList.add('show');
 
         setTimeout(() => {
           toast.classList.remove('show');
+          toast.classList.remove('toast-error');
         }, 3000);
       }
     }

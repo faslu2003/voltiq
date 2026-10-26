@@ -371,6 +371,49 @@ exports.getBrands = (req, res) => {
 
 
 
+exports.getOrders = async (req, res) => {
+
+    try {
+        const result = await adminService.getOrders();
+
+        const orders = result.orders;
+        const totalOrders = result.totalOrders;
+
+        const cardData = result.cardData;
+
+        return res.render('admin/order-management', 
+            { orders, totalOrders, cardData });
+    }
+    catch (err) {
+        console.log(err);
+
+    }
+}
+
+
+exports.getOrderDetails = async (req, res) => {
+
+    try {
+        
+    }
+    catch (err) {
+        console.log(err);
+
+    }
+}
+
+
+exports.getReturns = (req, res) => {
+
+    try {
+        return res.render('admin/return-management');
+    }
+    catch (err) {}
+}
+
+
+
+
 exports.logout = (req, res) => {
 
     req.session.destroy(() => {

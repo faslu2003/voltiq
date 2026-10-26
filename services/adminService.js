@@ -1,6 +1,7 @@
 const User = require('../src/models/User');
 const Category = require('../src/models/Category');
 const Product = require('../src/models/Product');
+const Order = require('../src/models/Order');
 
 const bcrypt = require('bcrypt');
 
@@ -759,4 +760,33 @@ exports.deleteProduct = async (id) => {
         success: true,
         message: "Product deleted successfully."
     };
+}
+
+
+
+exports.getOrders = async () => {
+
+    const orders = await Order.find();
+
+    const totalOrders = await Order.countDocuments();
+
+    const confirmedOrders = await Order.countDocuments({ orderStatus: "Confirmed" });
+    const processingOrders = await Order.countDocuments({ orderStatus: "Processing" });
+    const shippedOrders = await Order.countDocuments({ orderStatus: "Shipped" });
+    const deliveredOrders = await Order.countDocuments({ orderStatus: "Delivered" });
+    const returnedOrders = await Order.countDocuments({ orderStatus: "Returned" });
+
+    cardData = {
+        confirmedOrders,
+        processingOrders,
+        shippedOrders,
+        deliveredOrders,
+        returnedOrders
+    }
+
+    return {
+        orders,
+        totalOrders,
+        cardData
+    }
 }
