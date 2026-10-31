@@ -1,6 +1,7 @@
 const User = require('../src/models/User');
 const Category = require('../src/models/Category');
 const Product = require('../src/models/Product');
+const Order = require('../src/models/Order');
 
 const bcrypt = require('bcrypt');
 
@@ -508,9 +509,10 @@ exports.AddProducts = async (body, files) => {
     }
 }
 
-exports.toggleProductStatus = async (id) => {
 
-    const product = await Product.findById(id);
+exports.toggleVariantStatus = async (productId, variantId) => {
+
+    const product = await Product.findById(productId);
 
     if (!product) {
         return {
@@ -519,16 +521,27 @@ exports.toggleProductStatus = async (id) => {
         }
     }
 
-    product.isActive = !product.isActive;
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString() === variantId.toString();
+    });
+
+    if (!variant) {
+        return {
+            success: false,
+            message: "Variant not found."
+        }
+    }
+
+    variant.isActive = !variant.isActive;
 
     await product.save();
 
     return {
         success: true,
-        message: product.isActive
-            ? "Product activated successfully."
-            : "Product deactivated successfully.",
-        isActive: product.isActive
+        message: variant.isActive
+            ? "Variant activated successfully."
+            : "Variant deactivated successfully.",
+        isActive: variant.isActive
     };
 }
 
@@ -666,6 +679,7 @@ exports.editProduct = async (body, files) => {
             variant.storage = variantData.storage;
             variant.stock = Number(variantData.stock);
             variant.price = Number(variantData.price);
+            variant.isActive = product.isActive;
         }
         else {
             const newVariant = product.variants.create({
@@ -674,7 +688,8 @@ exports.editProduct = async (body, files) => {
                 storage: variantData.storage,
                 price: Number(variantData.price),
                 stock: Number(variantData.stock),
-                imgUrls: []
+                imgUrls: [],
+                isActive: product.isActive
             });
 
             product.variants.push(newVariant);
@@ -759,4 +774,215 @@ exports.deleteProduct = async (id) => {
         success: true,
         message: "Product deleted successfully."
     };
+}
+
+
+
+exports.getOrders = async () => {
+
+    const orders = await Order.find().sort({ createdAt: -1 });
+
+    const totalOrders = await Order.countDocuments();
+
+    const confirmedOrders = await Order.countDocuments({ orderStatus: "Confirmed" });
+    const processingOrders = await Order.countDocuments({ orderStatus: "Processing" });
+    const shippedOrders = await Order.countDocuments({ orderStatus: "Shipped" });
+    const deliveredOrders = await Order.countDocuments({ orderStatus: "Delivered" });
+
+    const returnedOrders = await Order.countDocuments({ "orderItems.returnDetails.returnStatus": { $ne: "Not Requested" } });
+
+    cardData = {
+        confirmedOrders,
+        processingOrders,
+        shippedOrders,
+        deliveredOrders,
+        returnedOrders
+    }
+
+    return {
+        orders,
+        totalOrders,
+        cardData
+    }
+}
+
+
+exports.getOrder = async (orderId) => {
+
+    const order = await Order.findOne({ orderId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    return {
+        success: true,
+        order
+    };
+}
+
+
+exports.updateOrderStatus = async (orderId, newStatus) => {
+
+    const order = await Order.findOne({ orderId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    if (!["Confirmed", "Processing", "Shipped", "Out for Delivery", "Delivered", "Cancelled"].includes(newStatus)) {
+        return {
+            success: false,
+            message: "The status update is invalid."
+        }
+    }
+
+    const allowedTransitions = {
+        Confirmed: ["Processing", "Cancelled"],
+        Processing: ["Shipped", "Cancelled"],
+        Shipped: ["Out for Delivery", "Delivered"],
+        "Out for Delivery": ["Delivered"],
+        Delivered: [],
+        Cancelled: []
+    };
+
+    const currentStatus = order.orderStatus;
+
+    const allowedNextStatuses = allowedTransitions[currentStatus];
+
+    if (!allowedNextStatuses.includes(newStatus)) {
+        return {
+            success: false,
+            message: "Invalid status transition."
+        }
+    }
+
+    if (newStatus === "Delivered") {
+        order.deliveredAt = new Date();
+    }
+
+    order.orderStatus = newStatus;
+
+    await order.save();
+
+    return {
+        success: true,
+        message: "Order status updated successfully."
+    };
+}
+
+
+exports.getReturnOrders = async () => {
+
+    const statuses = ["Requested", "Approved", "Rejected", "Picked Up", "Received", "Completed"];
+
+    const returnOrders = await Order.find({ "orderItems.returnDetails.returnStatus": { $in: statuses } }).populate("userId");
+
+    const returnItems = returnOrders.flatMap((order) => {
+        return order.orderItems.filter((orderItem) => {
+            return orderItem.returnDetails.returnStatus !== "Not Requested"
+        }).map(orderItem => ({
+            ...orderItem.toObject(),
+            orderId: order.orderId,
+            user: order.userId
+        }));
+    });
+
+    const pendingReturns = await Order.countDocuments({ "orderItems.returnDetails.returnStatus": "Pending" });
+    const pickedReturns = await Order.countDocuments({ "orderItems.returnDetails.returnStatus": "Picked Up" });
+    const completedReturns = await Order.countDocuments({ "orderItems.returnDetails.returnStatus": "Completed" });
+
+    const cardData = {
+        pendingReturns,
+        pickedReturns,
+        completedReturns
+    }
+
+    return {
+        returnItems,
+        cardData
+    };
+}
+
+
+exports.getReturnItem = async (itemId) => {
+
+    const order = await Order.findOne({ "orderItems._id": itemId }).populate("userId");
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === itemId.toString();
+    });
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found."
+        }
+    }
+
+    return {
+        success: true,
+        order,
+        orderItem
+    };
+}
+
+
+exports.updateReturnStatus = async (itemId, status) => {
+
+    if (!["Approved", "Rejected"].includes(status)) {
+        return {
+            success: false,
+            message: "Invalid return status."
+        };
+    }
+
+    const order = await Order.findOne({ "orderItems._id": itemId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === itemId.toString();
+    });
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found."
+        }
+    }
+
+    if (orderItem.returnDetails.returnStatus !== "Requested") {
+        return {
+            success: false,
+            message: "Only requests with status Requested can be approved or rejected."
+        }
+    }
+
+    orderItem.returnDetails.returnStatus = status;
+
+    await order.save();
+
+    return {
+        success: true,
+        message: `The return request has been successfully ${status}.`
+    }
 }

@@ -1,0 +1,326 @@
+<%
+  // ---- Data passed in from the controller ----
+  const currentOrder = (typeof order !== 'undefined' && order) ? order : ((typeof locals !== 'undefined' && locals.order) ? locals.order : {
+    _id: 'VQ-98214',
+    orderId: 'VQ-98214',
+    payment: { paymentMethod: 'UPI' },
+    createdAt: new Date('2024-10-14')
+  });
+
+  const item = (typeof orderItem !== 'undefined' && orderItem) ? orderItem : ((typeof locals !== 'undefined' && locals.orderItem) ? locals.orderItem : {
+    _id: 'ITEM-1',
+    productName: 'iPhone 17 Pro Max',
+    imgUrl: '/images/admin/iphone-17-pro-max.png',
+    orderedPrice: 159900,
+    quantity: 1,
+    discountAllocated: 0,
+    color: 'Titanium Black',
+    storage: '256GB'
+  });
+
+  const money = function (amount) { return '₹' + Number(amount || 0).toLocaleString('en-IN'); };
+
+  const refundAmount = (item.orderedPrice || 0) * (item.quantity || 1);
+  const pickupFee = 0;
+  const totalRefund = Math.max(0, refundAmount - (item.discountAllocated || 0));
+
+  // Cash on Delivery orders have no original payment to refund to, so only the wallet is offered
+  const isCOD = !!(currentOrder.payment && currentOrder.payment.paymentMethod === 'COD');
+
+  const orderDate = currentOrder.createdAt ? new Date(currentOrder.createdAt) : new Date('2024-10-14');
+  const purchasedOn = isNaN(orderDate.getTime()) ? 'Oct 14, 2024' : orderDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const variantLabel = [item.color, item.storage].filter(Boolean).join(' | ');
+
+  const returnReasons = ['Damaged or Defective', 'Received Incorrect Item', 'Performance Issues', 'Changed My Mind'];
+  const selectedReason = typeof returnReason !== 'undefined' && returnReason ? returnReason : 'Performance Issues';
+  const additionalDetails = typeof details !== 'undefined' && details ? details : '';
+  const selectedMethod = isCOD ? 'wallet' : ((typeof refundMethod !== 'undefined' && refundMethod) || (typeof locals !== 'undefined' && locals.refundMethod) || 'wallet');
+%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return Item · Voltiq</title>
+  <link rel="stylesheet" href="/css/user/return-item.css">
+</head>
+
+<body>
+
+  <!-- ============ TOP NAV ============ -->
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="/" class="brand">voltiq</a>
+      <nav class="main-links">
+        <a href="/home">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/support">Support</a>
+      </nav>
+      <div class="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <span>Search devices...</span>
+      </div>
+      <div class="topnav-icons">
+        <a href="/profile" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </a>
+        <a href="/wishlist" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+          </svg>
+        </a>
+        <a href="/cart" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="19" cy="21" r="1" />
+            <path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+
+    <!-- ============ BREADCRUMB ============ -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/orders">Orders</a>
+      <svg class="icon crumb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+      <a href="/orders/details/<%= currentOrder.orderId %>">#<%= currentOrder.orderId %></a>
+      <svg class="icon crumb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+      <span class="crumb-current">Return Item</span>
+    </nav>
+
+    <h1 class="page-title">Initiate Return</h1>
+
+    <% if (locals.error) { %>
+      <div class="alert alert-error" role="alert"><%= locals.error %></div>
+    <% } %>
+
+    <!--
+      The whole grid is one form so the "Initiate Return" button in the right column submits
+      the choices made in the left column.
+      Posts: itemId, reason, additionalDetails, refundMethod ("wallet" | "original")
+    -->
+    <form class="return-grid" id="returnForm" action="/orders/return/<%= item._id %>" method="POST">
+      <input type="hidden" name="orderId" value="<%= currentOrder._id %>">
+
+      <!-- ============ LEFT COLUMN ============ -->
+      <div class="left-col">
+
+        <!-- Item being returned -->
+        <section class="panel item-panel">
+          <div class="item-image-wrap">
+            <div class="item-image">
+              <img src="<%= item.imgUrl || item.productImage || item.image || '/images/admin/iphone-17-pro-max.png' %>" alt="<%= item.productName %>">
+            </div>
+          </div>
+
+          <div class="item-info">
+            <h2 class="item-name"><%= item.productName %></h2>
+            <p class="item-variant"><%= variantLabel %></p>
+            <p class="item-purchased">Purchased <%= purchasedOn %></p>
+          </div>
+
+          <div class="item-price-block">
+            <span class="item-price"><%= money(item.orderedPrice) %></span>
+            <span class="item-qty">Qty: <%= item.quantity %></span>
+          </div>
+        </section>
+
+        <!-- Step 1: reason -->
+        <section class="panel" aria-labelledby="reasonHeading">
+          <div class="section-head">
+            <span class="step-badge">1</span>
+            <h2 class="section-title" id="reasonHeading">Why are you returning this?</h2>
+          </div>
+
+          <div class="reason-list" role="radiogroup" aria-labelledby="reasonHeading">
+            <% returnReasons.forEach(function(reason){ %>
+              <label class="reason-option">
+                <input type="radio" name="reason" value="<%= reason %>" class="choice-input" required <%= reason === selectedReason ? 'checked' : '' %>>
+                <span class="radio-dot"></span>
+                <span class="reason-label"><%= reason %></span>
+              </label>
+            <% }); %>
+          </div>
+
+          <label class="field-label" for="additionalDetails">Additional Details (Optional)</label>
+          <textarea id="additionalDetails" name="additionalDetails" class="details-input" maxlength="500" placeholder="Tell us more about the issue..."><%= additionalDetails %></textarea>
+        </section>
+
+        <!-- Step 2: refund method -->
+        <section class="panel" aria-labelledby="refundHeading">
+          <div class="section-head">
+            <span class="step-badge">2</span>
+            <h2 class="section-title" id="refundHeading">How should we refund you?</h2>
+          </div>
+
+          <div class="refund-grid" role="radiogroup" aria-labelledby="refundHeading">
+
+            <!-- Voltiq Wallet -->
+            <label class="refund-option">
+              <input type="radio" name="refundMethod" value="wallet" class="choice-input" <%= selectedMethod === 'wallet' ? 'checked' : '' %>>
+              <span class="refund-card">
+                <span class="radio-dot"></span>
+                <svg class="refund-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4" />
+                  <path d="M4 6v12a2 2 0 0 0 2 2h14v-4" />
+                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                </svg>
+                <span class="refund-title"><span class="wordmark">voltiq</span> Wallet</span>
+                <span class="refund-tag accent">Instant Refund</span>
+                <span class="refund-desc">Refund will be added as store credit immediately after quality check.</span>
+              </span>
+            </label>
+
+            <!-- Original payment method -->
+            <label class="refund-option <%= isCOD ? 'is-disabled' : '' %>">
+              <input type="radio" name="refundMethod" value="original" class="choice-input" <%= selectedMethod === 'original' ? 'checked' : '' %> <%= isCOD ? 'disabled' : '' %>>
+              <span class="refund-card">
+                <span class="radio-dot"></span>
+                <svg class="refund-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="20" height="12" rx="2" />
+                  <circle cx="12" cy="12" r="2" />
+                  <path d="M6 12h.01M18 12h.01" />
+                </svg>
+                <span class="refund-title">Original Payment Method</span>
+                <span class="refund-tag">5-7 Business Days</span>
+                <span class="refund-desc">
+                  <% if (isCOD) { %>
+                    Not available for Cash on Delivery orders. Choose Voltiq Wallet instead.
+                  <% } else { %>
+                    Refund to your original payment method after the item reaches our warehouse.
+                  <% } %>
+                </span>
+              </span>
+            </label>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============ RIGHT COLUMN ============ -->
+      <aside class="right-col">
+
+        <!-- Return summary -->
+        <section class="panel summary-panel">
+          <h3 class="summary-eyebrow">RETURN SUMMARY</h3>
+
+          <div class="summary-row">
+            <span>Refund Amount</span>
+            <span class="summary-value"><%= money(refundAmount) %></span>
+          </div>
+          <div class="summary-row">
+            <span>Discount Allocated</span>
+            <span class="summary-value accent">- <%= item.discountAllocated %></span>
+          </div>
+          <div class="summary-row">
+            <span>Return Pickup Fee</span>
+            <span class="summary-value accent"><%= pickupFee > 0 ? money(pickupFee) : 'Free' %></span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <div class="total-text">
+              <span class="total-label">Total Refund</span>
+              <span class="total-note" id="refundDestination"><%= selectedMethod === 'original' ? 'Estimated to original payment method' : 'Estimated to Voltiq Wallet' %></span>
+            </div>
+            <span class="total-value"><%= money(totalRefund) %></span>
+          </div>
+
+          <button type="submit" class="btn-initiate-return" id="initiateReturnBtn">Initiate Return</button>
+
+          <p class="summary-legal">By proceeding, you agree to our <a href="/returns">Return Policy</a></p>
+        </section>
+
+        <!-- Reminder -->
+        <section class="reminder-panel">
+          <h3 class="reminder-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Important Reminder
+          </h3>
+          <p class="reminder-text">Please ensure the item is returned with all original accessories, documentation, and packaging to avoid delays in your refund processing.</p>
+        </section>
+
+      </aside>
+
+    </form>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">voltiq</a>
+      <div class="footer-links">
+        <a href="/support">Support</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/sustainability">Sustainability</a>
+      </div>
+      <span class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision.</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('returnForm');
+      var destination = document.getElementById('refundDestination');
+      var submitBtn = document.getElementById('initiateReturnBtn');
+      var methodInputs = form.querySelectorAll('input[name="refundMethod"]');
+
+      var destinationText = {
+        wallet: 'Estimated to Voltiq Wallet',
+        original: 'Estimated to original payment method'
+      };
+
+      // Keeps the "Estimated to ..." note under Total Refund in sync with the chosen refund method
+      function syncDestination() {
+        var selected = form.querySelector('input[name="refundMethod"]:checked');
+        if (selected && destinationText[selected.value]) {
+          destination.textContent = destinationText[selected.value];
+        }
+      }
+
+      Array.prototype.forEach.call(methodInputs, function (input) {
+        input.addEventListener('change', syncDestination);
+      });
+
+      // Only fires once the browser's built-in validation (reason is required) has passed
+      form.addEventListener('submit', function () {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+      });
+
+      // Restore the button if the user comes back to this page with the browser's Back button
+      window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Initiate Return';
+        }
+      });
+
+      syncDestination();
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -3,12 +3,26 @@ const Address = require('../src/models/Address');
 const Product = require('../src/models/Product');
 const Cart = require('../src/models/Cart');
 const Wishlist = require('../src/models/Wishlist');
+const Category = require('../src/models/Category');
+const Offer = require('../src/models/Offer');
+const Coupon = require('../src/models/Coupon');
+const CouponUsage = require('../src/models/CouponUsage');
+const Order = require('../src/models/Order');
 
 const addressService = require('./addressService');
 
 const bcrypt = require('bcrypt');
 const mailer = require('../utils/mailer');
 
+const crypto = require('crypto');
+const { userInfo } = require('os');
+
+
+
+exports.getUser = async (userId) => {
+
+    return await User.findById(userId);
+}
 
 
 exports.editProfile = async (body, file, session) => {
@@ -608,10 +622,23 @@ exports.getProductDetails = async (productId) => {
         }
     }
 
+    const brandId = product.brandId;
+
+    const categoryId = product.categoryId;
+    const category = await Category.findOne({ _id: categoryId });
+
+    let categoryName = '';
+    if (category) categoryName = category.categoryName;
+
+    const ecosystemProducts = await Product.find({ brandId, _id: { $ne: productId } });
+
     return {
         success: true,
-        product
-    }
+        product,
+        ecosystemProducts,
+        categoryId,
+        categoryName
+    };
 }
 
 
@@ -682,6 +709,13 @@ exports.addToWishlist = async (userId, variantId) => {
             success: false,
             message: "Variant not found."
         };
+    }
+
+    if (!variant.isActive) {
+        return {
+            sucess: false,
+            message: "This product variant is unavailable."
+        }
     }
 
     if (!variant.isActive) {
@@ -819,7 +853,7 @@ exports.addToCart = async (userId, variantId) => {
     if (!product) {
         return {
             success: false,
-            message: "Variant not found."
+            message: "Product not found."
         }
     }
 
@@ -837,7 +871,7 @@ exports.addToCart = async (userId, variantId) => {
     if (!variant) {
         return {
             success: false,
-            message: "Variant not found."
+            message: "Product variant not found."
         };
     }
 
@@ -845,7 +879,7 @@ exports.addToCart = async (userId, variantId) => {
         return {
             success: false,
             message: "This product variant is unavailable."
-        }
+        };
     }
 
     if (variant.stock === 0) {
@@ -982,4 +1016,546 @@ exports.removeCartItem = async (userId, variantId) => {
         success: true,
         message: "Item removed from cart successfully."
     };
+}
+
+
+
+exports.getCheckout = async (userId) => {
+
+    const addresses = await Address.find({ userId }).sort({ isDefault: -1 });
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "There are no items in your cart."
+        }
+    }
+
+    const items = cart.items;
+
+    let validCartItems = [];
+
+    for (let item of items) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        if (product.isActive && variant.stock >= item.quantity) {
+            validCartItems.push(item);
+        }
+    }
+
+    if (validCartItems.length === 0) {
+        return {
+            success: false,
+            message: "The item(s) in your cart is currently unavailable."
+        }
+    }
+
+    const cartItems = [];
+
+    for (let item of validCartItems) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        cartItems.push({
+            product,
+            variant,
+            quantity: item.quantity
+        });
+    }
+
+    const coupons = await Coupon.find({ isActive: true });
+    const offers = await Offer.find({ isActive: true });
+
+    return {
+        success: true,
+        addresses,
+        cartItems,
+        coupons,
+        offers
+    };
+}
+
+
+exports.validateCoupon = async (couponId, userId) => {
+
+    const coupon = await Coupon.findById(couponId);
+
+    if (!coupon) {
+        return {
+            success: false,
+            message: "The coupon is invalid or has expired."
+        }
+    }
+
+    const couponUsage = await CouponUsage.countDocuments({ couponId, userId });
+
+    if (couponUsage >= coupon.perUserLimit) {
+        return {
+            success: false,
+            message: "You have reached the usage limit for this coupon."
+        }
+    }
+
+    if (!coupon.isActive) {
+        return {
+            success: false,
+            message: "The coupon is invalid or has expired."
+        }
+    }
+
+    const currentDate = Date.now();
+
+    if (coupon.expiryDate) {
+        if (currentDate >= coupon.expiryDate.getTime()) {
+            return {
+                success: false,
+                message: "The coupon has expired."
+            }
+        }
+    }
+
+    const orderCount = await Order.countDocuments({ userId });
+
+    if (orderCount !== 0 && coupon.couponCode === "WELCOME10") {
+        return {
+            success: false,
+            message: "WELCOME10 coupon is only applicable for your first order."
+        }
+    }
+
+    return {
+        success: true,
+        coupon
+    }
+}
+
+
+exports.applyCoupon = async (coupon, userId) => {
+
+    const couponCode = coupon.couponCode;
+
+    let discountAmount = 0;
+
+    let subtotal = 0;
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "Cart not found."
+        }
+    }
+
+    const cartItems = cart.items;
+
+    for (let item of cartItems) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        subtotal += item.quantity * variant.price;
+    }
+
+    if (subtotal < coupon.minimumPurchase) {
+        let remainingPurchase = coupon.minimumPurchase - subtotal;
+        return {
+            success: false,
+            message: `Purchase for ₹${remainingPurchase.toLocaleString('en-IN')} more to avail the coupon.`
+        }
+    }
+
+    if (coupon.discountType === "percentage") {
+        discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+
+        if (coupon.maximumDiscount && discountAmount > coupon.maximumDiscount) discountAmount = coupon.maximumDiscount;
+    }
+    else {
+        discountAmount = coupon.discountValue;
+    }
+
+
+    return {
+        success: true,
+        couponCode,
+        discountAmount
+    };
+}
+
+
+exports.generateOrderId = () => {
+
+    return `VTQ-${crypto.randomUUID()
+        .replace(/-/g, '')
+        .slice(0, 12)
+        .toUpperCase()}`;
+}
+
+
+exports.validateAddress = async (addressId, userId) => {
+
+    const address = await Address.findOne({ _id: addressId, userId });
+
+    if (!address) {
+        return {
+            success: false,
+            message: "Please select a valid address."
+        }
+    }
+
+    return {
+        success: true,
+        address
+    }
+}
+
+
+exports.validateCartItems = async (userId) => {
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return {
+            success: false,
+            message: "There are no items in your cart."
+        }
+    }
+
+    let orderItems = [];
+    let subtotal = 0;
+
+    for (let item of cart.items) {
+        const product = await Product.findOne({ "variants._id": item.variantId });
+
+        if (!product) continue;
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        if (!variant) continue;
+
+        if (!product.isActive || variant.stock < item.quantity) {
+            continue;
+        }
+
+        orderItems.push({
+            productId: product._id,
+            variantId: variant._id,
+            productName: product.name,
+            color: variant.color,
+            storage: variant.storage,
+            quantity: item.quantity,
+            imgUrl: variant.imgUrls[0],
+            orderedPrice: variant.price
+        });
+
+        subtotal += variant.price * item.quantity;
+    }
+
+    if (orderItems.length === 0) {
+        return {
+            success: false,
+            message: "The items in your cart are currently unavailable."
+        }
+    }
+
+    return {
+        success: true,
+        orderItems,
+        subtotal
+    };
+}
+
+
+exports.updateStock = async (orderItems) => {
+
+    for (let item of orderItems) {
+
+        const product = await Product.findById(item.productId);
+
+        const variant = product.variants.find((variant) => {
+            return variant._id.toString() === item.variantId.toString();
+        });
+
+        variant.stock -= item.quantity;
+
+        await product.save();
+    }
+}
+
+
+exports.totalOrders = async (userId) => {
+
+    return await Order.countDocuments({ userId });
+}
+
+
+exports.getOrders = async (userId, skip, limit) => {
+
+    return await Order.find({ userId }).skip(skip).limit(limit).sort({ createdAt: -1 });
+}
+
+
+exports.getOrder = async (orderId, userId) => {
+
+    const order = await Order.findOne({ orderId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    return {
+        success: true,
+        order
+    };
+}
+
+
+exports.getOrderItem = async (orderItemId, userId) => {
+
+    const order = await Order.findOne({ "orderItems._id": orderItemId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === orderItemId.toString();
+    })
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found."
+        }
+    }
+
+    return {
+        success: true,
+        order,
+        orderItem
+    };
+}
+
+
+exports.postReturnItem = async (orderId, userId, orderItemId, reason, additionalDetails, refundMethod) => {
+
+    const order = await Order.findOne({ _id: orderId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === orderItemId.toString();
+    });
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found."
+        }
+    }
+
+    if (order.orderStatus !== "Delivered") {
+        return {
+            success: false,
+            message: "Return is not available for undelivered items."
+        }
+    }
+
+    if (orderItem.returnDetails.returnStatus !== "Not Requested") {
+        return {
+            success: false,
+            message: "A return has been already requested for the item."
+        }
+    }
+
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+    // if (Date.now > order.deliveredAt.getTime() + sevenDays) {
+    //     return {
+    //         success: false,
+    //         message: "The return window has expired."
+    //     }
+    // }
+
+    if (!['Damaged or Defective', 'Received Incorrect Item', 'Performance Issues', 'Changed My Mind'].includes(reason)) {
+        return {
+            success: false,
+            message: "The reason for return is not valid."
+        }
+    }
+
+    if (refundMethod !== "original" && refundMethod !== "wallet") {
+        return {
+            success: false,
+            message: "The selected refund method is invalid."
+        }
+    }
+
+    if (order.payment.paymentMethod === "COD" && refundMethod === "original") {
+        return {
+            success: false,
+            message: "Original payment method is not available for COD orders."
+        }
+    }
+
+    const itemPrice = orderItem.orderedPrice * orderItem.quantity;
+    const refundAmount = Number((itemPrice - orderItem.discountAllocated).toFixed(2));
+
+    orderItem.returnDetails = {
+        returnStatus: "Requested",
+        reason,
+        requestedAt: new Date(),
+        refundAmount,
+        refundStatus: "Pending",
+        refundMethod: refundMethod === "original" ? "Original Payment Method" : "VOLTIQ Wallet"
+    }
+
+    await order.save();
+
+    return {
+        success: true,
+        message: "Your return request has been submitted."
+    };
+}
+
+
+exports.getCancelItem = async (orderItemId, userId) => {
+
+    const order = await Order.findOne({ "orderItems._id": orderItemId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === orderItemId.toString();
+    });
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found"
+        }
+    }
+
+    return {
+        success: true,
+        order,
+        orderItem
+    };
+}
+
+
+exports.postCancelItem = async (orderId, userId, orderItemId, reason) => {
+
+    const order = await Order.findOne({ _id: orderId, userId });
+
+    if (!order) {
+        return {
+            success: false,
+            message: "Order not found."
+        }
+    }
+
+    const orderItem = order.orderItems.find((orderItem) => {
+        return orderItem._id.toString() === orderItemId.toString();
+    });
+
+    if (!orderItem) {
+        return {
+            success: false,
+            message: "Order item not found."
+        }
+    }
+
+    if (order.orderStatus === "Shipped" || order.orderStatus === "Delivered") {
+        return {
+            success: false,
+            message: "The order item cannot be cancelled as it is already shipped or delivered."
+        }
+    }
+
+    if (orderItem.cancellationDetails.cancelStatus !== "Not Requested") {
+        return {
+            success: false,
+            message: "Cancellation has been already requested for the item."
+        }
+    }
+
+    if (!['Ordered by Mistake', 'Found a Better Price Elsewhere', 'Delivery Is Taking Too Long', 'Want to Change Color or Storage', 'Changed My Mind'].includes(reason)) {
+        return {
+            success: false,
+            message: "The reason for cancellation is not valid."
+        }
+    }
+
+    let refundAmount = 0;
+
+    const paymentMethod = order.payment.paymentMethod;
+
+    if (paymentMethod !== "COD") {
+        const itemPrice = orderItem.orderedPrice * orderItem.quantity;
+        refundAmount = Number((itemPrice - orderItem.discountAllocated).toFixed(2));
+    }
+
+    orderItem.cancellationDetails = {
+        cancelStatus: "Approved",
+        reason,
+        requestedAt: new Date(),
+        refundAmount,
+        refundStatus: paymentMethod === "COD" ? "Not Applicable" : "Pending"
+    }
+
+    await order.save();
+
+    const product = await Product.findById(orderItem.productId);
+
+    const variant = product.variants.find((variant) => {
+        return variant._id.toString === orderItem.variantId.toString();
+    });
+
+    variant.stock += orderItem.quantity;
+
+    await product.save();
+
+    return {
+        success: true,
+        message: "Your order item is successfully cancelled."
+    }
 }

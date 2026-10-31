@@ -91,18 +91,13 @@
                     <div class="select-wrapper">
                       <select id="editProductBrandId" name="brandId" class="field-select">
                         <option value="" disabled selected>Select Brand</option>
-                        <% if (typeof brands !=='undefined' && brands.length) { %>
+
                           <% brands.forEach((brand)=> { %>
                             <option value="<%= brand._id %>">
                               <%= brand.name %>
                             </option>
-                            <% }) %>
-                              <% } else { %>
-                                <option value="Apple">Apple</option>
-                                <option value="Samsung">Samsung</option>
-                                <option value="Sony">Sony</option>
-                                <option value="Voltiq">Voltiq Original</option>
-                                <% } %>
+                          <% }) %>
+
                       </select>
                       <svg class="select-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

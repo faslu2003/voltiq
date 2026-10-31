@@ -308,8 +308,8 @@ body {
 
 .toast {
     position: fixed;
-    left: 370px;
-    bottom: 250px;
+    top: 150px;
+    left: 140px;
     padding: 14px 20px;
     min-width: 220px;
     background-color: var(--bg-card);
@@ -326,7 +326,17 @@ body {
     transition: all 0.3s ease;
     z-index: 1000;
 }
-
+/* Success toast */
+.toast.toast-message {
+  border-color: var(--purple-light);
+  border-left-color: var(--primary-purple);
+}
+/* Error toast */
+.toast.toast-error {
+  border-color: none;
+  border-left-color: #c85c5c;
+  color: rgb(176, 87, 87);
+}
 .toast.show {
     opacity: 1;
     visibility: visible;

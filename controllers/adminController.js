@@ -278,12 +278,12 @@ exports.postProducts = async (req, res) => {
 }
 
 
-exports.toggleProductStatus = async (req, res) => {
+exports.toggleVariantStatus = async (req, res) => {
 
     try {
-        const { id } = req.body;
+        const { productId, variantId } = req.body;
 
-        const result = await adminService.toggleProductStatus(id);
+        const result = await adminService.toggleVariantStatus(productId, variantId);
 
         if (!result.success) {
             return res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -307,6 +307,7 @@ exports.toggleProductStatus = async (req, res) => {
         });
     }
 }
+
 
 exports.editProduct = async (req, res) => {
 
@@ -368,6 +369,145 @@ exports.getBrands = (req, res) => {
 
     res.render('admin/brands');
 }
+
+
+
+exports.getOrders = async (req, res) => {
+
+    try {
+        const result = await adminService.getOrders();
+
+        const orders = result.orders;
+        const totalOrders = result.totalOrders;
+
+        const cardData = result.cardData;
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        return res.render('admin/order-management',
+            { orders, totalOrders, cardData, error });
+    }
+    catch (err) {
+        console.log(err);
+
+    }
+}
+
+
+exports.getOrderDetails = async (req, res) => {
+
+    try {
+        const { orderId } = req.params;
+
+        const result = await adminService.getOrder(orderId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/admin/orders');
+        }
+
+        const order = result.order;
+
+        return res.render('admin/order-details', { order });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again."
+        return res.redirect('/admin/orders');
+    }
+}
+
+
+exports.updateOrderStatus = async (req, res) => {
+
+    try {
+        const { orderId, status } = req.body;
+
+        const result = await adminService.updateOrderStatus(orderId, status);
+
+        if (!result.success) {
+            return res.status(400).json(result);
+        }
+
+        return res.status(200).json(result);
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong."
+        });
+    }
+}
+
+
+exports.getReturns = async (req, res) => {
+
+    try {
+        const result = await adminService.getReturnOrders();
+
+        const returnItems = result.returnItems;
+        const cardData = result.cardData;
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        return res.render('admin/return-management', { returnItems, cardData, error });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong."
+        return res.redirect('/admin/orders');
+    }
+}
+
+
+exports.getReturnItem = async (req, res) => {
+
+    try {
+        const { itemId } = req.params;
+
+        const result = await adminService.getReturnItem(itemId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/admin/returns');
+        }
+
+        const order = result.order;
+        const orderItem = result.orderItem;
+
+        return res.render('admin/return-request', { order, orderItem });
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
+
+exports.updateReturnStatus = async (req, res) => {
+
+    try {
+        const { itemId, status } = req.body;
+
+        const result = await adminService.updateReturnStatus(itemId, status);
+
+        if (!result.success) {
+            return res.status(STATUS_CODES.BAD_REQUEST).json(result);
+        }
+
+        return res.status(200).json(result);
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Something went wrong."
+        });
+    }
+}
+
 
 
 

@@ -314,35 +314,21 @@ nav.navlist {
 }
 
 .logout-btn {
-
   display: flex;
-
   align-items: center;
-
   gap: 8px;
-
   padding: 10px 16px;
-
   border: 1px solid #e5dada;
-
   border-radius: 10px;
-
   background: #fff;
-
   color: #dc2626;
-
   font-weight: 600;
-
   cursor: pointer;
-
   transition: .2s;
-
 }
 
 .logout-btn:hover {
-
   background: #fef2f2;
-
 }
 
 .page-head {
