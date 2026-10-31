@@ -27,6 +27,11 @@ const variantSchema = new mongoose.Schema({
     imgUrls: {
         type: [String],
         required: true
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+        required: true
     }
 });
 

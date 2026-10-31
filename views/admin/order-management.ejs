@@ -1,11 +1,118 @@
+<%
+  // 1. Safe normalization of data passed from controller or defaults
+  const allOrders = (typeof orders !== 'undefined' && Array.isArray(orders)) ? orders : [];
+  
+  const searchVal = (typeof search !== 'undefined' && search) 
+    ? String(search).trim() 
+    : ((typeof locals !== 'undefined' && locals.search) ? String(locals.search).trim() : '');
+
+  const statusVal = (typeof status !== 'undefined' && status) 
+    ? String(status).trim() 
+    : ((typeof locals !== 'undefined' && locals.status) ? String(locals.status).trim() : 'all');
+
+  const dateRangeVal = (typeof dateRange !== 'undefined' && dateRange) 
+    ? String(dateRange).trim() 
+    : ((typeof locals !== 'undefined' && locals.dateRange) ? String(locals.dateRange).trim() : 'all');
+
+  const cardDataObj = (typeof cardData !== 'undefined' && cardData) ? cardData : {
+    confirmedOrders: 0,
+    processingOrders: 0,
+    shippedOrders: 0,
+    deliveredOrders: 0,
+    returnedOrders: 0
+  };
+
+  const totalOrdersCountServer = typeof totalOrders !== 'undefined' ? Number(totalOrders) : allOrders.length;
+
+  // 2. Determine whether server already provided pagination
+  const serverHasPaginated = typeof pagination !== 'undefined' && pagination && typeof pagination.currentPage !== 'undefined';
+
+  let currentPageNum = 1;
+  let totalPagesCount = 1;
+  let totalCount = totalOrdersCountServer;
+  let fromCount = 0;
+  let toCount = 0;
+  let displayOrders = allOrders;
+
+  if (serverHasPaginated) {
+    currentPageNum = Number(pagination.currentPage) || 1;
+    totalCount = Number(pagination.total) || totalOrdersCountServer;
+    const limit = Number(pagination.limit) || 10;
+    totalPagesCount = Number(pagination.lastPage || pagination.totalPages) || Math.max(1, Math.ceil(totalCount / limit));
+    fromCount = typeof pagination.from !== 'undefined' ? Number(pagination.from) : (totalCount === 0 ? 0 : (currentPageNum - 1) * limit + 1);
+    toCount = typeof pagination.to !== 'undefined' ? Number(pagination.to) : Math.min(currentPageNum * limit, totalCount);
+    displayOrders = allOrders;
+  } else {
+    // Client-side / in-template filtering fallback if server passed unpaginated orders
+    let filtered = allOrders;
+
+    if (searchVal) {
+      const q = searchVal.toLowerCase();
+      filtered = filtered.filter(function(o) {
+        const orderIdMatch = o.orderId && o.orderId.toLowerCase().includes(q);
+        const nameMatch = o.shippingAddress && o.shippingAddress.fullName && o.shippingAddress.fullName.toLowerCase().includes(q);
+        const phoneMatch = o.shippingAddress && o.shippingAddress.phoneNumber && String(o.shippingAddress.phoneNumber).includes(q);
+        const userEmailMatch = o.user && o.user.email && o.user.email.toLowerCase().includes(q);
+        const amountMatch = o.totalPrice && String(o.totalPrice).includes(q);
+        return orderIdMatch || nameMatch || phoneMatch || userEmailMatch || amountMatch;
+      });
+    }
+
+    if (statusVal && statusVal !== 'all') {
+      filtered = filtered.filter(function(o) {
+        return (o.orderStatus || '').toLowerCase() === statusVal.toLowerCase();
+      });
+    }
+
+    if (dateRangeVal && dateRangeVal !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(function(o) {
+        const d = new Date(o.createdAt);
+        if (isNaN(d.getTime())) return true;
+        if (dateRangeVal === 'today') {
+          return d.toDateString() === now.toDateString();
+        } else if (dateRangeVal === '7days') {
+          return (now.getTime() - d.getTime()) <= (7 * 24 * 60 * 60 * 1000);
+        } else if (dateRangeVal === '30days') {
+          return (now.getTime() - d.getTime()) <= (30 * 24 * 60 * 60 * 1000);
+        } else if (dateRangeVal === 'this-month') {
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        } else if (dateRangeVal === 'this-year') {
+          return d.getFullYear() === now.getFullYear();
+        }
+        return true;
+      });
+    }
+
+    const pageSize = 10;
+    totalCount = filtered.length;
+    totalPagesCount = Math.max(1, Math.ceil(totalCount / pageSize));
+
+    let requestedPage = 1;
+    if (typeof currentPage !== 'undefined') requestedPage = Number(currentPage);
+    else if (typeof page !== 'undefined') requestedPage = Number(page);
+    else if (typeof locals !== 'undefined' && locals.page) requestedPage = Number(locals.page);
+    
+    if (isNaN(requestedPage) || requestedPage < 1) requestedPage = 1;
+    if (requestedPage > totalPagesCount && totalPagesCount > 0) requestedPage = totalPagesCount;
+    currentPageNum = requestedPage;
+
+    fromCount = totalCount === 0 ? 0 : (currentPageNum - 1) * pageSize + 1;
+    toCount = Math.min(currentPageNum * pageSize, totalCount);
+
+    displayOrders = filtered.slice(fromCount > 0 ? fromCount - 1 : 0, toCount);
+  }
+%>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Order Management · Voltiq Admin Portal' %></title>
-  <link rel="stylesheet" href="/css/admin/orders.css">
+  <title>
+    <%= typeof title !=='undefined' ? title : 'Order Management · Voltiq Admin Portal' %>
+  </title>
+  <link rel="stylesheet" href="/css/admin/order-management.css">
 </head>
 
 <body>
@@ -24,12 +131,24 @@
         </div>
       </a>
 
+      <form action="/admin/logout" method="POST">
+        <button class="logout-btn" type="submit">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </button>
+      </form>
+
       <nav class="sidebar-nav">
         <!-- Dashboard (Expandable) -->
         <div class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect>
@@ -38,7 +157,8 @@
             </span>
             <span>Dashboard</span>
           </div>
-          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
@@ -73,8 +193,11 @@
         <a href="/admin/products" class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                </path>
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                 <line x1="12" y1="22.08" x2="12" y2="12"></line>
               </svg>
@@ -87,7 +210,8 @@
         <a href="/admin/categories" class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
               </svg>
             </span>
@@ -99,7 +223,8 @@
         <div class="nav-item active">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -107,6 +232,10 @@
             </span>
             <span>Orders</span>
           </div>
+          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
 
         <!-- Orders Sub-nav (Expanded) -->
@@ -129,7 +258,8 @@
         <a href="/admin/customers" class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -144,14 +274,16 @@
         <div class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
             </span>
             <span>Promotions</span>
           </div>
-          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="nav-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
@@ -160,7 +292,8 @@
         <a href="/admin/brands" class="nav-item">
           <div class="nav-item-content">
             <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
             </span>
@@ -176,16 +309,19 @@
       <!-- TOP HEADER BAR -->
       <header class="top-header-bar">
         <div class="header-search-wrapper">
-          <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" class="header-search-input" placeholder="Search orders, customers, or SKUs..." aria-label="Search orders">
+          <input type="text" class="header-search-input" placeholder="Search orders, customers, or SKUs..."
+            aria-label="Search orders">
         </div>
 
         <div class="header-right-actions">
           <button class="header-icon-btn" aria-label="Notifications">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
@@ -193,7 +329,8 @@
           </button>
 
           <button class="header-icon-btn" aria-label="Help & Support">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
               <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -202,7 +339,8 @@
 
           <div class="user-profile-pill">
             <div class="user-avatar-circle">A</div>
-            <svg class="user-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="user-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
@@ -218,7 +356,7 @@
             <h1 class="page-main-heading">Order Management</h1>
             <p class="page-subheading-text">
               Manage your customer transactions.
-              <span class="total-orders-highlight">Total Orders: <%= totalOrders.toLocaleString() %></span>
+              <span class="total-orders-highlight">Total Orders: <%= totalCount.toLocaleString() %></span>
             </p>
           </div>
 
@@ -232,13 +370,20 @@
           </a>
         </div>
 
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <% } %>
+
         <!-- 4 METRIC STAT CARDS -->
         <div class="metric-cards-grid">
           <!-- Card 1: New Orders -->
           <div class="metric-card">
             <div class="metric-top-row">
               <div class="metric-icon-box icon-purple">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                   <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -246,17 +391,19 @@
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
               </div>
-              <!-- <span class="metric-trend-badge trend-positive">↗ 12%</span> -->
             </div>
             <span class="metric-label-text">New Orders</span>
-            <span class="metric-value-text"><%= cardData.confirmedOrders.toLocaleString() %></span>
+            <span class="metric-value-text">
+              <%= (cardDataObj.confirmedOrders || 0).toLocaleString() %>
+            </span>
           </div>
 
           <!-- Card 2: Processing -->
           <div class="metric-card">
             <div class="metric-top-row">
               <div class="metric-icon-box icon-amber">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
                   <polyline points="23 4 23 10 17 10"></polyline>
                   <polyline points="1 20 1 14 7 14"></polyline>
                   <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -264,14 +411,34 @@
               </div>
             </div>
             <span class="metric-label-text">Processing</span>
-            <span class="metric-value-text"><%= cardData.processingOrders.toLocaleString() %></span>
+            <span class="metric-value-text">
+              <%= (cardDataObj.processingOrders || 0).toLocaleString() %>
+            </span>
           </div>
 
-          <!-- Card 3: Out for Delivery -->
+          <!-- Card 3: Shipped -->
+          <div class="metric-card">
+            <div class="metric-top-row">
+              <div class="metric-icon-box icon-rose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </div>
+            </div>
+            <span class="metric-label-text">Shipped</span>
+            <span class="metric-value-text">
+              <%= (cardDataObj.shippedOrders || 0).toLocaleString() %>
+            </span>
+          </div>
+
+          <!-- Card 4: Delivered -->
           <div class="metric-card">
             <div class="metric-top-row">
               <div class="metric-icon-box icon-blue">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
                   <rect x="1" y="3" width="15" height="13"></rect>
                   <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
                   <circle cx="5.5" cy="18.5" r="2.5"></circle>
@@ -279,71 +446,72 @@
                 </svg>
               </div>
             </div>
-            <!-- <span class="metric-label-text">Out for Delivery</span> -->
-             <span class="metric-label-text">Delivered</span>
-            <span class="metric-value-text"><%= cardData.deliveredOrders.toLocaleString() %></span>
+            <span class="metric-label-text">Delivered</span>
+            <span class="metric-value-text">
+              <%= (cardDataObj.deliveredOrders || 0).toLocaleString() %>
+            </span>
           </div>
 
-          <!-- Card 4: Returns/Refunds -->
-          <div class="metric-card">
-            <div class="metric-top-row">
-              <div class="metric-icon-box icon-rose">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 4 1 10 7 10"></polyline>
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                </svg>
-              </div>
-            </div>
-            <span class="metric-label-text">Returns</span>
-            <span class="metric-value-text"><%= cardData.returnedOrders.toLocaleString() %></span>
-          </div>
         </div>
 
         <!-- FILTERS & SEARCH ROW -->
         <div class="table-filters-container">
           <div class="filters-left-group">
-            <div class="order-search-box">
-              <svg class="order-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Dynamic Search Box -->
+            <form id="orderSearchForm" class="order-search-box" onsubmit="event.preventDefault(); applyOrderFilters();">
+              <svg class="order-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" class="order-search-input" placeholder="Search Order ID..." value="<%= typeof search !== 'undefined' ? search : '' %>">
-            </div>
+              <input type="text" id="orderSearchInput" class="order-search-input" placeholder="Search by Order ID, customer, phone..."
+                value="<%= searchVal %>">
+              <% if (searchVal) { %>
+                <button type="button" class="order-search-clear" onclick="clearSearch()" aria-label="Clear search">✕</button>
+              <% } %>
+            </form>
 
-            <select class="status-dropdown-select" aria-label="Filter by order status">
-              <option value="all" <%= typeof status !== 'undefined' && status === 'all' ? 'selected' : '' %>>All Statuses</option>
-              <option value="Processing" <%= typeof status !== 'undefined' && status === 'Processing' ? 'selected' : '' %>>Processing</option>
-              <option value="Shipped" <%= typeof status !== 'undefined' && status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-              <option value="Delivered" <%= typeof status !== 'undefined' && status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-              <option value="Pending" <%= typeof status !== 'undefined' && status === 'Pending' ? 'selected' : '' %>>Pending</option>
-              <option value="Cancelled" <%= typeof status !== 'undefined' && status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+            <!-- Status Dropdown Filter -->
+            <select id="orderStatusSelect" class="status-dropdown-select" aria-label="Filter by order status" onchange="applyOrderFilters()">
+              <option value="all" <%= statusVal === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="Confirmed" <%= statusVal === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+              <option value="Processing" <%= statusVal === 'Processing' ? 'selected' : '' %>>Processing</option>
+              <option value="Shipped" <%= statusVal === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+              <option value="Out for Delivery" <%= statusVal === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+              <option value="Delivered" <%= statusVal === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+              <option value="Cancelled" <%= statusVal === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
             </select>
           </div>
 
           <div class="filters-right-group">
-            <button class="date-range-picker-btn" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Dynamic Date Range Filter -->
+            <div class="date-dropdown-wrapper">
+              <svg class="date-filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
-              <span>Date Range: Oct 20 - Oct 27</span>
-            </button>
+              <select id="orderDateSelect" class="date-dropdown-select" aria-label="Filter by date range" onchange="applyOrderFilters()">
+                <option value="all" <%= dateRangeVal === 'all' ? 'selected' : '' %>>All Time</option>
+                <option value="today" <%= dateRangeVal === 'today' ? 'selected' : '' %>>Today</option>
+                <option value="7days" <%= dateRangeVal === '7days' ? 'selected' : '' %>>Last 7 Days</option>
+                <option value="30days" <%= dateRangeVal === '30days' ? 'selected' : '' %>>Last 30 Days</option>
+                <option value="this-month" <%= dateRangeVal === 'this-month' ? 'selected' : '' %>>This Month</option>
+                <option value="this-year" <%= dateRangeVal === 'this-year' ? 'selected' : '' %>>This Year</option>
+              </select>
+            </div>
 
-            <button class="filter-sliders-btn" type="button" aria-label="Advanced Filters">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" y1="21" x2="4" y2="14"></line>
-                <line x1="4" y1="10" x2="4" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12" y2="3"></line>
-                <line x1="20" y1="21" x2="20" y2="16"></line>
-                <line x1="20" y1="12" x2="20" y2="3"></line>
-                <line x1="1" y1="14" x2="7" y2="14"></line>
-                <line x1="9" y1="8" x2="15" y2="8"></line>
-                <line x1="17" y1="16" x2="23" y2="16"></line>
-              </svg>
-            </button>
+            <!-- Reset Filters Pill -->
+            <% if (searchVal || (statusVal && statusVal !== 'all') || (dateRangeVal && dateRangeVal !== 'all')) { %>
+              <a href="/admin/orders" class="btn-reset-filters" title="Reset all filters">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                <span>Reset</span>
+              </a>
+            <% } %>
           </div>
         </div>
 
@@ -364,20 +532,36 @@
               </thead>
               <tbody>
 
-                  <% orders.forEach(function(order) { %>
+                <% if (displayOrders.length === 0) { %>
+                  <tr>
+                    <td colspan="7">
+                      <div class="empty-orders-state">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <div class="empty-orders-title">No orders found</div>
+                        <div class="empty-orders-sub">No transactions match your current search and filter selections.</div>
+                      </div>
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% displayOrders.forEach(function(order) { %>
                     <tr>
                       <td class="order-id-cell">#<%= order.orderId %></td>
                       <td>
                         <div class="customer-info-cell">
-                          <span class="customer-name"><%= order.shippingAddress.fullName %></span>
-                          <span class="customer-id">ID: <%= order.user ? (order.user._id ? order.user._id.toString().slice(-6).toUpperCase() : '') : '' %></span>
+                          <span class="customer-name"><%= order.shippingAddress ? order.shippingAddress.fullName : 'Customer' %></span>
+                          <span class="customer-id">ID: <%= order.user ? (order.user._id ? order.user._id.toString().slice(-6).toUpperCase() : '' ) : (order.userId ? (order.userId._id ? order.userId._id.toString().slice(-6).toUpperCase() : order.userId.toString().slice(-6).toUpperCase()) : '') %></span>
                         </div>
                       </td>
-                      <td class="order-date-cell"><%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></td>
-                      <td class="order-amount-cell">₹<%= order.totalPrice.toLocaleString('en-IN') %></td>
+                      <td class="order-date-cell">
+                        <%= new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short' , day: 'numeric' , year: 'numeric' }) %>
+                      </td>
+                      <td class="order-amount-cell">₹<%= Number(order.totalPrice || 0).toLocaleString('en-IN') %></td>
                       <td>
-                        <span class="status-pill-text <%= order.payment && order.payment.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending' %>">
-                          <%= order.payment.paymentStatus %>
+                        <span class="status-pill-text <%= (order.payment && order.payment.paymentStatus === 'Paid') ? 'status-paid' : 'status-pending' %>">
+                          <%= order.payment ? order.payment.paymentStatus : 'Pending' %>
                         </span>
                       </td>
                       <td>
@@ -386,7 +570,7 @@
                         </span>
                       </td>
                       <td class="action-cell">
-                        <a href="/admin/orders/<%= order.orderId %>" class="btn-view-order" aria-label="View Order Details">
+                        <a href="/admin/orders/details/<%= order.orderId %>" class="btn-view-order" aria-label="View Order Details">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -395,6 +579,7 @@
                       </td>
                     </tr>
                   <% }); %>
+                <% } %>
 
               </tbody>
             </table>
@@ -403,27 +588,70 @@
           <!-- TABLE FOOTER / PAGINATION -->
           <div class="table-pagination-footer">
             <span class="pagination-info-text">
-              Showing <%= typeof pagination !== 'undefined' ? `${pagination.from}-${pagination.to} of ${pagination.total.toLocaleString()}` : '1-10 of 42,650' %> orders
+              Showing <%= fromCount %>-<%= toCount %> of <%= totalCount.toLocaleString() %> orders
             </span>
 
             <div class="pagination-controls-row">
-              <button class="pagination-btn disabled" disabled aria-label="Previous page">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
+              <!-- Previous Button -->
+              <% if (currentPageNum > 1) { %>
+                <button type="button" class="pagination-btn" onclick="goToPage(<%= currentPageNum - 1 %>)" aria-label="Previous page">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+              <% } else { %>
+                <button type="button" class="pagination-btn disabled" disabled aria-label="Previous page">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+              <% } %>
 
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn">2</button>
-              <button class="pagination-btn">3</button>
-              <span class="pagination-ellipsis">...</span>
-              <button class="pagination-btn">428</button>
+              <!-- Dynamic Numeric Page Buttons -->
+              <%
+                let startPage = Math.max(1, currentPageNum - 2);
+                let endPage = Math.min(totalPagesCount, currentPageNum + 2);
 
-              <button class="pagination-btn" aria-label="Next page">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+                if (currentPageNum <= 3) {
+                  endPage = Math.min(totalPagesCount, 5);
+                }
+                if (currentPageNum >= totalPagesCount - 2) {
+                  startPage = Math.max(1, totalPagesCount - 4);
+                }
+              %>
+
+              <% if (startPage > 1) { %>
+                <button type="button" class="pagination-btn <%= currentPageNum === 1 ? 'active' : '' %>" onclick="goToPage(1)">1</button>
+                <% if (startPage > 2) { %>
+                  <span class="pagination-ellipsis">...</span>
+                <% } %>
+              <% } %>
+
+              <% for (let p = startPage; p <= endPage; p++) { %>
+                <button type="button" class="pagination-btn <%= p === currentPageNum ? 'active' : '' %>" onclick="goToPage(<%= p %>)"><%= p %></button>
+              <% } %>
+
+              <% if (endPage < totalPagesCount) { %>
+                <% if (endPage < totalPagesCount - 1) { %>
+                  <span class="pagination-ellipsis">...</span>
+                <% } %>
+                <button type="button" class="pagination-btn <%= currentPageNum === totalPagesCount ? 'active' : '' %>" onclick="goToPage(<%= totalPagesCount %>)"><%= totalPagesCount %></button>
+              <% } %>
+
+              <!-- Next Button -->
+              <% if (currentPageNum < totalPagesCount) { %>
+                <button type="button" class="pagination-btn" onclick="goToPage(<%= currentPageNum + 1 %>)" aria-label="Next page">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              <% } else { %>
+                <button type="button" class="pagination-btn disabled" disabled aria-label="Next page">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              <% } %>
             </div>
           </div>
         </div>
@@ -433,6 +661,69 @@
     </div>
 
   </div>
+
+  <!-- Client-side script for search, filter & pagination URL navigation -->
+  <script>
+    function applyOrderFilters() {
+      const searchInput = document.getElementById('orderSearchInput');
+      const statusSelect = document.getElementById('orderStatusSelect');
+      const dateSelect = document.getElementById('orderDateSelect');
+
+      const params = new URLSearchParams(window.location.search);
+      params.set('page', '1');
+
+      const searchVal = searchInput ? searchInput.value.trim() : '';
+      if (searchVal) {
+        params.set('search', searchVal);
+      } else {
+        params.delete('search');
+      }
+
+      const statusVal = statusSelect ? statusSelect.value : 'all';
+      if (statusVal && statusVal !== 'all') {
+        params.set('status', statusVal);
+      } else {
+        params.delete('status');
+      }
+
+      const dateVal = dateSelect ? dateSelect.value : 'all';
+      if (dateVal && dateVal !== 'all') {
+        params.set('dateRange', dateVal);
+      } else {
+        params.delete('dateRange');
+      }
+
+      window.location.href = `/admin/orders?${params.toString()}`;
+    }
+
+    function clearSearch() {
+      const searchInput = document.getElementById('orderSearchInput');
+      if (searchInput) searchInput.value = '';
+      applyOrderFilters();
+    }
+
+    function goToPage(pageNum) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('page', pageNum);
+      window.location.href = `/admin/orders?${params.toString()}`;
+    }
+
+    // Sync input values from URL search params on load if needed
+    document.addEventListener('DOMContentLoaded', function () {
+      const params = new URLSearchParams(window.location.search);
+      const urlSearch = params.get('search');
+      const urlStatus = params.get('status');
+      const urlDate = params.get('dateRange');
+
+      const searchInput = document.getElementById('orderSearchInput');
+      const statusSelect = document.getElementById('orderStatusSelect');
+      const dateSelect = document.getElementById('orderDateSelect');
+
+      if (urlSearch && searchInput && !searchInput.value) searchInput.value = urlSearch;
+      if (urlStatus && statusSelect) statusSelect.value = urlStatus;
+      if (urlDate && dateSelect) dateSelect.value = urlDate;
+    });
+  </script>
 
 </body>
 

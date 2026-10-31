@@ -1,0 +1,273 @@
+<%
+  const currentOrder = (typeof order !== 'undefined' && order) ? order : ((typeof locals !== 'undefined' && locals.order) ? locals.order : {
+    _id: 'VQ-98214',
+    orderId: 'VQ-98214',
+    payment: { paymentMethod: 'UPI' },
+    createdAt: new Date('2024-10-14')
+  });
+
+  const item = (typeof orderItem !== 'undefined' && orderItem) ? orderItem : ((typeof locals !== 'undefined' && locals.orderItem) ? locals.orderItem : {
+    _id: 'ITEM-1',
+    productName: 'iPhone 17 Pro Max',
+    imgUrl: '/images/admin/iphone-17-pro-max.png',
+    orderedPrice: 159900,
+    quantity: 1,
+    discountAllocated: 0,
+    color: 'Titanium Black',
+    storage: '256GB'
+  });
+
+  const money = function (amount) { return '₹' + Number(amount || 0).toLocaleString('en-IN'); };
+
+  const itemTotal = (item.orderedPrice || 0) * (item.quantity || 1);
+  const discount = item.discountAllocated || 0;
+  const totalRefund = Math.max(0, itemTotal - discount);
+
+  // Cash on Delivery orders have not been paid yet, so there is nothing to refund
+  const isCOD = !!(currentOrder.payment && currentOrder.payment.paymentMethod === 'COD');
+  const refundDue = isCOD ? 0 : totalRefund;
+
+  const orderDate = currentOrder.createdAt ? new Date(currentOrder.createdAt) : new Date('2024-10-14');
+  const purchasedOn = isNaN(orderDate.getTime()) ? 'Oct 14, 2024' : orderDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  const variantLabel = [item.color, item.storage].filter(Boolean).join(' | ');
+
+  const cancelReasons = [
+    'Ordered by Mistake',
+    'Found a Better Price Elsewhere',
+    'Delivery Is Taking Too Long',
+    'Want to Change Color or Storage',
+    'Changed My Mind'
+  ];
+  const selectedReason = (typeof locals !== 'undefined' && locals.reason) || '';
+%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cancel Item · Voltiq</title>
+  <link rel="stylesheet" href="/css/user/cancel-item.css">
+</head>
+
+<body>
+
+  <!-- ============ TOP NAV ============ -->
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="/" class="brand">voltiq</a>
+      <nav class="main-links">
+        <a href="/home">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/support">Support</a>
+      </nav>
+      <div class="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <span>Search devices...</span>
+      </div>
+      <div class="topnav-icons">
+        <a href="/profile" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </a>
+        <a href="/wishlist" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+          </svg>
+        </a>
+        <a href="/cart" class="icon-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="19" cy="21" r="1" />
+            <path d="M2.5 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+
+    <!-- ============ BREADCRUMB ============ -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/orders">Orders</a>
+      <svg class="icon crumb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+      <a href="/orders/details/<%= currentOrder.orderId %>">#<%= currentOrder.orderId %></a>
+      <svg class="icon crumb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+      <span class="crumb-current">Cancel Item</span>
+    </nav>
+
+    <h1 class="page-title">Cancel Item</h1>
+
+    <% if (error) { %>
+       <div class="alert alert-error">
+            <%= error %>
+        </div>
+<% } %>
+
+    <!--
+      The whole grid is one form so the "Cancel Item" button in the right column submits
+      the choices made in the left column.
+      Posts: orderId, reason
+    -->
+    <form class="cancel-grid" id="cancelForm" action="/orders/cancel/<%= item._id %>" method="POST">
+      <input type="hidden" name="orderId" value="<%= currentOrder._id %>">
+
+      <!-- ============ LEFT COLUMN ============ -->
+      <div class="left-col">
+
+        <!-- Item being cancelled -->
+        <section class="panel item-panel">
+          <div class="item-image-wrap">
+            <div class="item-image">
+              <img src="<%= item.imgUrl %>" alt="<%= item.productName %>">
+            </div>
+          </div>
+
+          <div class="item-info">
+            <h2 class="item-name"><%= item.productName %></h2>
+            <p class="item-variant"><%= variantLabel %></p>
+            <p class="item-purchased">Purchased <%= purchasedOn %></p>
+          </div>
+
+          <div class="item-price-block">
+            <span class="item-price"><%= money(item.orderedPrice) %></span>
+            <span class="item-qty">Qty: <%= item.quantity %></span>
+          </div>
+        </section>
+
+        <!-- Step 1: reason -->
+        <section class="panel" aria-labelledby="reasonHeading">
+          <div class="section-head">
+            <span class="step-badge">1</span>
+            <h2 class="section-title" id="reasonHeading">Why are you cancelling this?</h2>
+          </div>
+
+          <div class="reason-list" role="radiogroup" aria-labelledby="reasonHeading">
+            <% cancelReasons.forEach(function(reason){ %>
+              <label class="reason-option">
+                <input type="radio" name="reason" value="<%= reason %>" class="choice-input" required <%= reason === selectedReason ? 'checked' : '' %>>
+                <span class="radio-dot"></span>
+                <span class="reason-label"><%= reason %></span>
+              </label>
+            <% }); %>
+          </div>
+
+        </section>
+
+        <!-- Step 2: refund information (no choice needed, so it's shown as information only) -->
+        <section class="panel" aria-labelledby="refundHeading">
+          <div class="section-head">
+            <span class="step-badge">2</span>
+            <h2 class="section-title" id="refundHeading">Your refund</h2>
+          </div>
+
+          <div class="refund-info <%= isCOD ? 'is-cod' : '' %>">
+            <span class="refund-info-icon">
+              <% if (isCOD) { %>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="6" width="20" height="12" rx="2" />
+                  <circle cx="12" cy="12" r="2" />
+                  <path d="M6 12h.01M18 12h.01" />
+                </svg>
+              <% } else { %>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                  <polyline points="3 3 3 8 8 8" />
+                </svg>
+              <% } %>
+            </span>
+            <div class="refund-info-body">
+              <% if (isCOD) { %>
+                <h3 class="refund-info-title">No refund needed</h3>
+                <span class="refund-info-tag">Cash on Delivery</span>
+                <p class="refund-info-desc">You haven't paid for this order yet, so there's nothing to refund.</p>
+              <% } else { %>
+                <h3 class="refund-info-title">Refund to Original Payment Method</h3>
+                <span class="refund-info-tag accent">5-7 Business Days</span>
+                <p class="refund-info-desc">Your refund will be started as soon as the cancellation is processed and sent back to the payment method you used at checkout.</p>
+              <% } %>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============ RIGHT COLUMN ============ -->
+      <aside class="right-col">
+
+        <!-- Cancellation summary -->
+        <section class="panel summary-panel">
+          <h3 class="summary-eyebrow">CANCELLATION SUMMARY</h3>
+
+          <div class="summary-row">
+            <span>Item Total</span>
+            <span class="summary-value"><%= money(itemTotal) %></span>
+          </div>
+          <div class="summary-row">
+            <span>Discount Allocated</span>
+            <span class="summary-value accent">- <%= money(discount) %></span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <div class="total-text">
+              <span class="total-label">Total Refund</span>
+              <span class="total-note">
+                <%= isCOD ? 'Cash on Delivery · Nothing was charged' : 'Estimated to original payment method' %>
+              </span>
+            </div>
+            <span class="total-value"><%= money(refundDue) %></span>
+          </div>
+
+          <button type="submit" class="btn-cancel-item" id="cancelItemBtn">Cancel Item</button>
+          <a href="/orders/details/<%= currentOrder.orderId %>" class="btn-keep-item">Keep Item</a>
+
+          <p class="summary-legal">By proceeding, you agree to our <a href="/cancellations">Cancellation Policy</a></p>
+        </section>
+
+        <!-- Reminder -->
+        <section class="reminder-panel">
+          <h3 class="reminder-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Important Reminder
+          </h3>
+          <p class="reminder-text">Cancelling an item cannot be undone. If you still want it later, you'll need to place a new order at the then-current price and availability.</p>
+        </section>
+
+      </aside>
+
+    </form>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">voltiq</a>
+      <div class="footer-links">
+        <a href="/support">Support</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/sustainability">Sustainability</a>
+      </div>
+      <span class="footer-copy">© <%= new Date().getFullYear() %> voltiq. atmospheric precision.</span>
+    </div>
+  </footer>
+
+</body>
+
+</html>

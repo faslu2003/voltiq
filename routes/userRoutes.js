@@ -32,7 +32,7 @@ router.post('/resend-otp', userController.resendOtp);
 
 
 
-router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/wishlist', '/cart', '/checkout', '/order-success', '/order-placed', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
+router.use(['/home', '/profile', '/email', '/change-password', '/address', '/products', '/wishlist', '/cart', '/checkout', '/order-success', '/coupon', '/orders', '/logout'], authMiddleware.authenticateUser, authMiddleware.checkBlocked);
 
 
 
@@ -98,6 +98,13 @@ router.get('/order-success/:orderId', userController.getOrderSuccess);
 
 router.get('/orders', userController.getOrders);
 router.get('/orders/details/:orderId', userController.getOrderDetails);
+
+router.get('/orders/return/:orderItemId', userController.getReturnItem);
+router.post('/orders/return/:orderItemId', userController.postReturnItem);
+
+router.get('/orders/cancel/:orderItemId', userController.getCancelItem);
+router.post('/orders/cancel/:orderItemId', userController.postCancelItem);
+
 
 
 router.post('/logout', userController.logout);

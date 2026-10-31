@@ -62,7 +62,6 @@ const couponSchema = new mongoose.Schema({
         type: Number,
         min: 1,
         required: true,
-        default: 2
     },
     usedCount: {
         type: Number,

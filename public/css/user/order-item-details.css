@@ -179,7 +179,20 @@ ul{margin:0;padding:0;list-style:none;}
 }
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);}
 
-.item-actions{display:flex;gap:12px;}
+.item-actions{
+  display:flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap:12px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
 .btn-return{
   background:var(--violet);
   color:#fff;
@@ -228,6 +241,40 @@ ul{margin:0;padding:0;list-style:none;}
     border: 1px solid #e9e4df;
     opacity: 1;
     cursor: not-allowed;
+}
+
+.cancel-status-Not-Requested,
+.cancel-status-Requested,
+.cancel-status-Approved,
+.cancel-status-Rejected,
+.cancel-status-Cancelled {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.cancel-status-Not-Requested {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+.cancel-status-Requested {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.cancel-status-Approved {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.cancel-status-Rejected {
+    color: #b91c1c;
+    background: #fee2e2;
 }
 
 button:disabled{opacity:0.7;cursor:not-allowed;}
@@ -423,4 +470,155 @@ button:disabled{opacity:0.7;cursor:not-allowed;}
   .timeline-time {
     line-height: 1.5;
   }
+}
+
+
+/* Base badge styling */
+[class^="return-status-"]:not([class^="return-status-dot-"]) {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+/* Base status dot */
+[class^="return-status-dot-"] {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+/* Requested — Violet */
+.return-status-Requested {
+    background: #efeafd;
+    border-color: #e3dbf5;
+    color: #694CAC;
+}
+
+.return-status-dot-Requested {
+    background: #694CAC;
+}
+
+/* Approved — Green */
+.return-status-Approved {
+    background: #e7f6ec;
+    border-color: #c5e8d0;
+    color: #247a43;
+}
+
+.return-status-dot-Approved {
+    background: #247a43;
+}
+
+/* Rejected — Red */
+.return-status-Rejected {
+    background: #fdecec;
+    border-color: #f5cccc;
+    color: #b42318;
+}
+
+.return-status-dot-Rejected {
+    background: #b42318;
+}
+
+/* Cancelled — Muted gray */
+.return-status-Cancelled {
+    background: #f3f1f4;
+    border-color: #e3dfe6;
+    color: #6f6877;
+}
+
+.return-status-dot-Cancelled {
+    background: #8a8590;
+}
+
+/* Picked Up — Blue */
+.return-status-Picked.Up {
+    background: #e3eef5;
+    border-color: #c8deed;
+    color: #3d6b8f;
+}
+
+.return-status-dot-Picked.Up {
+    background: #3d6b8f;
+}
+
+/* Received — Teal */
+.return-status-Received {
+    background: #e3f5f3;
+    border-color: #c2e8e3;
+    color: #18766e;
+}
+
+.return-status-dot-Received {
+    background: #18766e;
+}
+
+/* Completed — Green */
+.return-status-Completed {
+    background: #e7f6ec;
+    border-color: #c5e8d0;
+    color: #247a43;
+}
+
+.return-status-dot-Completed {
+    background: #247a43;
+}
+
+
+.refund-details {
+  margin-top: 14px;
+  padding: 14px;
+  background: #f8f9fb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.refund-details h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.refund-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.refund-row strong {
+  color: #222;
+  font-weight: 600;
+}
+
+.refund-status {
+  font-weight: 600;
+}
+
+.refund-status-Pending {
+  color: #b7791f;
+}
+
+.refund-status-Initiated {
+  color: #2563eb;
+}
+
+.refund-status-Completed {
+  color: #15803d;
+}
+
+.refund-status-Failed {
+  color: #dc2626;
 }

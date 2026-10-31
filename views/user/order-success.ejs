@@ -124,7 +124,7 @@
 
         <!-- Action Buttons -->
         <div class="order-actions-row">
-          <a href="/orders" class="btn-pill btn-track-order">Track Order</a>
+          <a href="/orders" class="btn-pill btn-track-order">Go To Orders</a>
           <a href="/home" class="btn-pill btn-continue-shopping">Continue Shopping</a>
         </div>
 
@@ -182,10 +182,10 @@
             </div>
 
             <!-- Other Charges -->
-            <% if (order.otherCharges) { %>
+            <% if (order.codCharge) { %>
               <div class="summary-calc-row">
-                <span class="calc-label">Other Charges</span>
-                <span class="calc-value">₹<%= order.otherCharges ? order.otherCharges.toLocaleString('en-IN') : '' %>
+                <span class="calc-label">COD Charge</span>
+                <span class="calc-value">₹<%= order.codCharge %>
                     </span>
               </div>
               <% } %>

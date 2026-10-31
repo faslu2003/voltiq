@@ -10,6 +10,7 @@ const authService = require('../services/authService');
 const userService = require('../services/userService');
 
 const STATUS_CODES = require('../constants/statusCode');
+const CouponUsage = require('../src/models/CouponUsage');
 
 
 
@@ -284,8 +285,6 @@ exports.getHome = (req, res) => {
 exports.getProfile = async (req, res) => {
 
     const user = await User.findById(req.session.user.id);
-
-    console.log(user);
 
     const message = req.session.message || null;
     req.session.message = null;
@@ -921,7 +920,7 @@ exports.getCheckout = async (req, res) => {
         let appliedCouponId = req.session.appliedCouponId;
 
         if (appliedCouponId) {
-            const validationResult = await userService.validateCoupon(appliedCouponId);
+            const validationResult = await userService.validateCoupon(appliedCouponId, userId);
 
             if (!validationResult.success) {
                 req.session.appliedCouponId = null;
@@ -943,7 +942,10 @@ exports.getCheckout = async (req, res) => {
             }
         }
 
-        res.render('user/checkout', { addresses, cartItems, coupons, offers, appliedCouponId, couponCode, discountAmount });
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        res.render('user/checkout', { addresses, cartItems, coupons, offers, appliedCouponId, couponCode, discountAmount, error });
     }
     catch (err) {
         console.log(err);
@@ -958,15 +960,15 @@ exports.applyCoupon = async (req, res) => {
     try {
         const { couponId } = req.body;
 
-        const validationResult = await userService.validateCoupon(couponId);
+        const userId = req.session.user.id;
+
+        const validationResult = await userService.validateCoupon(couponId, userId);
 
         if (!validationResult.success) {
             return res.json(validationResult);
         }
 
         const coupon = validationResult.coupon;
-
-        const userId = req.session.user.id;
 
         const result = await userService.applyCoupon(coupon, userId);
 
@@ -1033,15 +1035,15 @@ exports.postCheckout = async (req, res) => {
 
         const shippingCharge = shippingMethod === "express" ? 200 : 0;
 
-        let otherCharges;
+        let codCharge;
 
-        otherCharges = paymentMethod === "COD" ? 50 : 0;
+        codCharge = paymentMethod === "COD" ? 50 : 0;
 
         let discountAmount = 0;
         const couponId = req.session.appliedCouponId;
 
         if (couponId) {
-            const couponResult = await userService.validateCoupon(couponId);
+            const couponResult = await userService.validateCoupon(couponId, userId);
 
             if (!couponResult.success) {
                 req.session.appliedCouponId = null;
@@ -1059,9 +1061,34 @@ exports.postCheckout = async (req, res) => {
             }
 
             discountAmount = discountResult.discountAmount;
+
+            let allocatedDiscount = 0;
+
+            orderItems.forEach((item, index) => {
+                const itemPrice = item.orderedPrice * item.quantity;
+
+                let itemDiscount;
+
+                if (index === orderItems.length - 1) {
+                    itemDiscount = discountAmount - allocatedDiscount;
+                } else {
+                    itemDiscount = Number(
+                        ((itemPrice / subtotal) * discountAmount).toFixed(2)
+                    );
+
+                    allocatedDiscount += itemDiscount;
+                }
+
+                item.discountAllocated = Number(itemDiscount.toFixed(2));
+            });
         }
 
-        const totalPrice = subtotal - discountAmount + shippingCharge + otherCharges;
+        const totalPrice = subtotal - discountAmount + shippingCharge + codCharge;
+
+        if (!paymentMethod) {
+            req.session.error = "Please select a payment method to continue.";
+            return res.redirect('/checkout');
+        }
 
         if (paymentMethod !== "COD") {
             req.session.error = "Online payment is not currently available.";
@@ -1074,7 +1101,7 @@ exports.postCheckout = async (req, res) => {
             orderItems,
             subtotal,
             shippingCharge,
-            otherCharges,
+            codCharge,
             discountAmount,
             totalPrice,
             shippingAddress,
@@ -1084,7 +1111,17 @@ exports.postCheckout = async (req, res) => {
             }
         });
 
+        if (discountAmount > 0) {
+            await CouponUsage.create({
+                couponId,
+                userId,
+                orderId: order._id
+            });
+        }
+
         await Cart.deleteOne({ userId });
+
+        await userService.updateStock(orderItems);
 
         req.session.appliedCouponId = null;
 
@@ -1097,7 +1134,7 @@ exports.postCheckout = async (req, res) => {
         console.log(err);
         return res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
-            message: "Unable to place your order."
+            message: "Something went wrong."
         });
     }
 }
@@ -1130,6 +1167,8 @@ exports.getOrders = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
+        const user = await userService.getUser(userId);
+
         const currentPage = Math.max(1, parseInt(req.query.page, 10) || 1);
 
         const limit = 5;
@@ -1145,6 +1184,7 @@ exports.getOrders = async (req, res) => {
         const orders = await userService.getOrders(userId, skip, limit);
 
         return res.render('user/order-history', {
+            user,
             orders,
             pagination: {
                 currentPage: page,
@@ -1182,6 +1222,113 @@ exports.getOrderDetails = async (req, res) => {
         console.log(err);
         req.session.error = "Something went wrong. Please try again."
         return res.redirect('/orders');
+    }
+}
+
+
+exports.getReturnItem = async (req, res) => {
+
+    try {
+        const { orderItemId } = req.params;
+        const userId = req.session.user.id;
+
+        const result = await userService.getOrderItem(orderItemId, userId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/orders');
+        }
+
+        const order = result.order;
+        const orderItem = result.orderItem;
+
+        return res.render('user/return-item', { order, orderItem });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again.";
+        return res.redirect('/orders');
+    }
+}
+
+
+exports.postReturnItem = async (req, res) => {
+
+    try {
+        const { reason, additionalDetails, refundMethod, orderId } = req.body;
+        const { orderItemId } = req.params;
+        const userId = req.session.user.id;
+
+        const result = await userService.postReturnItem(orderId, userId, orderItemId, reason, additionalDetails, refundMethod);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect(`/orders/return/${orderItemId}`);
+        }
+
+        req.session.message = result.message;
+        return res.redirect('/orders');
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again.";
+        const { orderItemId } = req.params;
+        return res.redirect(`/orders/return/${orderItemId}`);
+    }
+}
+
+
+exports.getCancelItem = async (req, res) => {
+
+    try {
+        const { orderItemId } = req.params;
+        const userId = req.session.user.id;
+
+        const result = await userService.getCancelItem(orderItemId, userId);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect('/orders');
+        }
+
+        const order = result.order;
+        const orderItem = result.orderItem;
+
+        const error = req.session.error || null;
+        req.session.error = null;
+
+        return res.render('user/cancel-item', { order, orderItem, error });
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again.";
+        return res.redirect('/orders');
+    }
+}
+
+
+exports.postCancelItem = async (req, res) => {
+
+    try {
+        const { orderItemId } = req.params;
+        const { orderId, reason,  } = req.body;
+        const userId = req.session.user.id;
+
+        const result = await userService.postCancelItem(orderId, userId, orderItemId, reason);
+
+        if (!result.success) {
+            req.session.error = result.message;
+            return res.redirect(`/orders/cancel/${orderItemId}`);
+        }
+
+        req.session.message = result.message;
+        return res.redirect('/orders');
+    }
+    catch (err) {
+        console.log(err);
+        req.session.error = "Something went wrong. Please try again.";
+        const { orderItemId } = req.params;
+        return res.redirect(`/orders/cancel/${orderItemId}`);
     }
 }
 

@@ -15,8 +15,8 @@
     <div class="topnav-inner">
       <a href="/" class="brand">voltiq</a>
       <nav class="main-links">
-        <a href="/">Home</a>
-        <a href="/shop">Shop</a>
+        <a href="home">Home</a>
+        <a href="/products">Shop</a>
         <a href="/support">Support</a>
       </nav>
       <div class="search">
@@ -53,6 +53,26 @@
 
     <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar">
+      <div class="profile-card">
+          <img class="profile-avatar" src="<%= user.profileImgUrl || '/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg' %>" alt="<%= user.name %>">
+          <div class="profile-text">
+            <span class="profile-name">
+              <%= user.fullName %>
+            </span>
+          </div>
+        </div>
+
+        <form action="/logout" method="POST">
+          <button type="submit" class="logout-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </form>
       <nav class="account-nav">
         <a href="/account" class="account-nav-item">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

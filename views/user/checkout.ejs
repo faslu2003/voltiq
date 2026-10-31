@@ -68,238 +68,244 @@
           <p class="checkout-subtitle">Complete your order with atmospheric precision.</p>
         </div>
 
-        <!-- STEP 1: SHIPPING INFORMATION -->
-        <section class="checkout-section-card" id="stepShippingAddress">
-          <div class="section-header">
-            <span class="section-icon">
-              <!-- Delivery Truck Icon -->
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="1" y="3" width="15" height="13"></rect>
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-              </svg>
-            </span>
-            <h2 class="section-title">1. Shipping Information</h2>
+        <% if (error) { %>
+          <div class="alert alert-error">
+            <%= error %>
           </div>
+          <% } %>
 
-          <!-- Saved Address List -->
-          <div class="address-options-list" id="addressListContainer">
+            <!-- STEP 1: SHIPPING INFORMATION -->
+            <section class="checkout-section-card" id="stepShippingAddress">
+              <div class="section-header">
+                <span class="section-icon">
+                  <!-- Delivery Truck Icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                  </svg>
+                </span>
+                <h2 class="section-title">1. Shipping Information</h2>
+              </div>
 
-              <% addresses.forEach((addr, idx)=> { %>
-                <div class="address-option-card <%= addr.isDefault ? 'selected' : '' %>"
-                  data-address-id="<%= addr._id %>" onclick="selectAddress(this)">
-                  <div class="address-card-main">
+              <!-- Saved Address List -->
+              <div class="address-options-list" id="addressListContainer">
+
+                <% addresses.forEach((addr, idx)=> { %>
+                  <div class="address-option-card <%= addr.isDefault ? 'selected' : '' %>"
+                    data-address-id="<%= addr._id %>" onclick="selectAddress(this)">
+                    <div class="address-card-main">
+                      <div class="custom-radio">
+                        <span class="custom-radio-dot"></span>
+                      </div>
+                      <div class="address-text-group">
+                        <div class="address-type-title">
+                          <span>
+                            <%= addr.addressType || 'Home' %>
+                          </span>
+                          <% if (addr.isDefault) { %>
+                            <span class="badge-default">DEFAULT</span>
+                            <% } %>
+                        </div>
+                        <span class="address-detail-text">
+                          <%= addr.houseName %>, <%= addr.locality %>, <%= addr.city %>, <%= addr.state %> - <%=
+                                    addr.pincode %>
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- EDIT OPTION FOR EACH ADDRESS -->
+                    <div class="address-card-actions" onclick="event.stopPropagation();">
+                      <a href="/address/edit/<%= addr._id %>?redirect=checkout" class="btn-edit-address"
+                        title="Edit this address">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                        </svg>
+                        Edit
+                      </a>
+                    </div>
+                  </div>
+                  <% }) %>
+
+              </div>
+
+              <!-- Add New Address Button -->
+              <a href="/address/add?redirect=checkout" class="btn-add-address-dashed">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Address
+              </a>
+            </section>
+
+            <!-- STEP 2: SHIPPING METHOD -->
+            <section class="checkout-section-card" id="stepShippingMethod">
+              <div class="section-header">
+                <span class="section-icon">
+                  <!-- Speed/Parcel Shipping Icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4"></path>
+                    <path d="m4.93 4.93 2.83 2.83"></path>
+                    <path d="M2 12h4"></path>
+                    <path d="M14 12a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"></path>
+                    <path d="m16.24 7.76 2.83-2.83"></path>
+                    <path d="M12 18v4"></path>
+                    <path d="m4.93 19.07 2.83-2.83"></path>
+                    <path d="m19.07 19.07-2.83-2.83"></path>
+                  </svg>
+                </span>
+                <h2 class="section-title">2. Shipping Method</h2>
+              </div>
+
+              <div class="shipping-options-list">
+                <!-- Standard Shipping (Free) -->
+                <div class="shipping-option-card selected" id="shipStandard" data-cost="0"
+                  onclick="selectShippingMethod(this, 0, 'Free')">
+                  <div class="shipping-card-main">
                     <div class="custom-radio">
                       <span class="custom-radio-dot"></span>
                     </div>
-                    <div class="address-text-group">
-                      <div class="address-type-title">
-                        <span>
-                          <%= addr.addressType || 'Home' %>
-                        </span>
-                        <% if (addr.isDefault) { %>
-                          <span class="badge-default">DEFAULT</span>
-                          <% } %>
-                      </div>
-                      <span class="address-detail-text">
-                        <%= addr.houseName %>, <%= addr.locality %>, <%= addr.city %>, <%= addr.state %> - <%=
-                                  addr.pincode %>
-                      </span>
+                    <div class="shipping-text-group">
+                      <span class="shipping-title">Standard Shipping</span>
+                      <span class="shipping-subtitle">3-5 business days</span>
                     </div>
                   </div>
+                  <span class="shipping-price-tag">Free</span>
+                </div>
 
-                  <!-- EDIT OPTION FOR EACH ADDRESS -->
-                  <div class="address-card-actions" onclick="event.stopPropagation();">
-                    <a href="/address/edit/<%= addr._id %>?redirect=checkout" class="btn-edit-address"
-                      title="Edit this address">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                      </svg>
-                      Edit
-                    </a>
+                <!-- Express Delivery (₹2,000) -->
+                <div class="shipping-option-card" id="shipExpress" data-cost="2000"
+                  onclick="selectShippingMethod(this, 200, '₹200')">
+                  <div class="shipping-card-main">
+                    <div class="custom-radio">
+                      <span class="custom-radio-dot"></span>
+                    </div>
+                    <div class="shipping-text-group">
+                      <span class="shipping-title">Express Delivery</span>
+                      <span class="shipping-subtitle">Next day delivery</span>
+                    </div>
                   </div>
-                </div>
-              <% }) %>
-
-          </div>
-
-          <!-- Add New Address Button -->
-          <a href="/address/add?redirect=checkout" class="btn-add-address-dashed">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Add New Address
-          </a>
-        </section>
-
-        <!-- STEP 2: SHIPPING METHOD -->
-        <section class="checkout-section-card" id="stepShippingMethod">
-          <div class="section-header">
-            <span class="section-icon">
-              <!-- Speed/Parcel Shipping Icon -->
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v4"></path>
-                <path d="m4.93 4.93 2.83 2.83"></path>
-                <path d="M2 12h4"></path>
-                <path d="M14 12a2 2 0 1 0-4 0 2 2 0 0 0 4 0Z"></path>
-                <path d="m16.24 7.76 2.83-2.83"></path>
-                <path d="M12 18v4"></path>
-                <path d="m4.93 19.07 2.83-2.83"></path>
-                <path d="m19.07 19.07-2.83-2.83"></path>
-              </svg>
-            </span>
-            <h2 class="section-title">2. Shipping Method</h2>
-          </div>
-
-          <div class="shipping-options-list">
-            <!-- Standard Shipping (Free) -->
-            <div class="shipping-option-card selected" id="shipStandard" data-cost="0"
-              onclick="selectShippingMethod(this, 0, 'Free')">
-              <div class="shipping-card-main">
-                <div class="custom-radio">
-                  <span class="custom-radio-dot"></span>
-                </div>
-                <div class="shipping-text-group">
-                  <span class="shipping-title">Standard Shipping</span>
-                  <span class="shipping-subtitle">3-5 business days</span>
+                  <span class="shipping-price-tag fee">₹200</span>
                 </div>
               </div>
-              <span class="shipping-price-tag">Free</span>
-            </div>
+            </section>
 
-            <!-- Express Delivery (₹2,000) -->
-            <div class="shipping-option-card" id="shipExpress" data-cost="2000"
-              onclick="selectShippingMethod(this, 200, '₹200')">
-              <div class="shipping-card-main">
-                <div class="custom-radio">
-                  <span class="custom-radio-dot"></span>
-                </div>
-                <div class="shipping-text-group">
-                  <span class="shipping-title">Express Delivery</span>
-                  <span class="shipping-subtitle">Next day delivery</span>
-                </div>
-              </div>
-              <span class="shipping-price-tag fee">₹200</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- STEP 3: PAYMENT METHOD -->
-        <section class="checkout-section-card" id="stepPaymentMethod">
-          <div class="section-header">
-            <span class="section-icon">
-              <!-- Payment Card Icon -->
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                <line x1="2" y1="10" x2="22" y2="10"></line>
-              </svg>
-            </span>
-            <h2 class="section-title">3. Payment Method</h2>
-          </div>
-
-          <!-- 4 Payment Pills Grid (UPI, Net Banking, COD, Wallet) -->
-          <div class="payment-methods-grid">
-            <div class="payment-method-pill" data-method="upi" onclick="selectPaymentPill(this)">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-              <span>UPI</span>
-            </div>
-
-            <div class="payment-method-pill" data-method="netbanking" onclick="selectPaymentPill(this)">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="3 8 12 3 21 8"></polygon>
-                <line x1="5" y1="8" x2="5" y2="19"></line>
-                <line x1="10" y1="8" x2="10" y2="19"></line>
-                <line x1="14" y1="8" x2="14" y2="19"></line>
-                <line x1="19" y1="8" x2="19" y2="19"></line>
-                <line x1="2" y1="19" x2="22" y2="19"></line>
-              </svg>
-              <span>Net Banking</span>
-            </div>
-
-            <div class="payment-method-pill" data-method="cod" onclick="selectPaymentPill(this)">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                <circle cx="12" cy="12" r="2"></circle>
-                <path d="M6 12h.01M18 12h.01"></path>
-              </svg>
-              <span>Cash on Delivery (COD)</span>
-            </div>
-
-            <div class="payment-method-pill" data-method="wallet" onclick="selectPaymentPill(this)">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
-                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
-                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
-              </svg>
-              <span>Wallet</span>
-            </div>
-          </div>
-
-          <!-- Divider: OR PAY VIA CARD -->
-          <div class="payment-divider">
-            <span class="payment-divider-text">OR PAY VIA CARD</span>
-          </div>
-
-          <!-- Card Form Inputs -->
-          <div class="card-details-group" id="cardDetailsGroup">
-            <!-- Card Number -->
-            <div class="form-group-item">
-              <label for="cardNumber" class="form-field-label">Card Number</label>
-              <div class="input-with-icon">
-                <span class="input-icon-left">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <!-- STEP 3: PAYMENT METHOD -->
+            <section class="checkout-section-card" id="stepPaymentMethod">
+              <div class="section-header">
+                <span class="section-icon">
+                  <!-- Payment Card Icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="5" width="20" height="14" rx="2"></rect>
                     <line x1="2" y1="10" x2="22" y2="10"></line>
                   </svg>
                 </span>
-                <input type="text" id="cardNumber" class="checkout-input has-icon" placeholder="0000 0000 0000 0000"
-                  maxlength="19" oninput="formatCardNumber(this)">
+                <h2 class="section-title">3. Payment Method</h2>
               </div>
-            </div>
 
-            <!-- Expiry & CVV 2-Column Row -->
-            <div class="card-split-row">
-              <div class="form-group-item">
-                <label for="cardExpiry" class="form-field-label">Expiry Date</label>
-                <input type="text" id="cardExpiry" class="checkout-input" placeholder="MM / YY" maxlength="7"
-                  oninput="formatExpiry(this)">
-              </div>
-              <div class="form-group-item">
-                <label for="cardCvv" class="form-field-label">CVV</label>
-                <input type="password" id="cardCvv" class="checkout-input" placeholder="123" maxlength="4">
-              </div>
-            </div>
-          </div>
+              <!-- 4 Payment Pills Grid (UPI, Net Banking, COD, Wallet) -->
+              <div class="payment-methods-grid">
+                <div class="payment-method-pill" data-method="upi" onclick="selectPaymentPill(this)">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>UPI</span>
+                </div>
 
-          <!-- Notice when non-card payment pill is active -->
-          <div class="alt-payment-notice hidden" id="altPaymentNotice">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <span id="altPaymentNoticeText">You will be securely redirected to complete your payment upon
-              checkout.</span>
-          </div>
-        </section>
+                <div class="payment-method-pill" data-method="netbanking" onclick="selectPaymentPill(this)">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="3 8 12 3 21 8"></polygon>
+                    <line x1="5" y1="8" x2="5" y2="19"></line>
+                    <line x1="10" y1="8" x2="10" y2="19"></line>
+                    <line x1="14" y1="8" x2="14" y2="19"></line>
+                    <line x1="19" y1="8" x2="19" y2="19"></line>
+                    <line x1="2" y1="19" x2="22" y2="19"></line>
+                  </svg>
+                  <span>Net Banking</span>
+                </div>
+
+                <div class="payment-method-pill" data-method="cod" onclick="selectPaymentPill(this)">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    <path d="M6 12h.01M18 12h.01"></path>
+                  </svg>
+                  <span>Cash on Delivery (COD)</span>
+                </div>
+
+                <div class="payment-method-pill" data-method="wallet" onclick="selectPaymentPill(this)">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                  </svg>
+                  <span>Wallet</span>
+                </div>
+              </div>
+
+              <!-- Divider: OR PAY VIA CARD -->
+              <div class="payment-divider">
+                <span class="payment-divider-text">OR PAY VIA CARD</span>
+              </div>
+
+              <!-- Card Form Inputs -->
+              <div class="card-details-group" id="cardDetailsGroup">
+                <!-- Card Number -->
+                <div class="form-group-item">
+                  <label for="cardNumber" class="form-field-label">Card Number</label>
+                  <div class="input-with-icon">
+                    <span class="input-icon-left">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                      </svg>
+                    </span>
+                    <input type="text" id="cardNumber" class="checkout-input has-icon" placeholder="0000 0000 0000 0000"
+                      maxlength="19" oninput="formatCardNumber(this)">
+                  </div>
+                </div>
+
+                <!-- Expiry & CVV 2-Column Row -->
+                <div class="card-split-row">
+                  <div class="form-group-item">
+                    <label for="cardExpiry" class="form-field-label">Expiry Date</label>
+                    <input type="text" id="cardExpiry" class="checkout-input" placeholder="MM / YY" maxlength="7"
+                      oninput="formatExpiry(this)">
+                  </div>
+                  <div class="form-group-item">
+                    <label for="cardCvv" class="form-field-label">CVV</label>
+                    <input type="password" id="cardCvv" class="checkout-input" placeholder="123" maxlength="4">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notice when non-card payment pill is active -->
+              <div class="alt-payment-notice hidden" id="altPaymentNotice">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span id="altPaymentNoticeText">You will be securely redirected to complete your payment upon
+                  checkout.</span>
+              </div>
+            </section>
 
       </div>
 
@@ -397,89 +403,90 @@
               <span class="calc-val discount-val" id="summaryDiscountText">-₹0</span>
             </div>
 
-          <!-- Total Row -->
-          <div class="summary-total-row">
-            <span class="total-label">Total</span>
-            <span class="total-amount-val" id="summaryTotalText">
-              ₹<%= typeof total !=='undefined' ? total.toLocaleString('en-IN') : '2,47,564' %>
-            </span>
-          </div>
+            <!-- Total Row -->
+            <div class="summary-total-row">
+              <span class="total-label">Total</span>
+              <span class="total-amount-val" id="summaryTotalText">
+                ₹<%= typeof total !=='undefined' ? total.toLocaleString('en-IN') : '2,47,564' %>
+              </span>
+            </div>
 
-          <!-- Complete Purchase Button -->
-          <button type="button" class="btn-complete-purchase" id="btnCompletePurchase"
-            onclick="handleCompletePurchase()">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <span>Complete Purchase</span>
-          </button>
-
-          <!-- SSL Encryption Subtext -->
-          <div class="secure-ssl-subtext">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <span>Secure SSL Encryption</span>
-          </div>
-        </div>
-
-        <!-- AVAILABLE COUPONS CARD (Click opens Coupon Modal) -->
-        <div class="action-info-card" id="cardAvailableCoupons" onclick="openCouponModal()">
-          <div class="info-card-left">
-            <div class="info-card-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <!-- Complete Purchase Button -->
+            <button type="button" class="btn-complete-purchase" id="btnCompletePurchase"
+              onclick="handleCompletePurchase()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                 stroke-linecap="round" stroke-linejoin="round">
-                <path
-                  d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z">
-                </path>
-                <path d="M13 5v2"></path>
-                <path d="M13 17v2"></path>
-                <path d="M13 11v2"></path>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Complete Purchase</span>
+            </button>
+
+            <!-- SSL Encryption Subtext -->
+            <div class="secure-ssl-subtext">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Secure SSL Encryption</span>
+            </div>
+          </div>
+
+          <!-- AVAILABLE COUPONS CARD (Click opens Coupon Modal) -->
+          <div class="action-info-card" id="cardAvailableCoupons" onclick="openCouponModal()">
+            <div class="info-card-left">
+              <div class="info-card-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z">
+                  </path>
+                  <path d="M13 5v2"></path>
+                  <path d="M13 17v2"></path>
+                  <path d="M13 11v2"></path>
+                </svg>
+              </div>
+              <div class="info-card-text">
+                <span class="info-card-title">Available Coupons</span>
+                <span class="info-card-sub" id="couponCardSub">
+                  <%= coupons.length %> Coupons available
+                </span>
+              </div>
+            </div>
+            <div class="info-card-right">
+              <span id="couponCardRightText">View All</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-            <div class="info-card-text">
-              <span class="info-card-title">Available Coupons</span>
-              <span class="info-card-sub" id="couponCardSub"><%= coupons.length %> Coupons available</span>
-            </div>
           </div>
-          <div class="info-card-right">
-            <span id="couponCardRightText">View All</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </div>
 
-        <!-- AVAILABLE OFFERS CARD (Click opens Offers Modal) -->
-        <div class="action-info-card" id="cardAvailableOffers" onclick="openOffersModal()">
-          <div class="info-card-left">
-            <div class="info-card-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <!-- AVAILABLE OFFERS CARD (Click opens Offers Modal) -->
+          <!-- <div class="action-info-card" id="cardAvailableOffers" onclick="openOffersModal()">
+            <div class="info-card-left">
+              <div class="info-card-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="m19 14 1.41-1.41a2 2 0 0 0 0-2.83l-6.17-6.17A2 2 0 0 0 12.83 3H5a2 2 0 0 0-2 2v7.83a2 2 0 0 0 .59 1.41l6.17 6.17a2 2 0 0 0 2.83 0L14 19">
+                  </path>
+                  <circle cx="8" cy="8" r="1.5"></circle>
+                </svg>
+              </div>
+              <div class="info-card-text">
+                <span class="info-card-title">Available Offers</span>
+              </div>
+            </div>
+            <div class="info-card-right">
+              <span>View All</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
-                <path
-                  d="m19 14 1.41-1.41a2 2 0 0 0 0-2.83l-6.17-6.17A2 2 0 0 0 12.83 3H5a2 2 0 0 0-2 2v7.83a2 2 0 0 0 .59 1.41l6.17 6.17a2 2 0 0 0 2.83 0L14 19">
-                </path>
-                <circle cx="8" cy="8" r="1.5"></circle>
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-            <div class="info-card-text">
-              <span class="info-card-title">Available Offers</span>
-              <!-- <span class="info-card-sub">Bank & Card Offers</span> -->
-            </div>
-          </div>
-          <div class="info-card-right">
-            <span>View All</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </div>
+          </div> -->
 
       </aside>
 
@@ -616,7 +623,7 @@
         code,
         discountAmount
       },
-      selectedPaymentMethod: 'card' // 'card', 'upi', 'netbanking', 'cod', 'wallet'
+      selectedPaymentMethod: null // 'card', 'upi', 'netbanking', 'cod', 'wallet'
     };
 
     let couponId = null;
@@ -926,6 +933,23 @@
       }
 
       const btn = document.getElementById('btnCompletePurchase');
+      const originalButtonHTML = btn.innerHTML;
+
+      const addressId = selectedAddr.dataset.addressId;
+
+      if (!checkoutState.selectedPaymentMethod) {
+        showToast('Please select a payment method.', 'error');
+        return;
+      }
+
+      if (checkoutState.selectedPaymentMethod !== 'cod') {
+        showToast('Only Cash on Delivery is currently available.', 'error');
+        return;
+      }
+
+      const shippingMethod = checkoutState.shippingCost === 200 ? "express" : "standard";
+      const paymentMethod = checkoutState.selectedPaymentMethod === "cod" ? "COD" : null;
+
       btn.disabled = true;
       btn.innerHTML = `
         <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -935,30 +959,34 @@
         <span>Processing Order...</span>
       `;
 
-      const addressId = selectedAddr.dataset.addressId;
+      try {
+        const response = await fetch('/checkout/place-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            addressId,
+            shippingMethod,
+            paymentMethod
+          })
+        });
 
-      const shippingMethod = checkoutState.shippingCost === 200 ? "express" : "standard";
-      const paymentMethod = checkoutState.selectedPaymentMethod === "cod" ? "COD" : "Razorpay";
+        const result = await response.json();
 
-      const response = await fetch('/checkout/place-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          addressId,
-          shippingMethod,
-          paymentMethod
-        })
-      });
+        if (!response.ok || !result.success) {
+          showToast(result.message || "Unable to place your order.", 'error');
+          return;
+        }
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message);
+        window.location.href = result.redirectUrl;
       }
-
-      window.location.href = result.redirectUrl;
+      catch (err) {
+        console.log(err);
+        showToast("Something went wrong. Please try again.", 'error');
+        btn.disabled = false;
+        btn.innerHTML = originalButtonHTML;
+      }
     }
 
     // Initialize on DOM load

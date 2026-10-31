@@ -28,8 +28,9 @@ router.patch('/categories/toggle-status', adminController.toggleCategoryStatus);
 
 router.get('/products', adminController.getProducts);
 router.post('/products', upload.any(), adminController.postProducts);
-router.patch('/products/toggle-status', adminController.toggleProductStatus);
+router.patch('/products/variant/toggle-status', adminController.toggleVariantStatus);
 router.patch('/products/edit', upload.any(), adminController.editProduct);
+router.delete('/products/delete', adminController.deleteProduct);
 
 
 router.get('/brands', adminController.getBrands);
@@ -38,7 +39,12 @@ router.get('/brands', adminController.getBrands);
 router.get('/orders', adminController.getOrders);
 router.get('/orders/details/:orderId', adminController.getOrderDetails);
 
+router.patch('/orders/update-status', adminController.updateOrderStatus);
+
 router.get('/returns', adminController.getReturns);
+router.get('/returns/:itemId', adminController.getReturnItem);
+router.patch('/returns/update-status', adminController.updateReturnStatus);
+
 
 
 router.post('/logout', adminController.logout);

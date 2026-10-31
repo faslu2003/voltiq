@@ -14,10 +14,8 @@ const couponUsageSchema = new mongoose.Schema({
     },
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
         required: true
-    },
-    usedAt: {
-        type: Date
     }
 },
 {

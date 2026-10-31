@@ -4,9 +4,38 @@ const mongoose = require('mongoose');
 const returnSchema = new mongoose.Schema({
     returnStatus: {
         type: String,
-        enum: ["Not Requested", "Requested", "Approved", "Rejected", "Picked Up", "Received", "Completed"],
-        default: "Not Requested",
-        required: true
+        enum: ["Not Requested", "Requested", "Cancelled", "Approved", "Rejected", "Picked Up", "Received", "Completed"],
+        default: "Not Requested"
+    },
+    reason: {
+        type: String
+    },
+    additionalDetails: {
+        type: String
+    },
+    requestedAt: {
+        type: Date
+    },
+    refundAmount: {
+        type: Number,
+        min: 0
+    },
+    refundStatus: {
+        type: String,
+        enum: ["Pending", "Initiated", "Completed", "Failed"]
+    },
+    refundMethod: {
+        type: String,
+        enum: ["Original Payment Method", "VOLTIQ Wallet"]
+    }
+});
+
+
+const cancelSchema = new mongoose.Schema({
+    cancelStatus: {
+        type: String,
+        enum: ["Not Requested", "Approved"],
+        default: "Not Requested"
     },
     reason: {
         type: String
@@ -20,10 +49,10 @@ const returnSchema = new mongoose.Schema({
     },
     refundStatus: {
         type: String,
-        enum: ["Pending", "Initiated", "Completed", "Failed"],
-        default: "Pending"
+        enum: ["Not Applicable", "Pending", "Initiated", "Completed", "Failed"]
     }
-});
+})
+
 
 const orderItemsSchema = new mongoose.Schema({
     productId: {
@@ -61,11 +90,21 @@ const orderItemsSchema = new mongoose.Schema({
         min: 0,
         required: true
     },
+    discountAllocated: {
+        type: Number,
+        min: 0,
+        default: 0
+    },
     returnDetails: {
         type: returnSchema,
         default: () => ({})
+    },
+    cancellationDetails: {
+        type: cancelSchema,
+        default: () => ({})
     }
 });
+
 
 const shippingAddressSchema = new mongoose.Schema({
     fullName: {
@@ -105,6 +144,7 @@ const shippingAddressSchema = new mongoose.Schema({
     }
 });
 
+
 const paymentSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
@@ -113,9 +153,9 @@ const paymentSchema = new mongoose.Schema({
     },
     transactionId: {
         type: String,
-        required: function() {
+        required: function () {
             return this.paymentMethod === "Razorpay"
-            && this.paymentStatus === "Paid";
+                && this.paymentStatus === "Paid";
         }
     },
     paymentStatus: {
@@ -124,6 +164,7 @@ const paymentSchema = new mongoose.Schema({
         required: true
     }
 })
+
 
 
 const orderSchema = new mongoose.Schema({
@@ -149,7 +190,7 @@ const orderSchema = new mongoose.Schema({
     shippingCharge: {
         type: Number
     },
-    otherCharges: {
+    codCharge: {
         type: Number
     },
     discountAmount: {
@@ -171,20 +212,32 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ["Confirmed", "Processing", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Returned"],
+        enum: ["Confirmed", "Processing", "Shipped", "Out for Delivery", "Delivered"],
         default: "Confirmed",
         required: true
     },
+    statusHistory: [{
+        status: String,
+        updatedAt: Date
+    }],
     estimatedDelivery: {
         type: Date
+    },
+    deliveredAt: {
+        type: Date,
+        required: function () {
+            return this.orderStatus === "Delivered"
+        }
     }
-}, 
-{
-    timestamps: true
-});
+},
+    {
+        timestamps: true
+    });
+
 
 
 const Order = mongoose.model('order', orderSchema);
+
 
 
 module.exports = Order;

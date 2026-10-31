@@ -29,10 +29,10 @@ app.use(session({
 }));
 
 
-// app.use(methodOverride('_method'));
-app.use(methodOverride((req) => {
-    return req.body?._method;
-}));
+app.use(methodOverride('_method'));
+// app.use(methodOverride((req) => {
+//     return req.body?._method;
+// }));
 
 
 const adminRoutes = require('../routes/adminRoutes');
