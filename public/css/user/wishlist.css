@@ -552,3 +552,17 @@ body {
   visibility: visible;
   transform: translateY(0);
 }
+
+.unavailable-badge {
+  position: absolute;
+  top: 100px;
+  left: 60px;
+  color: #dc5252;
+  padding: 6px 10px;
+  background: #ece9e9;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}

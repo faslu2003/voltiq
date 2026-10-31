@@ -69,7 +69,11 @@
       <!-- Card -->
       <div class="wishlist-card">
         <div class="card-image-box">
-          <span class="stock-badge"><%= item.variant.stock === 0 ? 'Out of Stock' : 'In Stock' %></span>
+          <% if (item.variant.isActive) { %>
+            <span class="stock-badge"><%= item.variant.stock === 0 ? 'Out of Stock' : 'In Stock' %></span>
+          <% } else { %>
+            <span class="unavailable-badge">Unavailable</span>
+          <% } %>
           <img src="<%= item.variant.imgUrls[0] %>" alt="<%= item.product.name %>" class="card-image">
         </div>
         <div class="card-body">

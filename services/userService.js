@@ -684,6 +684,13 @@ exports.addToWishlist = async (userId, variantId) => {
         };
     }
 
+    if (!variant.isActive) {
+        return {
+            success: false,
+            message: "This product variant is unavailable."
+        }
+    }
+
     if (variant.stock === 0) {
         return {
             success: false,
@@ -826,6 +833,20 @@ exports.addToCart = async (userId, variantId) => {
     const variant = product.variants.find((variant) => {
         return variant._id.toString() === variantId;
     });
+
+    if (!variant) {
+        return {
+            success: false,
+            message: "Variant not found."
+        };
+    }
+
+    if (!variant.isActive) {
+        return {
+            success: false,
+            message: "This product variant is unavailable."
+        }
+    }
 
     if (variant.stock === 0) {
         return {
